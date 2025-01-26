@@ -15,8 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from yueLearningApp.views import index  # Importa la vista principal
 
 urlpatterns = [
+    path("", index, name="index"),  # Ruta para la raíz
+    path("yueLearningApp/", include("yueLearningApp.urls")),
     path('admin/', admin.site.urls),
 ]
