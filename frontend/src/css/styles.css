@@ -1,0 +1,40 @@
+/* Cambiar fuente del header */
+.header {
+    font-family: "Arial", sans-serif; /* Cambia por la fuente que desees */
+    font-size: 18px;
+}
+
+/* Logo */
+.logo {
+    width: 50px;
+    height: 50px;
+}
+
+/* Título de la aplicación */
+.app-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* Contenedor de la barra de búsqueda */
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+/* Estilo de la barra de búsqueda */
+.search-bar {
+    width: 500px; /* Ancho ajustado */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Imagen de perfil */
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
