@@ -1,5 +1,7 @@
 import React from "react";
 import "@fontsource/roboto";
+import logo from "../Img/logo.JPG"
+import defaultLogo from "../Img/default-profile.png"
 
 const Header = () => {
     return (
@@ -13,8 +15,8 @@ const Header = () => {
             }}
         >
             <div className="d-flex align-items-center">
-                <img src="logo.png" alt="Logo" style={{ width: 50, height: 50 }} />
-                <h1 className="mx-3 mb-0" style={{ fontSize: "1.5rem" }}>
+                <img src={logo} alt="Logo" style={{ width: 50, height: 50,borderRadius: "50%" }} />
+                <h1 className="mx-3 mb-0" style={{ fontSize: "2rem", fontFamily: "Roboto, sans-serif", fontWeight: "bold" }}>
                     YUE-Learning C
                 </h1>
             </div>
@@ -27,6 +29,7 @@ const Header = () => {
                         width: "400px",
                         marginRight: "15px",
                         fontFamily: "Roboto, sans-serif",
+                        fontWeight: "600",
                     }}
                 />
                 <button
@@ -37,7 +40,7 @@ const Header = () => {
                     }}
                 >
                     <img
-                        src="default-profile.png"
+                        src={defaultLogo}
                         alt="Perfil"
                         style={{
                             width: 40,
