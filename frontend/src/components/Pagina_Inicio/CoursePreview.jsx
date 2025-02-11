@@ -1,6 +1,6 @@
 import React from "react";
 import "@fontsource/roboto";
-import cursoImagen from "../Img/curso.JPG"
+import cursoImagen from "../../Img/curso.JPG"
 
 const CoursePreview = () => {
     // Simulación de datos (se sustituirá por datos de la base de datos en el futuro)

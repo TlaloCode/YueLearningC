@@ -1,12 +1,11 @@
 import React from "react";
 import "@fontsource/roboto";
-import escom from "../Img/ESCOM.jpeg"
+import escom from "../../Img/ESCOM.jpeg"
 
 const MainContent = () => {
     return (
         <div
             style={{
-
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 height: "600px",

@@ -1,6 +1,6 @@
 import React from "react";
 import "@fontsource/roboto";
-import creadores from "../Img/creadores.png"
+import creadores from "../../Img/creadores.png"
 
 const AboutUs = () => {
     return (
@@ -28,8 +28,8 @@ const AboutUs = () => {
                         src={creadores}
                         alt="Creadores de la plataforma"
                         style={{
-                            width: "100%",
-                            maxWidth: "400px",
+                            width: "150%",
+                            maxWidth: "450px",
                             borderRadius: "10px",
                         }}
                     />

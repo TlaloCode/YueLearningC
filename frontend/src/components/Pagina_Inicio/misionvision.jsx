@@ -16,19 +16,19 @@ const MissionVision = () => {
                 style={{
                     flex: "1",
                     minWidth: "300px",
-                    padding: "30px 20px",
+                    padding: "40px 100px",
                     backgroundColor: "#003366",
                     color: "white",
                     fontFamily: "Roboto, sans-serif",
                 }}
             >
-                <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "10px" }}>Misión</h2>
+                <h2 style={{ fontSize: "3rem", fontWeight: "bold", marginBottom: "10px" }}>Misión</h2>
                 <p style={{ fontSize: "1rem", lineHeight: "1.6", textAlign: "justify" }}>
                     Proporcionar a los estudiantes de la Escuela Superior de Cómputo (ESCOM) una herramienta
                     educativa confiable y académicamente respaldada, enfocada en la enseñanza del lenguaje de
                     programación C...
                 </p>
-                <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginTop: "20px", marginBottom: "10px" }}>
+                <h2 style={{ fontSize: "3rem", fontWeight: "bold", marginTop: "20px", marginBottom: "10px" }}>
                     Visión
                 </h2>
                 <p style={{ fontSize: "1rem", lineHeight: "1.6", textAlign: "justify" }}>
@@ -42,15 +42,15 @@ const MissionVision = () => {
                 style={{
                     flex: "1",
                     minWidth: "300px",
-                    padding: "30px 20px",
+                    padding: "30px 70px",
                     backgroundColor: "white",
                     fontFamily: "Roboto, sans-serif",
                 }}
             >
-                <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "10px", color: "#003366" }}>
+                <h2 style={{fontSize: "3rem", fontWeight: "bold", marginBottom: "10px", color: "#003366"}}>
                     Valores
                 </h2>
-                <ul style={{ paddingLeft: "20px", color: "gray" }}>
+                <ul style={{paddingLeft: "20px", color: "gray"}}>
                     <li>
                         <strong>Confiabilidad:</strong> Ofrecemos contenido preciso y fundamentado por docentes
                         de la ESCOM.
@@ -62,12 +62,25 @@ const MissionVision = () => {
                         <strong>Identidad:</strong> Reforzamos el orgullo por pertenecer a la comunidad ESCOM...
                     </li>
                 </ul>
-                <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginTop: "20px", marginBottom: "10px", color: "#003366" }}>
+                <h2 style={{
+                    fontSize: "3rem",
+                    fontWeight: "bold",
+                    marginTop: "20px",
+                    marginBottom: "10px",
+                    color: "#003366"
+                }}>
                     Equipo
                 </h2>
-                <p style={{ fontSize: "1rem", lineHeight: "1.6", color: "gray", textAlign: "justify" }}>
+                <p style={{fontSize: "1rem", lineHeight: "1.6", color: "gray", textAlign: "justify"}}>
                     <strong>Docentes especializados:</strong> Profesores de la ESCOM desarrollan contenido
-                    relevante y de calidad...
+                    relevante y de calidad.
+                </p>
+                <p style={{fontSize: "1rem", lineHeight: "1.6", color: "gray", textAlign: "justify"}}>
+                    <strong>Desarrolladores comprometidos:</strong> Diseñamos y mantenemos una plataforma moderna y
+                    eficiente.
+                </p>
+                <p style={{fontSize: "1rem", lineHeight: "1.6", color: "gray", textAlign: "justify"}}>
+                    <strong>Colaboradores estudiantiles:</strong> Estudiantes aportan ideas innovadoras y retroalimentación.
                 </p>
             </div>
         </section>

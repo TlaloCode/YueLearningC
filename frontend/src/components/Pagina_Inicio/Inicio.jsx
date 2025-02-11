@@ -1,6 +1,6 @@
 import React from "react";
 import "@fontsource/roboto";
-import coding from "../Img/coding.jpg"
+import coding from "../../Img/coding.jpg"
 
 const Inicio = () => {
     return (

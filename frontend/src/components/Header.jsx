@@ -2,8 +2,13 @@ import React from "react";
 import "@fontsource/roboto";
 import logo from "../Img/logo.JPG"
 import defaultLogo from "../Img/default-profile.png"
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 const Header = () => {
+    const navigate = useNavigate();
+    const handleNavigation = () => {
+        navigate('../login');
+    };
     return (
         <header
             className="navbar navbar-expand-lg"
@@ -33,7 +38,7 @@ const Header = () => {
                     }}
                 />
                 <button
-                    onClick={() => window.location.href = "/login"} // Redirige a login
+                    onClick={handleNavigation} // Redirige a login
                     style={{
                         background: "transparent",
                         border: "none",
