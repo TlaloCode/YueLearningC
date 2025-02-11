@@ -40,14 +40,14 @@ const Login = () => {
                     position: "relative",
                 }}
             >
-                {/* Aquí irá el ícono del tiburón */}
+                {/* Aqui se es dónde irá el ícono del tiburón */}
                 <img
                     src={isPasswordFocused ? tiburon2 : tiburon1}
                     alt="Tiburón"
                     style={{
                         width: "100%",
                         height: "120%",
-                        borderRadius: "50%",
+                        borderRadius: "50%", // La imagen se redondea
                         objectFit: "cover", // Asegura que la imagen se ajuste al contenedor
                     }}
                 />

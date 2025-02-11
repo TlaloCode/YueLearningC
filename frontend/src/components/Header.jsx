@@ -9,6 +9,9 @@ const Header = () => {
     const handleNavigation = () => {
         navigate('../login');
     };
+    const homeNavigation = () => {
+        navigate('../home');
+    };
     return (
         <header
             className="navbar navbar-expand-lg"
@@ -20,10 +23,19 @@ const Header = () => {
             }}
         >
             <div className="d-flex align-items-center">
-                <img src={logo} alt="Logo" style={{ width: 50, height: 50,borderRadius: "50%" }} />
-                <h1 className="mx-3 mb-0" style={{ fontSize: "2rem", fontFamily: "Roboto, sans-serif", fontWeight: "bold" }}>
-                    YUE-Learning C
-                </h1>
+                <button
+                    onClick={homeNavigation} // Redirige a login
+                    style={{
+                        background: "transparent",
+                        border: "none",
+                    }}
+                >
+                    <img src={logo} alt="Logo" style={{width: 50, height: 50, borderRadius: "50%"}}/>
+                </button>
+                    <h1 className="mx-3 mb-0"
+                        style={{fontSize: "2rem", fontFamily: "Roboto, sans-serif", fontWeight: "bold"}}>
+                        YUE-Learning C
+                    </h1>
             </div>
             <div className="ms-auto d-flex align-items-center">
                 <input
