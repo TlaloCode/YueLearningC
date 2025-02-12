@@ -35,13 +35,11 @@ const Header = () => {
         };
     }, []);
 
-
-
     return (
         <header
             className="navbar navbar-expand-lg"
             style={{
-                backgroundColor: "#003366", // Azul del header
+                backgroundColor: "rgb(0, 51, 102)", // Azul del header
                 color: "#fff",
                 padding: "10px 20px",
                 fontFamily: "Roboto, sans-serif",
@@ -49,7 +47,7 @@ const Header = () => {
         >
             <div className="d-flex align-items-center">
                 <button
-                    onClick={homeNavigation} // Redirige a login
+                    onClick={homeNavigation} // Redirige a la página principal
                     style={{
                         background: "transparent",
                         border: "none",
@@ -62,14 +60,13 @@ const Header = () => {
                     YUE-Learning C
                 </h1>
             </div>
-            <div className="ms-auto d-flex align-items-center">
+            <div className="ms-auto d-flex align-items-center" ref={menuRef}>
                 <button
                 onClick={() => setShowMenu(!showMenu)}
                 style={{
                     backgroundColor: "#FFFFFF",
-                    borderRadius: "5%",
-                    border: "none",
                     width: "200px",
+                    borderRadius: "5px",
                     marginRight: "15px"
                 }}>
                     Registrarse
@@ -80,7 +77,7 @@ const Header = () => {
                             position: "absolute",
                             top: "100%",  // Justo debajo del botón
                             width: "200px",
-                            backgroundColor: "#FFF",
+                            backgroundColor: "#c6c3c3",
                             border: "1px solid #ccc",
                             borderRadius: "5px",
                             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",

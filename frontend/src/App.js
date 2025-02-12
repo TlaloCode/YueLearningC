@@ -1,6 +1,8 @@
 import React from "react";
 import Login from "./paginas/login"
 import Home from "./paginas/home"
+import RegisterStudent from"./paginas/registerStudent"
+import RegisterTeacher from "./paginas/registerTeacher"
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -12,6 +14,8 @@ const App = () => {
               <Route path="/" element={<Home/>} />
               <Route path="/home" element={<Home/>} />
               <Route path="/login" element={<Login/>} />
+              <Route path="/registerStudent" element={<RegisterStudent/>}/>
+              <Route path="/registerTeacher" element={<RegisterTeacher/>}/>
           </Routes>
       </div>
       </Router>
