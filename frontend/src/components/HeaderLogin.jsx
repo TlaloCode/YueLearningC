@@ -43,6 +43,12 @@ const Header = () => {
                 color: "#fff",
                 padding: "10px 20px",
                 fontFamily: "Roboto, sans-serif",
+                position:"fixed",
+                width: "100%",
+                zIndex: 1000,
+                top: 0,
+                left: 0,
+                display: "flex"
             }}
         >
             <div className="d-flex align-items-center">
