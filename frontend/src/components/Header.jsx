@@ -16,6 +16,11 @@ const Header = () => {
         <header
             className="navbar navbar-expand-lg"
             style={{
+                position: "fixed",
+                width: "100%",
+                zIndex: 1000,
+                top: 0,
+                left: 0,
                 backgroundColor: "#003366", // Azul del header
                 color: "#fff",
                 padding: "10px 20px",

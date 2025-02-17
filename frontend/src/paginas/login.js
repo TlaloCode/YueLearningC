@@ -17,7 +17,7 @@ const Login = () => {
                 backgroundImage: `url(${escom})`, // Imagen de fondo
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                height: "100vh",
+                height: "150vh",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -32,7 +32,6 @@ const Login = () => {
                     height: "200px",
                     borderRadius: "50%",
                     backgroundColor: "white",
-                    display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
                     marginBottom: "20px",
