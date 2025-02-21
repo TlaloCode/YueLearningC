@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS PlataformaEducativa;
-USE PlataformaEducativa;
+CREATE DATABASE IF NOT EXISTS YUELearningC;
+USE YUELearningC;
 
 
 CREATE TABLE Docente (

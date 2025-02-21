@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Header from "../components/HeaderLogin";
-import Footer from "../components/footer"
+import Footer from "../components/footer";
 import escom from "../Img/ESCOM.jpeg";
 import tiburon1 from "../Img/Tiburón1.png"
 import tiburon2 from "../Img/Tiburón2.png"
