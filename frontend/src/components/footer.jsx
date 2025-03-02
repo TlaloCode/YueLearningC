@@ -1,8 +1,11 @@
+import { Link } from "react-router-dom";
 import React from "react";
 import "@fontsource/roboto";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWhatsapp, faFacebook } from "@fortawesome/free-brands-svg-icons";
 import "@fontsource/roboto";
+
+
 
 const Footer = () => {
     return (
@@ -41,24 +44,24 @@ const Footer = () => {
 
             {/* Derecha: Texto de copyright */}
             <div style={{ textAlign: "right" }}>
-                <a
-                    href="/privacy-policy"
+                <Link
+                    to="/privacy-policy"
                     style={{ color: "white", marginRight: "10px", textDecoration: "none" }}
                 >
                     Política de privacidad
-                </a>
-                <a
-                    href="/terms-and-conditions"
+                </Link>
+                <Link
+                    to="/terms-and-conditions"
                     style={{ color: "white", marginRight: "10px", textDecoration: "none" }}
                 >
                     Términos y condiciones
-                </a>
-                <a
+                </Link>
+                <Link
                     href="/help"
                     style={{ color: "white", textDecoration: "none" }}
                 >
                     Ayuda
-                </a>
+                </Link>
                 <p style={{ marginTop: "10px" }}>&copy; 2024 YUE, Inc.</p>
             </div>
         </footer>
