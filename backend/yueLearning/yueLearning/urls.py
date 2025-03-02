@@ -22,4 +22,5 @@ urlpatterns = [
     path("", index, name="index"),  # Ruta para la raíz
     path("yueLearningApp/", include("yueLearningApp.urls")),
     path('admin/', admin.site.urls),
+    path('api/', include('yueLearningApp.urls')),  # Conectar las rutas de la app
 ]

@@ -11,7 +11,8 @@ CREATE TABLE Docente (
                          DescripcionPerfil TEXT,
                          FotoPerfil VARCHAR(100),
                          CorreoElectronico VARCHAR(100),
-                         Contrasena VARCHAR(80)
+                         Contrasena VARCHAR(80),
+                         EstatusCorreo VARCHAR(15)
 );
 
 CREATE TABLE Estudiantes (
@@ -20,7 +21,8 @@ CREATE TABLE Estudiantes (
                              NivelConocimiento ENUM('Principiante', 'Intermedio', 'Avanzado'),
                              FotoPerfil VARCHAR(100),
                              CorreoElectronico VARCHAR(100),
-                             Contrasena VARCHAR(50)
+                             Contrasena VARCHAR(50),
+                             EstatusCorreo VARCHAR(15)
 );
 
 CREATE TABLE Curso (

@@ -3,6 +3,7 @@ import "@fontsource/roboto"
 import Header from "../components/HeaderLogin";
 import Footer from "../components/footer"
 import escom from "../Img/ESCOM.jpeg";
+import ErrorModal from "../components/ErrorModal"
 
 const RegisterTeacher = () => {
     const [formData, setFormData] = useState({
@@ -14,6 +15,8 @@ const RegisterTeacher = () => {
         confirmPassword: "",
         termsAccepted: false,
     });
+    const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
+
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -23,8 +26,50 @@ const RegisterTeacher = () => {
         });
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/register-teacher/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    firstname: formData.firstName,
+                    lastname: formData.lastName,
+                    middleName: formData.middleName,
+                    email: formData.email,
+                    password: formData.password,
+                    confirm_password: formData.confirmPassword,  // Asegúrate de enviar ambos
+                }),
+            });
+
+            const data = await response.json();
+
+
+            if (response.ok) {
+                alert("Estudiante registrado con éxito");
+                setFormData({  // Reiniciar el formulario después del registro
+                    nickname: "",
+                    email: "",
+                    password: "",
+                    confirmPassword: "",
+                    termsAccepted: false,
+                });
+            } else {
+                setErrorMessage(data.error || "Ocurrió un error en el registro");  // Muestra el mensaje de error
+            }
+        } catch (error) {
+            alert("Hubo un problema con el registro.");
+            console.error(error);
+        }
+    };
+
+
     return (
         <div>
+            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
             <Header />
         <div
             style={{
@@ -53,7 +98,7 @@ const RegisterTeacher = () => {
                     Registro de Docente
                 </h2>
 
-                <form>
+                <form onSubmit={handleSubmit}>
                     {/* Campo Nombre */}
                     <div style={{ marginBottom: "15px", textAlign: "left" }}>
                         <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Nombre(s)</label>
