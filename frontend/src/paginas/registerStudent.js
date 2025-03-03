@@ -4,6 +4,7 @@ import Header from "../components/HeaderLogin";
 import Footer from "../components/footer"
 import escom from "../Img/ESCOM.jpeg";
 import ErrorModal from "../components/ErrorModal"
+import InformationModal from "../components/InformationModal";
 
 const RegisterStudent = () => {
     // Definimos el estado para los datos del formulario
@@ -15,7 +16,7 @@ const RegisterStudent = () => {
         termsAccepted: false,
     });
 
-    const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
+    const [errorMessage, setErrorMessage, setInformationMessage, InformationMessage] = useState("");  // Estado para el mensaje de error
 
 
     const handleChange = (e) => {
@@ -37,9 +38,11 @@ const RegisterStudent = () => {
                 },
                 body: JSON.stringify({
                     nickname: formData.nickname,
-                    email: formData.email,
-                    password: formData.password,
-                    confirm_password: formData.confirmPassword,  // Asegúrate de enviar ambos
+                    correoelectronico: formData.email,
+                    contrasena: formData.password,
+                    confirm_password: formData.confirmPassword,
+                    estatuscorreo: "No verificado",
+
                 }),
             });
 
@@ -47,7 +50,7 @@ const RegisterStudent = () => {
 
 
             if (response.ok) {
-                alert("Estudiante registrado con éxito");
+                setInformationMessage(data.message);
                 setFormData({  // Reiniciar el formulario después del registro
                     nickname: "",
                     email: "",
@@ -56,10 +59,11 @@ const RegisterStudent = () => {
                     termsAccepted: false,
                 });
             } else {
-                setErrorMessage(data.error || "Ocurrió un error en el registro");  // Muestra el mensaje de error
+                setErrorMessage(data.error || "Ocurrió un error en el registro");
+
             }
         } catch (error) {
-            alert("Hubo un problema con el registro.");
+            setErrorMessage("Hubo un problema con el registro.");
             console.error(error);
         }
     };
@@ -68,6 +72,7 @@ const RegisterStudent = () => {
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
+            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
             <Header/>
             <div
                 style={{

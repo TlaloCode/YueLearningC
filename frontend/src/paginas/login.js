@@ -6,11 +6,47 @@ import tiburon1 from "../Img/Tiburón1.png"
 import tiburon2 from "../Img/Tiburón2.png"
 import aletas from "../Img/Aletas.png"
 import aletas2 from "../Img/Aletas2.png"
+import ErrorModal from "../components/ErrorModal"
+import InformationModal from "../components/InformationModal";
 
 const Login = () => {
+    const [formData, setFormData] = useState({ correoelectronico: "", contrasena: "" });
+    const [errorMessage, setErrorMessage] = useState("");
+    const [InformationMessage, setInformationMessage] = useState("");
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const response = await fetch("http://127.0.0.1:8000/api/login/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                correoelectronico: formData.correoelectronico,
+                contrasena: formData.contrasena,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            setErrorMessage(data.error || "Error al iniciar sesión");
+            return;
+        }
+        setInformationMessage(data.message);
+        // Guardar el token y tipo de usuario en el localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("tipo_usuario", data.tipo_usuario);
+        window.location.href = "/home"; // Redirigir a la página principal
+    };
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
     return (
         <div>
+            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
+            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
             <Header/>
         <div
             style={{
@@ -92,11 +128,14 @@ const Login = () => {
                 <h2 style={{ fontFamily: "Roboto, sans-serif", marginBottom: "20px" }}>
                     Iniciar Sesión
                 </h2>
-                <form>
+                <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: "15px", position: "relative" }}>
                         <input
                             type="email"
+                            name="correoelectronico"
                             placeholder="Correo Electrónico"
+                            onChange={handleChange}
+                            required
                             style={{
                                 width: "100%",
                                 padding: "10px 10px 10px 40px",
@@ -122,8 +161,11 @@ const Login = () => {
                         <input
                             type="password"
                             placeholder="Contraseña"
+                            name="contrasena"
                             onFocus={() => setIsPasswordFocused(true)} // Cambia a Tiburón2
                             onBlur={() => setIsPasswordFocused(false)} // Cambia a Tiburón1
+                            onChange={handleChange}
+                            required
                             style={{
                                 width: "100%",
                                 padding: "10px 10px 10px 40px",

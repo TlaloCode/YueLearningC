@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from datetime import timedelta
+from django.utils.timezone import now
 
 class Calificaciones(models.Model):
     id_calificacion = models.AutoField(db_column='ID_Calificacion', primary_key=True)  # Field name made lowercase.
@@ -136,10 +138,13 @@ class Video(models.Model):
         managed = False
         db_table = 'video'
 
-class EmailVerificationToken(models.Model):
-    estudiante = models.OneToOneField(Estudiantes, on_delete=models.CASCADE, related_name="verification_token")
-    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    creado_en = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Token para {self.estudiante.nickname}"
+def default_expiration():
+    return now() + timedelta(hours=24) #El código de verificación solo dura 24 horas
+
+class EmailVerificationToken(models.Model):
+    usuario_id = models.IntegerField()  # Puede ser un estudiante o un docente
+    token = models.UUIDField(default=uuid.uuid4, unique=True)
+    fecha_expiracion = models.DateTimeField(default=default_expiration)
+    class Meta:
+        db_table = 'email_verification_tokens'
