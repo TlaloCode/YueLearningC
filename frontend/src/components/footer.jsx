@@ -62,7 +62,7 @@ const Footer = () => {
                 >
                     Ayuda
                 </Link>
-                <p style={{ marginTop: "10px" }}>&copy; 2024 YUE, Inc.</p>
+                <p style={{ marginTop: "10px" }}>&copy; Copyright 2024 YUE, Inc.</p>
             </div>
         </footer>
     );

@@ -11,7 +11,11 @@ const Header = () => {
 
 
     const handleNavigation = () => {
-        navigate('../login');
+        if (usuario.tipo_usuario === "estudiante") {
+            navigate('/perfil-estudiante');
+        } else if (usuario.tipo_usuario === "docente") {
+            navigate('/perfil-docente');
+        }
     };
 
     const handleLogout = () => {
