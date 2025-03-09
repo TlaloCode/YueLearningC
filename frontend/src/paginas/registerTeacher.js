@@ -98,7 +98,7 @@ const RegisterTeacher = () => {
                 }}
             >
                 <h2 style={{ fontFamily: "Roboto, sans-serif", marginBottom: "20px", fontWeight: "bold" }}>
-                    Registro de Docente
+                    Registro de docente
                 </h2>
 
                 <form onSubmit={handleSubmit}>

@@ -98,7 +98,7 @@ const RegisterStudent = () => {
                     }}
                 >
                     <h2 style={{fontFamily: "Roboto, sans-serif", marginBottom: "20px", fontWeight: "bold"}}>
-                        Registro de Estudiante
+                        Registro de estudiante
                     </h2>
                     <form onSubmit={handleSubmit}>
                         {/* Campo Nickname */}
