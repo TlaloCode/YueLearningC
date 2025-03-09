@@ -103,11 +103,12 @@ const RegisterStudent = () => {
                     <form onSubmit={handleSubmit}>
                         {/* Campo Nickname */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
-                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Nickname</label>
+                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Nombre de usuario</label>
                             <div style={{position: "relative"}}>
                                 <input
                                     type="text"
                                     name="nickname"
+                                    placeholder="ejem: Ju4n P3rez"
                                     value={formData.nickname}
                                     onChange={handleChange}
                                     style={{
@@ -141,7 +142,7 @@ const RegisterStudent = () => {
                                 <input
                                     type="email"
                                     name="email"
-                                    placeholder="example@ipn.com.mx"
+                                    placeholder="ejem: alumno@ipn.mx"
                                     value={formData.email}
                                     onChange={handleChange}
                                     style={{
@@ -201,7 +202,7 @@ const RegisterStudent = () => {
 
                         {/* Campo Confirmar Contraseña */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
-                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Confirmar Contraseña</label>
+                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Confirmar contraseña</label>
                             <div style={{position: "relative"}}>
                                 <input
                                     type="password"

@@ -126,7 +126,7 @@ const Login = () => {
                 }}
             >
                 <h2 style={{ fontFamily: "Roboto, sans-serif", marginBottom: "20px" }}>
-                    Iniciar Sesión
+                    Iniciar sesión
                 </h2>
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: "15px", position: "relative" }}>

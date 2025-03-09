@@ -137,7 +137,7 @@ const RegisterTeacher = () => {
                     {/* Apellido Paterno y Apellido Materno en una sola línea */}
                     <div style={{ display: "flex", gap: "10px", marginBottom: "15px", textAlign: "left" }}>
                         <div style={{ flex: 1 }}>
-                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Apellido Paterno</label>
+                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Apellido paterno</label>
                             <div style={{ position: "relative" }}>
                                 <input
                                     type="text"
@@ -167,7 +167,7 @@ const RegisterTeacher = () => {
                             </div>
                         </div>
                         <div style={{ flex: 1 }}>
-                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Apellido Materno</label>
+                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Apellido materno</label>
                             <div style={{ position: "relative" }}>
                                 <input
                                     type="text"
@@ -205,7 +205,7 @@ const RegisterTeacher = () => {
                             <input
                                 type="email"
                                 name="email"
-                                placeholder="example@ipn.mx"
+                                placeholder="ejem: ejemplo@ipn.mx"
                                 value={formData.email}
                                 onChange={handleChange}
                                 style={{
@@ -265,7 +265,7 @@ const RegisterTeacher = () => {
 
                     {/* Campo Confirmar Contraseña */}
                     <div style={{ marginBottom: "15px", textAlign: "left" }}>
-                        <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Confirmar Contraseña</label>
+                        <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Confirmar contraseña</label>
                         <div style={{ position: "relative" }}>
                             <input
                                 type="password"

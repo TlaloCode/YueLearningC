@@ -26,9 +26,9 @@ const Footer = () => {
                 <p style={{ marginBottom: "10px" }}>
                     <strong>Contáctanos:</strong>
                 </p>
-                <p style={{ margin: "5px 0", display: "flex", alignItems: "center", gap: "10px" }}>
+                {/* <p style={{ margin: "5px 0", display: "flex", alignItems: "center", gap: "10px" }}>
                     <FontAwesomeIcon icon={faWhatsapp} style={{ color: "white" }} /> 5527166934
-                </p>
+                </p>*/}
                 <p style={{ margin: "5px 0", display: "flex", alignItems: "center", gap: "10px" }}>
                     <FontAwesomeIcon icon={faFacebook} style={{ color: "white" }} />
                     <a
