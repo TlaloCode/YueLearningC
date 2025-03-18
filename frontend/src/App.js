@@ -9,6 +9,9 @@ import TermsAndConditions from "./paginas/TermsAndConditions";
 import PrivacyPolicy from "./paginas/PrivacyPolicy";
 import TeacherProfile from "./paginas/TeacherProfile";
 import StudentProfile from "./paginas/StudentProfile";
+import TeacherCourses from "./paginas/TeacherCourses";
+import CreateCourse from "./paginas/CreateCourse";
+
 
 
 
@@ -30,6 +33,10 @@ const App = () => {
               <Route path="/help" element={<Help />} />
               <Route path="/perfil-docente" element={<TeacherProfile />} />
               <Route path="/perfil-estudiante" element={<StudentProfile />} />
+              <Route path="/mis-cursos" element={<TeacherCourses />} />
+              <Route path="/crear-curso" element={<CreateCourse />} />
+
+
 
 
           </Routes>

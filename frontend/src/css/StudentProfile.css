@@ -1,59 +1,84 @@
+/* Asegurar que el contenedor principal ocupe toda la pantalla */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor general que asegura que el footer se mantenga abajo */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Hace que el contenedor ocupe toda la pantalla */
+}
+
+/* Contenedor del perfil que crece dinámicamente */
 .profile-container {
-    width: 100%;
     max-width: 900px;
     margin: auto;
-    background: #fff;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 60px 40px;
+    background-color: white;
     border-radius: 10px;
-    overflow: hidden;
-}
-
-.profile-header {
-    background: #003366;
-    color: white;
-    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    flex: 1; /* Mantener el crecimiento del contenedor */
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center; /* Centramos verticalmente */
 }
 
-.profile-avatar img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.profile-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 1px;
+    text-align: left; /* Alinea el texto a la izquierda */
+    width: 100%;
+    padding-left: 100px;
 }
 
 .profile-content {
     display: flex;
-    padding: 20px;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center; /* Asegurar que los elementos estén alineados */
+    padding-top: 35px; /* Aumentar espacio superior */
 }
 
-.profile-sidebar {
-    width: 30%;
-    text-align: center;
+.profile-left {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.profile-picture {
+.profile-image {
     position: relative;
-    width: 120px;
-    height: 120px;
-    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.profile-picture img {
-    width: 100%;
-    height: 100%;
+.profile-image img {
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
 }
 
-.edit-icon {
+.edit-photo {
     position: absolute;
-    right: 5px;
-    bottom: 5px;
+    bottom: 10px; /* Ajuste de posición */
+    left: 50%;
+    transform: translateX(-50%); /* Centra el botón horizontalmente */
     background: white;
-    border-radius: 50%;
-    padding: 5px;
+    border: none;
     cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
 }
 
 .delete-profile {
@@ -61,66 +86,90 @@
     border: none;
     color: red;
     cursor: pointer;
+    margin-top: 10px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin: 10px auto;
+    gap: 5px; /* Espaciado entre el icono y el texto */
 }
 
-.profile-form {
-    width: 70%;
+.profile-courses {
+    margin-top: 20px;
+    text-align: center;
 }
 
-.form-group {
-    margin-bottom: 15px;
+.profile-courses h3 {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.profile-courses span {
+    font-size: 60px; /* Aumentar tamaño del ícono 🎓 */
+    display: block;
+    margin-top: 5px;
+}
+
+.profile-right {
+    width: 60%;
+    text-align: left;
 }
 
 .input-group {
     display: flex;
     align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 5px;
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    flex: 1;
+    font-weight: bold;
 }
 
 .input-group input {
-    flex: 1;
-    border: none;
-    outline: none;
+    flex: 2;
     padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
-.edit-icon {
-    color: #003366;
+.edit-btn {
+    background: none;
+    border: none;
     cursor: pointer;
+    font-size: 16px;
 }
 
 .profile-buttons {
     display: flex;
-    gap: 10px;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
-.update-btn {
-    background: green;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.cancel-btn {
-    background: red;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.profile-footer {
-    background: #222;
+.btn-save {
+    background-color: green;
     color: white;
     padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background-color: red;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* --- Ajustes del Footer --- */
+footer {
+    width: 100%;
     text-align: center;
+    padding: 10px;
+    background: #002855;
+    color: white;
+    position: relative;
+    bottom: 0;
+    margin-top: auto; /* Hace que el footer siempre esté pegado abajo */
 }

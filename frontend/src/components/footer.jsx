@@ -56,6 +56,7 @@ const Footer = () => {
                 >
                     Términos y condiciones
                 </Link>
+
                 <Link
                     to="/help"
                     style={{ color: "white", textDecoration: "none" }}
