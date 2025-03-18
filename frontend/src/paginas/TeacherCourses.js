@@ -2,26 +2,47 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/TeacherCourses.css";
-import { FaPlusCircle } from "react-icons/fa";
+import { FaPlus, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const TeacherCourses = () => {
     const navigate = useNavigate();
     const [courses] = useState([
-        { id: 1, title: "Arquitectura de Von Neumann", image: "../assets/course1.png" },
-        { id: 2, title: "Introducción a C", image: "../assets/course2.png" },
+        { id: 1, title: "Arquitectura de Von Neumann", image: require("../assets/c-course.jpg") },
+        { id: 2, title: "Arquitectura de Von Neumann", image: require("../assets/c-course.jpg") },
+        { id: 3, title: "Arquitectura de Von Neumann", image: require("../assets/c-course.jpg") },
     ]);
 
+
     const handleCreateCourse = () => {
-        navigate("/crear-curso"); // Redirige a la vista de creación de curso
+        navigate("/crear-curso");
     };
 
     return (
         <div className="app-container">
             <Header />
 
-            <div className="profile-container">
-                <h2 className="profile-title">Mis Cursos</h2>
+            <div className="profile-section">
+                <div className="profile-info">
+                    <img src={require("../assets/default-user.jpg")} alt="Profile" className="profile-image" />
+                    <div className="profile-details">
+                        <h2 className="profile-name">López Ruiz Gabriela de Jesús</h2>
+                        <a href="mailto:usuario@ipn.mx" className="profile-email">usuario@ipn.mx</a>
+                        <p className="profile-description">
+                            Soy una profesora con el propósito de motivar a mis estudiantes...
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="courses-section">
+                <div className="courses-header">
+                    <h2>Todos mis cursos</h2>
+                    <button className="btn-new-course" onClick={handleCreateCourse}>
+                        <span>Nuevo curso</span>
+                        <FaPlus />
+                    </button>
+                </div>
 
                 <div className="courses-container">
                     {courses.length > 0 ? (
@@ -32,14 +53,13 @@ const TeacherCourses = () => {
                                     <h3>{course.title}</h3>
                                 </div>
                             ))}
+                            <button className="btn-arrow">
+                                <FaChevronRight />
+                            </button>
                         </div>
                     ) : (
                         <p>No tienes cursos creados aún.</p>
                     )}
-
-                    <button className="btn-create" onClick={handleCreateCourse}>
-                        <FaPlusCircle /> Nuevo Curso
-                    </button>
                 </div>
             </div>
 
