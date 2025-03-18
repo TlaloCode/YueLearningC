@@ -2,18 +2,31 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/CreateCourse.css";
-import { FaPlusCircle } from "react-icons/fa";
+import { FaPlus, FaVideo, FaFileAlt, FaImage, FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const CreateCourse = () => {
-    const [course] = useState({
+    const navigate = useNavigate();
+    const [course, setCourse] = useState({
         title: "",
         description: "",
-        category: "",
-        image: "",
+        image: null,
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type } = e.target;
+
+        if (type === "file") {
+            setCourse((prev) => ({
+                ...prev,
+                [name]: e.target.files[0],
+            }));
+        } else {
+            setCourse((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
     };
 
     const handleSubmit = (e) => {
@@ -25,54 +38,62 @@ const CreateCourse = () => {
         <div className="app-container">
             <Header />
 
-            <div className="profile-container">
-                <h2 className="profile-title">Crear Nuevo Curso</h2>
+            <div className="course-container">
+                <div className="course-header">
+                    <button className="btn-back" onClick={() => navigate(-1)}>
+                        <FaArrowLeft />
+                    </button>
+                    <h2 className="course-title">Título del curso</h2>
+                </div>
 
-                <div className="course-form-container">
-                    <form onSubmit={handleSubmit} className="course-form">
-                        <div className="form-group">
-                            <label>Nombre del Curso</label>
-                            <input
-                                type="text"
-                                name="title"
-                                value={course.title}
-                                onChange={handleChange}
-                                placeholder="Ingrese el nombre del curso"
-                                required
-                            />
+                <div className="course-content">
+                    <div className="left-side">
+                        <input
+                            type="text"
+                            name="title"
+                            value={course.title}
+                            onChange={handleChange}
+                            placeholder="Título del curso"
+                            className="input-title"
+                            required
+                        />
+
+                        <label htmlFor="imageUpload" className="image-upload-label">
+                            {course.image ? (
+                                <img src={URL.createObjectURL(course.image)} alt="Vista previa" className="preview-image" />
+                            ) : (
+                                <FaImage className="upload-icon" />
+                            )}
+                        </label>
+                        <input type="file" id="imageUpload" name="image" onChange={handleChange} hidden />
+
+                        <textarea
+                            name="description"
+                            value={course.description}
+                            onChange={handleChange}
+                            placeholder="Descripción del curso, el profesor podrá agregar caracteres especiales o links"
+                            className="input-description"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div className="right-side">
+                        <div className="action-container">
+                            <span>Agregar video</span>
+                            <button type="button" className="btn-circle">
+                                <FaPlus />
+                            </button>
                         </div>
-
-                        <div className="form-group">
-                            <label>Descripción</label>
-                            <textarea
-                                name="description"
-                                value={course.description}
-                                onChange={handleChange}
-                                placeholder="Escriba una breve descripción"
-                                required
-                            ></textarea>
+                        <div className="action-container">
+                            <span>Agregar recurso de apoyo</span>
+                            <button type="button" className="btn-circle">
+                                <FaPlus />
+                            </button>
                         </div>
-
-                        <div className="form-group">
-                            <label>Categoría</label>
-                            <select name="category" value={course.category} onChange={handleChange} required>
-                                <option value="">Seleccione una categoría</option>
-                                <option value="Programación">Programación</option>
-                                <option value="Matemáticas">Matemáticas</option>
-                                <option value="Ciencias">Ciencias</option>
-                                <option value="Idiomas">Idiomas</option>
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Imagen del Curso</label>
-                            <input type="file" name="image" onChange={handleChange} />
-                        </div>
-
                         <button type="submit" className="btn-create">
-                            <FaPlusCircle /> Crear Curso
+                            Crear
                         </button>
-                    </form>
+                    </div>
                 </div>
             </div>
 
