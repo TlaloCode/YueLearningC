@@ -11,7 +11,7 @@ import TeacherProfile from "./paginas/TeacherProfile";
 import StudentProfile from "./paginas/StudentProfile";
 import TeacherCourses from "./paginas/TeacherCourses";
 import CreateCourse from "./paginas/CreateCourse";
-
+import StudentCourses from "./paginas/StudentCourses";
 
 
 
@@ -35,6 +35,8 @@ const App = () => {
               <Route path="/perfil-estudiante" element={<StudentProfile />} />
               <Route path="/mis-cursos" element={<TeacherCourses />} />
               <Route path="/crear-curso" element={<CreateCourse />} />
+              <Route path="/mis-cursos-estudiante" element={<StudentCourses />} />
+
 
 
 
