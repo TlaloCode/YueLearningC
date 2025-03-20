@@ -16,8 +16,8 @@ const RegisterStudent = () => {
         termsAccepted: false,
     });
 
-    const [errorMessage, setErrorMessage, setInformationMessage, InformationMessage] = useState("");  // Estado para el mensaje de error
-
+    const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
+    const [InformationMessage, setInformationMessage] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -31,12 +31,13 @@ const RegisterStudent = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/register-student/", {
+            const response = await fetch("http://127.0.0.1:8000/api/register-user/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    rol: "estudiante",
                     nickname: formData.nickname,
                     correoelectronico: formData.email,
                     contrasena: formData.password,

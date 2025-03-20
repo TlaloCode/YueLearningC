@@ -32,7 +32,7 @@ const Footer = () => {
                 <p style={{ margin: "5px 0", display: "flex", alignItems: "center", gap: "10px" }}>
                     <FontAwesomeIcon icon={faFacebook} style={{ color: "white" }} />
                     <a
-                        href="https://www.facebook.com/YUE-LearningC"
+                        href="https://www.facebook.com/profile.php?id=61561107116721"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ color: "white", textDecoration: "none" }}

@@ -31,7 +31,6 @@ const Login = () => {
         });
 
         const data = await response.json();
-
         if (!response.ok) {
             setErrorMessage(data.error || "Error al iniciar sesión");
             return;
@@ -39,8 +38,14 @@ const Login = () => {
         setInformationMessage(data.message);
         // Guardar el token y tipo de usuario en el localStorage
         localStorage.setItem("token", data.token);
-        localStorage.setItem("tipo_usuario", data.tipo_usuario);
+        localStorage.setItem("refresh",data.refresh_token);
+        localStorage.setItem("rol", data.rol);
+        localStorage.setItem("correo", data.correo);
+        localStorage.setItem("id", data.id);
         window.location.href = "/home"; // Redirigir a la página principal
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("refresh",data.refresh_token);
+        localStorage.setItem("rol",data.rol);
     };
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
     return (
@@ -133,7 +138,7 @@ const Login = () => {
                         <input
                             type="email"
                             name="correoelectronico"
-                            placeholder="Correo Electrónico"
+                            placeholder="Correo electrónico"
                             onChange={handleChange}
                             required
                             style={{

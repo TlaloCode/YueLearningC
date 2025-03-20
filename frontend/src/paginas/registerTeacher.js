@@ -16,8 +16,8 @@ const RegisterTeacher = () => {
         confirmPassword: "",
         termsAccepted: false,
     });
-    const [errorMessage, setErrorMessage, setInformationMessage, InformationMessage] = useState("");  // Estado para el mensaje de error
-
+    const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
+    const [InformationMessage, setInformationMessage] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -31,18 +31,19 @@ const RegisterTeacher = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/register-teacher/", {
+            const response = await fetch("http://127.0.0.1:8000/api/register-user/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    rol: "docente",
                     nombre: formData.firstName,
                     apellidopaterno: formData.lastName,
                     apellidomaterno: formData.middleName,
                     correoelectronico: formData.email,
                     contrasena: formData.password,
-                    confirm_password: formData.confirmPassword,
+                    confirmPassword: formData.confirmPassword,
                     estatuscorreo: "No verificado",
                 }),
             });
@@ -51,9 +52,11 @@ const RegisterTeacher = () => {
 
 
             if (response.ok) {
-                setInformationMessage(data.message);
+                setInformationMessage("Docente registrado con éxito");
                 setFormData({  // Reiniciar el formulario después del registro
-                    nickname: "",
+                    nombre: "",
+                    apellidopaterno: "",
+                    apellidomaterno: "",
                     email: "",
                     password: "",
                     confirmPassword: "",
@@ -238,6 +241,7 @@ const RegisterTeacher = () => {
                             <input
                                 type="password"
                                 name="password"
+                                placeholder="ejem:Martha.123"
                                 value={formData.password}
                                 onChange={handleChange}
                                 style={{

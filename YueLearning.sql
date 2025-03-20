@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS YUELearningC;
 USE YUELearningC;
 
 CREATE TABLE Docente (
-                         ID_Usuario INT PRIMARY KEY AUTO_INCREMENT,
+                         ID INT PRIMARY KEY AUTO_INCREMENT,
                          Nombre VARCHAR(50),
                          ApellidoPaterno VARCHAR(50),
                          ApellidoMaterno VARCHAR(50),
@@ -16,7 +16,7 @@ CREATE TABLE Docente (
 );
 
 CREATE TABLE Estudiantes (
-                             ID_Usuario INT PRIMARY KEY AUTO_INCREMENT,
+                             ID INT PRIMARY KEY AUTO_INCREMENT,
                              Nickname VARCHAR(50),
                              NivelConocimiento ENUM('Principiante', 'Intermedio', 'Avanzado'),
                              FotoPerfil VARCHAR(100),

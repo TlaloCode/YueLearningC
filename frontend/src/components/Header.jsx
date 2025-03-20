@@ -11,9 +11,10 @@ const Header = () => {
 
 
     const handleNavigation = () => {
-        if (usuario.tipo_usuario === "estudiante") {
+        const token = localStorage.getItem("token");
+        if (usuario.rol === "estudiante") {
             navigate('/perfil-estudiante');
-        } else if (usuario.tipo_usuario === "docente") {
+        } else if (usuario.rol === "docente") {
             navigate('/perfil-docente');
         }
     };
@@ -21,8 +22,9 @@ const Header = () => {
     const handleLogout = () => {
         // Eliminar los datos de sesión del localStorage
         localStorage.removeItem("token");
-        localStorage.removeItem("nickname");
-        localStorage.removeItem("tipo_usuario");
+        localStorage.removeItem("refresh");
+        localStorage.removeItem("correo");
+        localStorage.removeItem("rol");
         localStorage.removeItem("fotoPerfil");
 
         // Redirigir a la página de inicio de sesión
@@ -31,20 +33,18 @@ const Header = () => {
 
 
     const homeNavigation = () => {
-        navigate('../home');
+        navigate('../login');
     };
 
     useEffect(() => {
         // Obtener datos del usuario desde localStorage
         const token = localStorage.getItem("token");
-        const nickname = localStorage.getItem("nickname");
-        const tipo_usuario = localStorage.getItem("tipo_usuario");
+        const rol = localStorage.getItem("rol");
         const fotoPerfil = localStorage.getItem("fotoPerfil"); // Foto de perfil
 
         if (token) {
             setUsuario({
-                nickname,
-                tipo_usuario,
+                rol,
                 fotoPerfil: fotoPerfil || defaultLogo, // Usa la foto de perfil si existe, de lo contrario, usa la predeterminada
             });
         }
@@ -151,7 +151,7 @@ const Header = () => {
                                         cursor: "pointer",
                                     }}
                                 >
-                                    Cerrar Sesión
+                                    Cerrar sesión
                                 </button>
             </div>
                         )}
