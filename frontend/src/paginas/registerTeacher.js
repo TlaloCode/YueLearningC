@@ -4,6 +4,7 @@ import Header from "../components/HeaderLogin";
 import Footer from "../components/footer"
 import escom from "../Img/ESCOM.jpeg";
 import ErrorModal from "../components/ErrorModal"
+import InformationModal from "../components/InformationModal";
 
 const RegisterTeacher = () => {
     const [formData, setFormData] = useState({
@@ -16,7 +17,7 @@ const RegisterTeacher = () => {
         termsAccepted: false,
     });
     const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
-
+    const [InformationMessage, setInformationMessage] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -30,18 +31,20 @@ const RegisterTeacher = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/register-teacher/", {
+            const response = await fetch("http://127.0.0.1:8000/api/register-user/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    firstname: formData.firstName,
-                    lastname: formData.lastName,
-                    middleName: formData.middleName,
-                    email: formData.email,
-                    password: formData.password,
-                    confirm_password: formData.confirmPassword,  // Asegúrate de enviar ambos
+                    rol: "docente",
+                    nombre: formData.firstName,
+                    apellidopaterno: formData.lastName,
+                    apellidomaterno: formData.middleName,
+                    correoelectronico: formData.email,
+                    contrasena: formData.password,
+                    confirmPassword: formData.confirmPassword,
+                    estatuscorreo: "No verificado",
                 }),
             });
 
@@ -49,9 +52,11 @@ const RegisterTeacher = () => {
 
 
             if (response.ok) {
-                alert("Estudiante registrado con éxito");
+                setInformationMessage("Docente registrado con éxito");
                 setFormData({  // Reiniciar el formulario después del registro
-                    nickname: "",
+                    nombre: "",
+                    apellidopaterno: "",
+                    apellidomaterno: "",
                     email: "",
                     password: "",
                     confirmPassword: "",
@@ -61,7 +66,7 @@ const RegisterTeacher = () => {
                 setErrorMessage(data.error || "Ocurrió un error en el registro");  // Muestra el mensaje de error
             }
         } catch (error) {
-            alert("Hubo un problema con el registro.");
+            setErrorMessage("Hubo un problema con el registro.");
             console.error(error);
         }
     };
@@ -70,6 +75,7 @@ const RegisterTeacher = () => {
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
+            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
             <Header />
         <div
             style={{
@@ -95,7 +101,7 @@ const RegisterTeacher = () => {
                 }}
             >
                 <h2 style={{ fontFamily: "Roboto, sans-serif", marginBottom: "20px", fontWeight: "bold" }}>
-                    Registro de Docente
+                    Registro de docente
                 </h2>
 
                 <form onSubmit={handleSubmit}>
@@ -134,7 +140,7 @@ const RegisterTeacher = () => {
                     {/* Apellido Paterno y Apellido Materno en una sola línea */}
                     <div style={{ display: "flex", gap: "10px", marginBottom: "15px", textAlign: "left" }}>
                         <div style={{ flex: 1 }}>
-                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Apellido Paterno</label>
+                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Apellido paterno</label>
                             <div style={{ position: "relative" }}>
                                 <input
                                     type="text"
@@ -164,7 +170,7 @@ const RegisterTeacher = () => {
                             </div>
                         </div>
                         <div style={{ flex: 1 }}>
-                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Apellido Materno</label>
+                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Apellido materno</label>
                             <div style={{ position: "relative" }}>
                                 <input
                                     type="text"
@@ -202,7 +208,7 @@ const RegisterTeacher = () => {
                             <input
                                 type="email"
                                 name="email"
-                                placeholder="example@ipn.mx"
+                                placeholder="ejem: ejemplo@ipn.mx"
                                 value={formData.email}
                                 onChange={handleChange}
                                 style={{
@@ -235,6 +241,7 @@ const RegisterTeacher = () => {
                             <input
                                 type="password"
                                 name="password"
+                                placeholder="ejem:Martha.123"
                                 value={formData.password}
                                 onChange={handleChange}
                                 style={{
@@ -262,7 +269,7 @@ const RegisterTeacher = () => {
 
                     {/* Campo Confirmar Contraseña */}
                     <div style={{ marginBottom: "15px", textAlign: "left" }}>
-                        <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Confirmar Contraseña</label>
+                        <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Confirmar contraseña</label>
                         <div style={{ position: "relative" }}>
                             <input
                                 type="password"

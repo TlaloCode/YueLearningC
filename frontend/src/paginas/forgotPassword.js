@@ -30,7 +30,7 @@ const RecoverPassword = () => {
                     }}
                 >
                     <h2 style={{ fontFamily: "Roboto, sans-serif", marginBottom: "20px" }}>
-                        Recuperar Contraseña
+                        Recuperar contraseña
                     </h2>
                     <form>
                         <div style={{ marginBottom: "15px", position: "relative" }}>

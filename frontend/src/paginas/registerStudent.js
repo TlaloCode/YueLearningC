@@ -4,6 +4,7 @@ import Header from "../components/HeaderLogin";
 import Footer from "../components/footer"
 import escom from "../Img/ESCOM.jpeg";
 import ErrorModal from "../components/ErrorModal"
+import InformationModal from "../components/InformationModal";
 
 const RegisterStudent = () => {
     // Definimos el estado para los datos del formulario
@@ -16,7 +17,7 @@ const RegisterStudent = () => {
     });
 
     const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
-
+    const [InformationMessage, setInformationMessage] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -30,16 +31,19 @@ const RegisterStudent = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/register-student/", {
+            const response = await fetch("http://127.0.0.1:8000/api/register-user/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    rol: "estudiante",
                     nickname: formData.nickname,
-                    email: formData.email,
-                    password: formData.password,
-                    confirm_password: formData.confirmPassword,  // Asegúrate de enviar ambos
+                    correoelectronico: formData.email,
+                    contrasena: formData.password,
+                    confirm_password: formData.confirmPassword,
+                    estatuscorreo: "No verificado",
+
                 }),
             });
 
@@ -47,7 +51,7 @@ const RegisterStudent = () => {
 
 
             if (response.ok) {
-                alert("Estudiante registrado con éxito");
+                setInformationMessage(data.message);
                 setFormData({  // Reiniciar el formulario después del registro
                     nickname: "",
                     email: "",
@@ -56,10 +60,11 @@ const RegisterStudent = () => {
                     termsAccepted: false,
                 });
             } else {
-                setErrorMessage(data.error || "Ocurrió un error en el registro");  // Muestra el mensaje de error
+                setErrorMessage(data.error || "Ocurrió un error en el registro");
+
             }
         } catch (error) {
-            alert("Hubo un problema con el registro.");
+            setErrorMessage("Hubo un problema con el registro.");
             console.error(error);
         }
     };
@@ -68,6 +73,7 @@ const RegisterStudent = () => {
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
+            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
             <Header/>
             <div
                 style={{
@@ -93,16 +99,17 @@ const RegisterStudent = () => {
                     }}
                 >
                     <h2 style={{fontFamily: "Roboto, sans-serif", marginBottom: "20px", fontWeight: "bold"}}>
-                        Registro de Estudiante
+                        Registro de estudiante
                     </h2>
                     <form onSubmit={handleSubmit}>
                         {/* Campo Nickname */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
-                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Nickname</label>
+                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Nombre de usuario</label>
                             <div style={{position: "relative"}}>
                                 <input
                                     type="text"
                                     name="nickname"
+                                    placeholder="ejem: Ju4n P3rez"
                                     value={formData.nickname}
                                     onChange={handleChange}
                                     style={{
@@ -136,7 +143,7 @@ const RegisterStudent = () => {
                                 <input
                                     type="email"
                                     name="email"
-                                    placeholder="example@ipn.com.mx"
+                                    placeholder="ejem: alumno@ipn.mx"
                                     value={formData.email}
                                     onChange={handleChange}
                                     style={{
@@ -196,7 +203,7 @@ const RegisterStudent = () => {
 
                         {/* Campo Confirmar Contraseña */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
-                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Confirmar Contraseña</label>
+                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Confirmar contraseña</label>
                             <div style={{position: "relative"}}>
                                 <input
                                     type="password"

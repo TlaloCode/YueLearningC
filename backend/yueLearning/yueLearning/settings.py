@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,6 +26,12 @@ SECRET_KEY = 'django-insecure-3(1fif6$!-*x8yo8y*vbn9@7jaybb8voi6am)z_k3%^nkmuo(g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'yuelearning2025a011@gmail.com'  # CORREO DE LA "EMPRESA"
+EMAIL_HOST_PASSWORD = 'ugacqosboufitsux'  # CONTRASEÑA DE APLICACIÓN DE GOOGLE
 ALLOWED_HOSTS = []
 
 
@@ -40,6 +47,8 @@ INSTALLED_APPS = [
     'yueLearningApp',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -52,9 +61,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True  # Habilita solicitudes desde cualquier origen
 ROOT_URLCONF = 'yueLearning.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -143,4 +151,30 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # Habilita TokenAuthentication
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',  # Solo permite acceso a usuarios autenticados
+    ),
+
+}
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
+
+AUTHENTICATION_BACKENDS = [
+    'yueLearningApp.authentication.CustomAuthBackend',  # Ruta a tu backend de autenticación
+    'django.contrib.auth.backends.ModelBackend',  # Mantener el backend predeterminado para usuarios de Django
+    'rest_framework_simplejwt.authentication.JWTAuthentication',  # Agregar esta línea
+]
+
+AUTH_USER_MODEL = 'yueLearningApp.Usuario'
