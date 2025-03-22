@@ -1,65 +1,173 @@
+/* Ajuste global para ocupar toda la pantalla */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor principal para mantener estructura */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ocupa toda la pantalla */
+}
+
+/* Contenedor del perfil */
 .profile-container {
-    width: 80%;
-    margin: auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: #f5f5f5;
+    padding: 40px 20px;
 }
 
-.profile-header {
-    background: #003366;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    border-radius: 10px 10px 0 0;
+/* Ajuste del título "Mi Perfil" para que baje más */
+.profile-title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-top: 40px; /* Antes 20px, ahora más separación */
+    margin-bottom: 20px;
 }
 
+/* Contenido del perfil */
 .profile-content {
     display: flex;
-    flex-direction: row;
+    width: 80%;
+    max-width: 1100px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+/* Barra lateral */
+.profile-sidebar {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 2px solid #ddd;
     padding: 20px;
 }
 
-.profile-image {
-    width: 30%;
-    text-align: center;
-}
-
-.profile-image img {
+/* Imagen de perfil */
+.profile-picture {
+    position: relative;
     width: 150px;
     height: 150px;
-    border-radius: 50%;
-    border: 2px solid #003366;
 }
 
-.edit-photo {
-    background: none;
-    border: none;
+.profile-picture img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+}
+/* Alinear correctamente el ícono de editar foto */
+.profile-picture .edit-icon {
+    position: absolute;
+    bottom: 5px; /* Ajustar según necesites */
+    right: 5px;  /* Mover más hacia el borde */
+    background: white;
+    border-radius: 50%;
+    padding: 5px;
     cursor: pointer;
-    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 25px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.profile-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border-right: 2px solid #ddd;
+}
+
+/* Icono de cursos */
+.course-icon {
+    font-size: 35px;
     margin-top: 10px;
 }
 
-.profile-info {
+/* Sección derecha (Formulario) */
+.profile-form {
     width: 70%;
+    padding-left: 30px;
+}
+
+/* Título de la sección de datos */
+.profile-section-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    position: relative;
 }
 
-.profile-info input,
-.profile-info textarea {
+.input-group input,
+textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
+    padding: 10px;
     border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box; /* Evita que el padding afecte el tamaño */
 }
 
+.input-group textarea {
+    height: 40px;
+    resize: none;
+}
+
+/* Ajuste del icono de lápiz
+.input-group .edit-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;  /* Ajusta el tamaño del icono
+    height: 20px;
+    cursor: pointer;
+}*/
+
+
+/* Botones */
 .profile-buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
+    margin-top: 20px;
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px; /* Ajusta el tamaño del ícono */
+    margin-left: 8px; /* Espacio entre el input y el botón */
+    color: #FFA500; /* Amarillo */
 }
 
 .btn-save {
@@ -78,4 +186,14 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+/* Footer */
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    background: #222;
+    color: white;
+    margin-top: auto; /* Asegura que siempre esté abajo */
 }
