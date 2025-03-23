@@ -49,12 +49,15 @@ def registrar_usuario(request):
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
 
+    if not data.get("contrasena") == data.get("confirm_password"):
+        return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
+
     if Usuario.objects.filter(correoelectronico=data.get('correoelectronico')).exists():
         return Response({"error": "El correo electrónico ya está registrado."}, status=status.HTTP_400_BAD_REQUEST)
 
     usuario = Usuario.objects.create_user(
         correoelectronico=data.get("correoelectronico"),
-        contrasena=data.get("contrasena")
+        password=data.get("contrasena")
     )
 
     if rol == "estudiante":
@@ -89,8 +92,9 @@ def login_usuario(request):
     data = request.data
     correo = data.get("correoelectronico")
     password = data.get("contrasena")
-
+    print(data)
     usuario = Usuario.objects.filter(correoelectronico=correo).first()
+    print(usuario)
     if not usuario:
         return Response({"error": "Correo o contraseña incorrectos."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -150,6 +154,11 @@ def get_user_profile(request):
             return Response({
                 "nombre": docente.nombre,
                 "correoelectronico": usuario.correoelectronico,
+                "apellidopaterno": docente.apellidopaterno,
+                "apellidomaterno": docente.apellidomaterno,
+                "correoalternativo": docente.correoalternativo,
+                "numerocelular": docente.numerocelular,
+                "descripcionperfil": docente.descripcionperfil,
                 "fotoPerfil": usuario.fotoperfil if usuario.fotoperfil else "",
                 "contrasena": docente.contrasena,  # Devuelve la contraseña sin encriptar
             }, status=status.HTTP_200_OK)
@@ -178,13 +187,21 @@ def update_user_profile(request):
         try:
             docente = Docente.objects.get(usuario=usuario)
             docente.nombre = data.get("nombre", docente.nombre)
-            docente.apellidopaterno = data.get("apellidopaterno", docente.apellidopaterno)
-            docente.apellidomaterno = data.get("apellidomaterno", docente.apellidomaterno)
-            docente.correoalternativo = data.get("correoalternativo", docente.correoalternativo)
-            docente.numerocelular = data.get("numerocelular", docente.numerocelular)
-            docente.descripcionperfil = data.get("descripcionperfil", docente.descripcionperfil)
-            docente.save()
-            return Response({"message": "Perfil de docente actualizado correctamente."}, status=status.HTTP_200_OK)
+            print(data.get('password'))
+            error_contrasena = validar_contrasena(data.get('password'))
+            if error_contrasena:
+                return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
+            elif not data.get('password') == data.get('confirmPassword'):
+                return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                docente.contrasena = data.get("password", docente.contrasena)
+                docente.apellidopaterno = data.get("apellidopaterno", docente.apellidopaterno)
+                docente.apellidomaterno = data.get("apellidomaterno", docente.apellidomaterno)
+                docente.correoalternativo = data.get("correoalternativo", docente.correoalternativo)
+                docente.numerocelular = data.get("numerocelular", docente.numerocelular)
+                docente.descripcionperfil = data.get("descripcionperfil", docente.descripcionperfil)
+                docente.save()
+                return Response({"message": "Perfil de docente actualizado correctamente."}, status=status.HTTP_200_OK)
         except Docente.DoesNotExist:
             return Response({"error": "Perfil no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 

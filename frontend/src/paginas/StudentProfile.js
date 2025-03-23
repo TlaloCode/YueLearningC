@@ -3,6 +3,8 @@ import "../css/StudentProfile.css";
 import userPlaceholder from "../assets/default-user.jpg";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
+import Footer from "../components/footer";
+import Header from "../components/Header";
 
 const StudentProfile = () => {
     const [profile, setProfile] = useState({
@@ -137,36 +139,55 @@ const StudentProfile = () => {
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
             <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
-        <div className="profile-container">
-            <div className="profile-header">
-                <h2>Mi Perfil</h2>
-            </div>
-            <div className="profile-content">
-                <div className="profile-image" style={{ width: '500px' }}>
-                    <img src={profile.fotoPerfil} alt="Foto de perfil"/>
-                    <input type="file" accept="image/*" onChange={handleFileChange}/>
-                    <button className="edit-photo" onClick={handleUpload}>📷 Subir</button>
-                </div>
-                <div className="profile-info">
-                    <h3>Datos Personales</h3>
-                    <label>Nombre de usuario (nickname)</label>
-                    <input type="text" name="username" placeholder="Nombre de usuario (nickname)"
-                           value={profile.username} onChange={handleChange}/>
-                    <label>Correo institucional</label>
-                    <input type="email" name="institutionalEmail" placeholder="Correo Institucional"
-                           value={profile.institutionalEmail} onChange={handleChange} disabled/>
-                    <label>Contraseña</label>
-                    <input type="text" name="password" placeholder="**********"
-                           value={profile.password} onChange={handleChange}/>
-                    <div className="profile-buttons">
-                        <button className="btn-save" onClick={handleSave}>Actualizar</button>
+            <div className="app-container"> {/* Contenedor principal para ajustar el layout */}
+                <Header/>
+                <div className="profile-container">
+                    <h2 className="profile-title">Mi Perfil</h2>
+                    <div className="profile-content">
+                        <div className="profile-left">
+                            <div className="profile-image">
+                                <img src={userPlaceholder} alt="Foto de perfil"/>
+                                <button className="edit-photo">📷</button>
+                            </div>
+                            <button className="delete-profile">🗑️ Eliminar mi perfil</button>
+                            <div className="profile-courses">
+                                <h3>Mis cursos</h3>
+                                <span>🎓</span>
+                            </div>
+                        </div>
+                        <div className="profile-right">
+                            <h3>Datos Personales</h3>
+                            <div className="input-group">
+                                <label>Nombre de usuario (nickname)</label>
+                                <input type="text" name="username"
+                                       placeholder="Tu nombre de usuario" value={profile.username}
+                                       onChange={handleChange}/>
+                                <button className="edit-btn">✏️</button>
+                            </div>
+                            <div className="input-group">
+                                <label>Correo institucional</label>
+                                <input type="email" name="institutionalEmail"
+                                       placeholder="Tu correo institucional" value={profile.institutionalEmail}
+                                       onChange={handleChange} disabled/>
+                                <button className="edit-btn">✏️</button>
+                            </div>
+                            <div className="input-group">
+                                <label>Contraseña</label>
+                                <input type="password" name="password"
+                                       placeholder="**********" value={profile.password} onChange={handleChange}/>
+                                <button className="edit-btn">✏️</button>
+                            </div>
+                            <div className="profile-buttons">
+                                <button className="btn-save" onClick={handleSave}>Actualizar</button>
+                                <button className="btn-cancel">Cancelar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <Footer/>
             </div>
-            <Footer />
         </div>
-        </div>
-    );
-};
+            );
+            };
 
-export default StudentProfile;
+            export default StudentProfile;

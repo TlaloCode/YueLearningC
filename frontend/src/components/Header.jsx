@@ -33,6 +33,10 @@ const Header = () => {
 
 
     const homeNavigation = () => {
+        navigate('../home');
+    };
+
+    const LoginNavigation = () => {
         navigate('../login');
     };
 
@@ -158,7 +162,7 @@ const Header = () => {
                     </div>
                 ) : (
                     <button
-                        onClick={homeNavigation} // Redirige a login
+                        onClick={LoginNavigation} // Redirige a login
                         style={{
                             background: "transparent",
                             border: "none",
