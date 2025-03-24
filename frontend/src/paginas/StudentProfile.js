@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import "../css/StudentProfile.css";
 import userPlaceholder from "../assets/default-user.jpg";
 import ErrorModal from "../components/ErrorModal"
@@ -7,6 +8,7 @@ import Footer from "../components/footer";
 import Header from "../components/Header";
 
 const StudentProfile = () => {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState({
         username: localStorage.getItem("nombre"),
         institutionalEmail: localStorage.getItem("correo"),
@@ -16,6 +18,10 @@ const StudentProfile = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
+
+    const handleRedirect = () => {
+        navigate('/mis-cursos-estudiante');
+    };
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -150,7 +156,7 @@ const StudentProfile = () => {
                                 <button className="edit-photo">📷</button>
                             </div>
                             <button className="delete-profile">🗑️ Eliminar mi perfil</button>
-                            <div className="profile-courses">
+                            <div className="profile-courses" onClick={handleRedirect}>
                                 <h3>Mis cursos</h3>
                                 <span>🎓</span>
                             </div>

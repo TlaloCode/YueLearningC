@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from .views import registrar_usuario , login_usuario, verificar_correo, create_course
 from .views import get_user_profile, update_user_profile, upload_profile_photo, get_teacher_courses
+from .views import get_enrolled_courses, get_all_courses, get_teachers_with_courses
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -15,5 +16,8 @@ urlpatterns = [
     path('upload-profile-photo/', upload_profile_photo, name='upload_profile_photo'),
     path('get-teacher-courses/', get_teacher_courses, name='get_teacher_courses'),
     path('create-course/', create_course, name='create_course'),
+    path('get-enrolled-courses/', get_enrolled_courses, name='get_enrolled_courses'),
+    path('get-all-courses/', get_all_courses, name='get_all_courses'),
+    path('get-teachers-with-courses/', get_teachers_with_courses, name='get_teachers_with_courses'),
 
 ]

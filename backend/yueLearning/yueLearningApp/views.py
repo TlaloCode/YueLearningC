@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -278,3 +278,66 @@ def create_course(request):
     curso.save()
 
     return Response({"message": "Curso creado exitosamente", "id": curso.id_curso})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_enrolled_courses(request):
+    estudiante = request.user
+
+    # Buscar inscripciones del usuario
+    inscripciones = Inscripciones.objects.filter(id_usuario=estudiante).select_related('id_curso', 'id_curso__id_docente')
+
+    cursos_data = []
+    for inscripcion in inscripciones:
+        curso = inscripcion.id_curso
+        if curso:
+            cursos_data.append({
+                "id": curso.id_curso,
+                "title": curso.nombrecurso,
+                "description": curso.descripcioncurso,
+                "image": curso.imagen_url,
+                "author": f"{curso.id_docente.nombre} {curso.id_docente.apellidopaterno}" if curso.id_docente else "Desconocido"
+            })
+
+    return Response(cursos_data)
+
+
+@api_view(['GET'])
+def get_all_courses(request):
+    cursos = Curso.objects.select_related('id_docente').all()
+    data = []
+
+    for curso in cursos:
+        docente_info = "Desconocido"
+        try:
+            docente = Docente.objects.get(usuario=curso.id_docente)
+            docente_info = f"{docente.nombre} {docente.apellidopaterno}"
+        except Docente.DoesNotExist:
+            pass
+
+        data.append({
+            "id": curso.id_curso,
+            "title": curso.nombrecurso,
+            "description": curso.descripcioncurso,
+            "image": curso.imagen_url,
+            "author": docente_info
+        })
+
+    return Response(data)
+
+@api_view(['GET'])
+def get_teachers_with_courses(request):
+    docentes_con_cursos = Curso.objects.exclude(id_docente=None).values_list('id_docente', flat=True).distinct()
+    docentes = Docente.objects.filter(usuario_id__in=docentes_con_cursos)
+
+    data = []
+    for docente in docentes:
+        data.append({
+            "id": docente.usuario.id,
+            "name": f"{docente.nombre} {docente.apellidopaterno} {docente.apellidomaterno}",
+            "image": docente.usuario.fotoperfil or "https://via.placeholder.com/150"
+        })
+
+    return Response(data)
+
