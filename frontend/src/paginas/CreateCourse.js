@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/CreateCourse.css";
-import { FaPlus, FaVideo, FaFileAlt, FaImage, FaArrowLeft } from "react-icons/fa";
+import { FaPlus, FaImage, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const CreateCourse = () => {
@@ -29,10 +29,7 @@ const CreateCourse = () => {
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Nuevo curso creado:", course);
-    };
+
 
     return (
         <div className="app-container">

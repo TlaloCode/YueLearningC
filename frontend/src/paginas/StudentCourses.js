@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/StudentCourses.css";
-import { FaStar, FaChevronRight } from "react-icons/fa";
+import { FaStar, FaChevronRight,FaGraduationCap, FaBrain, FaTrophy } from "react-icons/fa";
 
 const StudentCourses = () => {
     const [courses] = useState([
@@ -26,7 +26,6 @@ const StudentCourses = () => {
     return (
         <div className="app-container">
             <Header />
-
             <div className="profile-section">
                 <div className="profile-info">
                     <img src={require("../assets/c-course.jpg")} alt="Profile" className="profile-image" />
@@ -46,6 +45,26 @@ const StudentCourses = () => {
                             <strong>3.0</strong>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div className="sidebar">
+                <div className="sidebar-item">
+                    <button className="sidebar-button">
+                        <FaGraduationCap />
+                        <span>Cursos</span>
+                    </button>
+                </div>
+                <div className="sidebar-item">
+                    <button className="sidebar-button">
+                        <FaTrophy />
+                        <span>Mi nivel</span>
+                    </button>
+                </div>
+                <div className="sidebar-item">
+                    <button className="sidebar-button">
+                        <FaBrain />
+                        <span>Practicar</span>
+                    </button>
                 </div>
             </div>
 

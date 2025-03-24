@@ -1,0 +1,136 @@
+.lista-videos-container {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 80px; /* espacio suficiente para que el header no tape */
+}
+
+.content-wrapper {
+    display: flex;
+    padding: 30px 60px;
+    max-width: 1900px;
+    width: 250%;
+    margin: 0 auto;
+    gap: 40px;
+}
+
+
+.sidebar-menu {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-right: 0px;
+}
+
+.sidebar-menu button {
+    padding: 19px;
+    background-color: #b4cef2;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sidebar-menu button:hover {
+    background-color: #7da4d6;
+    color: white;
+}
+
+.video-section {
+    flex: 1;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #5f9bcc;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.video-title-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.video-title-rating h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.video-title-rating p {
+    font-size: 16px;
+    color: #555;
+}
+
+.stars-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.star {
+    color: gold;
+    font-size: 20px;
+}
+
+.star.gray {
+    color: lightgray;
+}
+
+.rating {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+.video-section {
+    flex: 1;
+}
+
+
+.video-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.video-card {
+    display: flex;
+    gap: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    align-items: center;
+    width: 100%; /* ocuparán todo el espacio disponible */
+}
+
+
+.video-card img {
+    width: 160px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.video-info h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.video-info p {
+    font-size: 14px;
+    color: #666;
+}

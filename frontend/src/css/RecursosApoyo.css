@@ -1,0 +1,81 @@
+.recursos-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* fuerza a ocupar todo el alto de la ventana */
+}
+
+.recursos-wrapper {
+    display: flex;
+    padding: 30px 60px;
+    max-width: 1600px;
+    margin: auto;
+    gap: 100px; /* Más separación entre sidebar y contenido */
+    width: 100%;
+}
+
+.sidebar-menu {
+    width: 190px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-menu button {
+    padding: 17px;
+    background-color: #b4cef2;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.sidebar-menu .active {
+    background-color: #7da4d6;
+    color: white;
+}
+
+.recursos-content {
+    flex: 1;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #5f9bcc;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.recursos-content h1 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.recursos-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recurso-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    font-size: 22px;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+
+}
+
+.recurso-icon {
+    width: 24px;
+    height: 24px;
+}

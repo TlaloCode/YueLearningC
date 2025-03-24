@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/TeacherCourseDetail.css";
-import { FaStar, FaChevronRight, FaChevronLeft, FaPlusCircle, FaTrash } from "react-icons/fa";
+import AgregarVideo from "../paginas/AgregarVideo";
+import AgregarRecurso from "../paginas/AgregarRecurso";
+import {FaStar, FaChevronRight, FaChevronLeft, FaPlusCircle, FaTrash } from "react-icons/fa";
+
+
 
 const TeacherCourseDetail = () => {
     const [videos] = useState([
@@ -16,6 +20,17 @@ const TeacherCourseDetail = () => {
         { id: 2, title: "02 - Estructura de un sistema de Von Neumann", file: require("../assets/c-course.jpg") },
         { id: 3, title: "02 - Estructura de un sistema de Von Neumann", file: require("../assets/c-course.jpg") },
     ]);
+
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+
+    const [showRecursoModal, setShowRecursoModal] = useState(false);
+
+    const handleOpenRecursoModal = () => setShowRecursoModal(true);
+    const handleCloseRecursoModal = () => setShowRecursoModal(false);
+
 
     return (
         <div className="app-container">
@@ -51,9 +66,10 @@ const TeacherCourseDetail = () => {
                             <FaChevronLeft />
                         </button>
                         <h3>Lista de videos</h3>
-                        <button className="add-button">
+                        <button className="add-button" onClick={handleOpenModal}>
                             Agregar <FaPlusCircle />
                         </button>
+                        {showModal && <AgregarVideo onClose={handleCloseModal} />}
                     </div>
                     <div className="videos-grid">
                         {videos.map((video) => (
@@ -71,9 +87,10 @@ const TeacherCourseDetail = () => {
                 <div className="course-section">
                     <div className="section-header">
                         <h3>Recursos de apoyo</h3>
-                        <button className="add-button">
+                        <button className="add-button" onClick={handleOpenRecursoModal}>
                             Agregar <FaPlusCircle />
                         </button>
+                        {showRecursoModal && <AgregarRecurso onClose={handleCloseRecursoModal} />}
                     </div>
                     <div className="resources-list">
                         {resources.map((resource) => (

@@ -13,10 +13,10 @@ import TeacherCourses from "./paginas/TeacherCourses";
 import CreateCourse from "./paginas/CreateCourse";
 import StudentCourses from "./paginas/StudentCourses";
 import TeacherCourseDetail from "./paginas/TeacherCourseDetail";
-
-
-
-
+import InscribirCurso from "./paginas/InscribirCurso"; // Asegúrate de que la ruta sea correcta
+import ListaVideos from "./paginas/ListaVideos"; // Asegúrate de que la ruta sea correcta
+import EvaluaConocimientos from "./paginas/EvaluaConocimientos";
+import RecursosApoyo from "./paginas/RecursosApoyo";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -40,6 +40,10 @@ const App = () => {
               <Route path="/crear-curso" element={<CreateCourse />} />
               <Route path="/mis-cursos-estudiante" element={<StudentCourses />} />
               <Route path="/curso-detalle" element={<TeacherCourseDetail />} />
+              <Route path="/inscribir-curso" element={<InscribirCurso />} /> {/* Ruta para la inscripción al curso */}
+              <Route path="/lista-videos" element={<ListaVideos />} /> {/* Ruta para la inscripción al curso */}
+              <Route path="/evalua-conocimientos" element={<EvaluaConocimientos />} /> {/* Ruta para la inscripción al curso */}
+              <Route path="/recursos-apoyo" element={<RecursosApoyo />} /> {/* Ruta para la inscripción al curso */}
 
 
 
