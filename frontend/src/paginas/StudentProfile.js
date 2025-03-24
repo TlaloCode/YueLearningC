@@ -163,7 +163,7 @@ const StudentProfile = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <footer />
         </div>
         </div>
     );
