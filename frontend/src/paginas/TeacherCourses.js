@@ -1,18 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/TeacherCourses.css";
 import { FaPlus, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import genericCourse from "../assets/c-course.jpg";
+import defaultLogo from "../Img/default-profile.png";
 
 const TeacherCourses = () => {
     const navigate = useNavigate();
-    const [courses] = useState([
-        { id: 1, title: "Arquitectura de Von Neumann", image: require("../assets/c-course.jpg") },
-        { id: 2, title: "Arquitectura de Von Neumann", image: require("../assets/c-course.jpg") },
-        { id: 3, title: "Arquitectura de Von Neumann", image: require("../assets/c-course.jpg") },
-    ]);
+    const [profile, setProfile] = useState({
+        name: "",
+        lastName: "",
+        middleName: "",
+        institutionalEmail: "",
+        description: "",
+    });
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setProfile({ ...profile, [name]: value });
+    };
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token || token.trim() === "") {
+            alert("No tienes un token de autenticación. Inicia sesión.");
+            return;
+        }
+
+        const fetchProfileAndCourses = async () => {
+            try {
+                // 1. Obtener datos del perfil
+                const profileRes = await fetch("http://127.0.0.1:8000/api/get-user-profile/", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (profileRes.ok) {
+                    const data = await profileRes.json();
+                    setProfile({
+                        name: data.nombre,
+                        lastName: data.apellidopaterno,
+                        middleName: data.apellidomaterno,
+                        institutionalEmail: data.correoelectronico,
+                        description: data.descripcionperfil,
+                    });
+                }
+
+                // 2. Obtener cursos del docente
+                const coursesRes = await fetch("http://127.0.0.1:8000/api/get-teacher-courses/", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (coursesRes.ok) {
+                    const data = await coursesRes.json(); // Asegúrate de que el backend devuelve un array de cursos
+                    setCourses(data);
+                }
+
+            } catch (error) {
+                console.error("Error al cargar los datos del docente o cursos", error);
+            }
+        };
+
+        fetchProfileAndCourses();
+    }, []);
+
+
+    const [courses, setCourses] = useState([]);
 
     const handleCreateCourse = () => {
         navigate("/crear-curso");
@@ -26,10 +86,14 @@ const TeacherCourses = () => {
                 <div className="profile-info">
                     <img src={require("../assets/default-user.jpg")} alt="Profile" className="profile-image" />
                     <div className="profile-details">
-                        <h2 className="profile-name">López Ruiz Gabriela de Jesús</h2>
-                        <a href="mailto:usuario@ipn.mx" className="profile-email">usuario@ipn.mx</a>
+                        <h2 className="profile-name">
+                            {profile.name} {profile.lastName} {profile.middleName}
+                        </h2>
+                        <a href={`mailto:${profile.institutionalEmail}`} className="profile-email">
+                            {profile.institutionalEmail}
+                        </a>
                         <p className="profile-description">
-                            Soy una profesora con el propósito de motivar a mis estudiantes...
+                            {profile.description}
                         </p>
                     </div>
                 </div>
@@ -39,7 +103,7 @@ const TeacherCourses = () => {
                 <div className="courses-header">
                     <h2>Todos mis cursos</h2>
                     <button className="btn-new-course" onClick={handleCreateCourse}>
-                        <span>Nuevo curso</span>
+                    <span>Nuevo curso</span>
                         <FaPlus />
                     </button>
                 </div>
@@ -49,7 +113,11 @@ const TeacherCourses = () => {
                         <div className="courses-grid">
                             {courses.map((course) => (
                                 <div key={course.id} className="course-card">
-                                    <img src={course.image} alt={course.title} className="course-image" />
+                                    <img
+                                        src={course.image || genericCourse}
+                                        alt={course.title}
+                                        className="course-image"
+                                    />
                                     <h3>{course.title}</h3>
                                 </div>
                             ))}

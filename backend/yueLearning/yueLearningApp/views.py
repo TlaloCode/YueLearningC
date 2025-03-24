@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -231,3 +231,50 @@ def upload_profile_photo(request):
         return Response({"fotoPerfil": file_url}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_teacher_courses(request):
+    docente = request.user
+
+    # Filtrar cursos por el docente autenticado
+    cursos = Curso.objects.filter(id_docente=docente)
+
+    # Serializar manualmente la información que necesitas
+    cursos_data = []
+    for curso in cursos:
+        cursos_data.append({
+            "id": curso.id_curso,
+            "title": curso.nombrecurso,
+            "description": curso.descripcioncurso,
+            "image": curso.imagen_url
+        })
+
+    return Response(cursos_data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_course(request):
+    docente = request.user
+    nombrecurso = request.POST.get("nombrecurso")
+    descripcioncurso = request.POST.get("descripcioncurso")
+    imagen = request.FILES.get("imagen")
+
+    if not nombrecurso or not descripcioncurso:
+        return Response({"error": "Faltan campos obligatorios"}, status=400)
+
+    curso = Curso(
+        id_docente=docente,
+        nombrecurso=nombrecurso,
+        descripcioncurso=descripcioncurso,
+    )
+
+    if imagen:
+        # Aquí deberías guardar la imagen en algún lugar y asignar su URL real
+        curso.imagen_url = "http://tu-servidor.com/uploads/" + imagen.name  # Simulado
+
+    curso.save()
+
+    return Response({"message": "Curso creado exitosamente", "id": curso.id_curso})
