@@ -92,6 +92,7 @@ class Curso(models.Model):
     calificacion = models.DecimalField(db_column='Calificacion', max_digits=2, decimal_places=1, blank=True, null=True)
     listavideos = models.JSONField(db_column='ListaVideos', blank=True, null=True)
     listarecursos = models.JSONField(db_column='ListaRecursos', blank=True, null=True)
+    imagen_url = models.URLField(db_column='ImagenURL', max_length=500, blank=True, null=True)
 
     class Meta:
         db_table = 'curso'

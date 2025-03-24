@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -49,12 +49,15 @@ def registrar_usuario(request):
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
 
+    if not data.get("contrasena") == data.get("confirm_password"):
+        return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
+
     if Usuario.objects.filter(correoelectronico=data.get('correoelectronico')).exists():
         return Response({"error": "El correo electrónico ya está registrado."}, status=status.HTTP_400_BAD_REQUEST)
 
     usuario = Usuario.objects.create_user(
         correoelectronico=data.get("correoelectronico"),
-        contrasena=data.get("contrasena")
+        password=data.get("contrasena")
     )
 
     if rol == "estudiante":
@@ -89,8 +92,9 @@ def login_usuario(request):
     data = request.data
     correo = data.get("correoelectronico")
     password = data.get("contrasena")
-
+    print(data)
     usuario = Usuario.objects.filter(correoelectronico=correo).first()
+    print(usuario)
     if not usuario:
         return Response({"error": "Correo o contraseña incorrectos."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -150,6 +154,11 @@ def get_user_profile(request):
             return Response({
                 "nombre": docente.nombre,
                 "correoelectronico": usuario.correoelectronico,
+                "apellidopaterno": docente.apellidopaterno,
+                "apellidomaterno": docente.apellidomaterno,
+                "correoalternativo": docente.correoalternativo,
+                "numerocelular": docente.numerocelular,
+                "descripcionperfil": docente.descripcionperfil,
                 "fotoPerfil": usuario.fotoperfil if usuario.fotoperfil else "",
                 "contrasena": docente.contrasena,  # Devuelve la contraseña sin encriptar
             }, status=status.HTTP_200_OK)
@@ -178,13 +187,21 @@ def update_user_profile(request):
         try:
             docente = Docente.objects.get(usuario=usuario)
             docente.nombre = data.get("nombre", docente.nombre)
-            docente.apellidopaterno = data.get("apellidopaterno", docente.apellidopaterno)
-            docente.apellidomaterno = data.get("apellidomaterno", docente.apellidomaterno)
-            docente.correoalternativo = data.get("correoalternativo", docente.correoalternativo)
-            docente.numerocelular = data.get("numerocelular", docente.numerocelular)
-            docente.descripcionperfil = data.get("descripcionperfil", docente.descripcionperfil)
-            docente.save()
-            return Response({"message": "Perfil de docente actualizado correctamente."}, status=status.HTTP_200_OK)
+            print(data.get('password'))
+            error_contrasena = validar_contrasena(data.get('password'))
+            if error_contrasena:
+                return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
+            elif not data.get('password') == data.get('confirmPassword'):
+                return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                docente.contrasena = data.get("password", docente.contrasena)
+                docente.apellidopaterno = data.get("apellidopaterno", docente.apellidopaterno)
+                docente.apellidomaterno = data.get("apellidomaterno", docente.apellidomaterno)
+                docente.correoalternativo = data.get("correoalternativo", docente.correoalternativo)
+                docente.numerocelular = data.get("numerocelular", docente.numerocelular)
+                docente.descripcionperfil = data.get("descripcionperfil", docente.descripcionperfil)
+                docente.save()
+                return Response({"message": "Perfil de docente actualizado correctamente."}, status=status.HTTP_200_OK)
         except Docente.DoesNotExist:
             return Response({"error": "Perfil no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -214,3 +231,113 @@ def upload_profile_photo(request):
         return Response({"fotoPerfil": file_url}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_teacher_courses(request):
+    docente = request.user
+
+    # Filtrar cursos por el docente autenticado
+    cursos = Curso.objects.filter(id_docente=docente)
+
+    # Serializar manualmente la información que necesitas
+    cursos_data = []
+    for curso in cursos:
+        cursos_data.append({
+            "id": curso.id_curso,
+            "title": curso.nombrecurso,
+            "description": curso.descripcioncurso,
+            "image": curso.imagen_url
+        })
+
+    return Response(cursos_data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_course(request):
+    docente = request.user
+    nombrecurso = request.POST.get("nombrecurso")
+    descripcioncurso = request.POST.get("descripcioncurso")
+    imagen = request.FILES.get("imagen")
+
+    if not nombrecurso or not descripcioncurso:
+        return Response({"error": "Faltan campos obligatorios"}, status=400)
+
+    curso = Curso(
+        id_docente=docente,
+        nombrecurso=nombrecurso,
+        descripcioncurso=descripcioncurso,
+    )
+
+    if imagen:
+        # Aquí deberías guardar la imagen en algún lugar y asignar su URL real
+        curso.imagen_url = "http://tu-servidor.com/uploads/" + imagen.name  # Simulado
+
+    curso.save()
+
+    return Response({"message": "Curso creado exitosamente", "id": curso.id_curso})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_enrolled_courses(request):
+    estudiante = request.user
+
+    # Buscar inscripciones del usuario
+    inscripciones = Inscripciones.objects.filter(id_usuario=estudiante).select_related('id_curso', 'id_curso__id_docente')
+
+    cursos_data = []
+    for inscripcion in inscripciones:
+        curso = inscripcion.id_curso
+        if curso:
+            cursos_data.append({
+                "id": curso.id_curso,
+                "title": curso.nombrecurso,
+                "description": curso.descripcioncurso,
+                "image": curso.imagen_url,
+                "author": f"{curso.id_docente.nombre} {curso.id_docente.apellidopaterno}" if curso.id_docente else "Desconocido"
+            })
+
+    return Response(cursos_data)
+
+
+@api_view(['GET'])
+def get_all_courses(request):
+    cursos = Curso.objects.select_related('id_docente').all()
+    data = []
+
+    for curso in cursos:
+        docente_info = "Desconocido"
+        try:
+            docente = Docente.objects.get(usuario=curso.id_docente)
+            docente_info = f"{docente.nombre} {docente.apellidopaterno}"
+        except Docente.DoesNotExist:
+            pass
+
+        data.append({
+            "id": curso.id_curso,
+            "title": curso.nombrecurso,
+            "description": curso.descripcioncurso,
+            "image": curso.imagen_url,
+            "author": docente_info
+        })
+
+    return Response(data)
+
+@api_view(['GET'])
+def get_teachers_with_courses(request):
+    docentes_con_cursos = Curso.objects.exclude(id_docente=None).values_list('id_docente', flat=True).distinct()
+    docentes = Docente.objects.filter(usuario_id__in=docentes_con_cursos)
+
+    data = []
+    for docente in docentes:
+        data.append({
+            "id": docente.usuario.id,
+            "name": f"{docente.nombre} {docente.apellidopaterno} {docente.apellidomaterno}",
+            "image": docente.usuario.fotoperfil or "https://via.placeholder.com/150"
+        })
+
+    return Response(data)
+
