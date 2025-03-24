@@ -1,27 +1,30 @@
-from django.shortcuts import render
-
-# Create your views here.
-from django.http import HttpResponse
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status
-from .models import Estudiantes
-from .serializers import EstudianteSerializer, DocenteSerializer
 import hashlib
 import re
+import uuid
+from datetime import timedelta
+from rest_framework import status
+from django.shortcuts import render
+from django.core.mail import send_mail
+from django.utils.timezone import now
+from django.http import HttpResponse
+from rest_framework.response import Response
+from django.contrib.auth.hashers import check_password
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken
+from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+
+
+refresh = None
 
 def index(request):
     return HttpResponse("<h1>Hola mundo, estas en la vista principal</h1>")
 
 def validar_contrasena(password):
-    """
-    Verifica que la contraseña cumpla con los requisitos de seguridad:
-    - Mínimo 8 caracteres
-    - Al menos una letra mayúscula
-    - Al menos una letra minúscula
-    - Al menos un número
-    - Al menos un carácter especial (!@#$%^&*...)
-    """
     if len(password) < 8:
         return "La contraseña debe tener al menos 8 caracteres."
     if not re.search(r"[A-Z]", password):
@@ -32,76 +35,182 @@ def validar_contrasena(password):
         return "La contraseña debe incluir al menos un número."
     if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
         return "La contraseña debe incluir al menos un carácter especial."
-    return None  # Si pasa todas las validaciones, retorna None
+    return None
 
 @api_view(['POST'])
-def registrar_estudiante(request):
+def registrar_usuario(request):
     data = request.data
-    # Validar que ningún campo esté vacío
-    campos_obligatorios = ["nickname", "email", "password", "confirm_password"]
-    for campo in campos_obligatorios:
-        if not data.get(campo):
-            return Response({"error":"Ningun campo debe estar vacío. Favor de llenar todos los campos" }, status=status.HTTP_400_BAD_REQUEST)
+    rol = data.get("rol")  # Puede ser 'estudiante' o 'docente'
 
-    if data.get('password') != data.get('confirm_password'):
-         return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
+    if rol not in ["estudiante", "docente"]:
+        return Response({"error": "Rol no válido."}, status=status.HTTP_400_BAD_REQUEST)
 
-    error_contrasena = validar_contrasena(data.get('password'))
+    error_contrasena = validar_contrasena(data.get('contrasena'))
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
 
-    #Verificar que el correo electrónico no haya sido registrado previamente
-    if Estudiantes.objects.filter(correoelectronico=data.get('correo')).exists():
+    if Usuario.objects.filter(correoelectronico=data.get('correoelectronico')).exists():
         return Response({"error": "El correo electrónico ya está registrado."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Validar el nickname (máximo 8 caracteres y sin palabras ofensivas)
-    nickname = data.get("nickname")
-    if len(nickname) > 8:
-        return Response({"error": "El nickname debe tener máximo 8 caracteres y no se permiten palabras ofensivas."}, status=status.HTTP_400_BAD_REQUEST)
+    usuario = Usuario.objects.create_user(
+        correoelectronico=data.get("correoelectronico"),
+        contrasena=data.get("contrasena")
+    )
 
-    # Verificar que el nickname no esté en uso
-    if Estudiantes.objects.filter(nickname=nickname).exists():
-        return Response({"error": "El Nickname ya está en uso. Intenta iniciar sesión o usa otro nickname."}, status=status.HTTP_400_BAD_REQUEST)
+    if rol == "estudiante":
+        Estudiantes.objects.create(usuario=usuario, nickname=data.get("nickname"),contrasena=data.get("contrasena"))
+    else:
+        Docente.objects.create(
+            usuario=usuario,
+            nombre=data.get("nombre"),
+            apellidopaterno=data.get("apellidopaterno"),
+            apellidomaterno=data.get("apellidomaterno"),
+            correoalternativo=data.get("correoalternativo"),
+            numerocelular=data.get("numerocelular"),
+            descripcionperfil=data.get("descripcionperfil"),
+            contrasena=data.get("contrasena")
+        )
 
-    # Encriptar la contraseña antes de guardarla
-    data['password'] = hashlib.sha256(data['password'].encode()).hexdigest()
-    serializer = EstudianteSerializer(data=data)
+    token = uuid.uuid4()
+    EmailVerificationToken.objects.create(usuario_id=usuario, token=token, fecha_expiracion=now() + timedelta(hours=24))
+    verification_link = f"http://127.0.0.1:8000/api/verify-email/?token={token}"
+    send_mail(
+        subject="Verifica tu correo electrónico",
+        message=f"Hola, verifica tu correo aquí: {verification_link}",
+        from_email="yuelearning2025a011@gmail.com",
+        recipient_list=[data.get("correoelectronico")],
+        fail_silently=False,
+    )
 
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Estudiante registrado con éxito"}, status=status.HTTP_201_CREATED)
+    return Response({"message": "Usuario registrado con éxito. Verifica tu correo."}, status=status.HTTP_201_CREATED)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-#REGISTRO DE DOCENTE
 @api_view(['POST'])
-def registrar_docente(request):
+def login_usuario(request):
     data = request.data
-    print(data)
-    # Validar que ningún campo esté vacío
-    campos_obligatorios = ['firstName', 'lastName', 'middleName', 'email','password','confirmPassword']
-    for campo in campos_obligatorios:
-        if not data.get(campo):
-            return Response({"error":"Ningun campo debe estar vacío. Favor de llenar todos los campos" }, status=status.HTTP_400_BAD_REQUEST)
+    correo = data.get("correoelectronico")
+    password = data.get("contrasena")
 
-    if data.get('password') != data.get('confirm_password'):
-         return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
+    usuario = Usuario.objects.filter(correoelectronico=correo).first()
+    if not usuario:
+        return Response({"error": "Correo o contraseña incorrectos."}, status=status.HTTP_400_BAD_REQUEST)
 
-    error_contrasena = validar_contrasena(data.get('password'))
-    if error_contrasena:
-        return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
+    if usuario.estatuscorreo != "Verificado":
+        return Response({"error": "Debes verificar tu correo antes de iniciar sesión."}, status=status.HTTP_403_FORBIDDEN)
 
-    #Verificar que el correo electrónico no haya sido registrado previamente
-    if Estudiantes.objects.filter(correoelectronico=data.get('correo')).exists():
-        return Response({"error": "El correo electrónico ya está registrado."}, status=status.HTTP_400_BAD_REQUEST)
+    if not usuario.check_password(password):
+        return Response({"error": "Correo o contraseña incorrectos."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Encriptar la contraseña antes de guardarla
-    data['password'] = hashlib.sha256(data['password'].encode()).hexdigest()
-    serializer = DocenteSerializer(data=data)
+    refresh = RefreshToken.for_user(usuario)
 
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Docente registrado con éxito"}, status=status.HTTP_201_CREATED)
+    # Determinar el rol del usuario
+    rol = "estudiante" if Estudiantes.objects.filter(usuario=usuario).exists() else "docente" if Docente.objects.filter(usuario=usuario).exists() else "usuario"
+    print(rol)
+    return Response({
+        "message": "Inicio de sesión exitoso.",
+        "token": str(refresh.access_token),
+        "refresh_token": str(refresh),
+        "id": usuario.id,
+        "correo": usuario.correoelectronico,
+        "rol": rol,
+    }, status=status.HTTP_200_OK)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def verificar_correo(request):
+    token = request.GET.get('token')
+    try:
+        token_obj = EmailVerificationToken.objects.get(token=token)
+    except EmailVerificationToken.DoesNotExist:
+        return Response({"error": "Token inválido o ya utilizado."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if now() > token_obj.fecha_expiracion:
+        return Response({"error": "El enlace de verificación ha expirado."}, status=status.HTTP_400_BAD_REQUEST)
+
+    usuario = token_obj.usuario_id
+    usuario.estatuscorreo = "Verificado"
+    usuario.save()
+    token_obj.delete()
+    return Response({"message": "Correo verificado con éxito. Ya puedes iniciar sesión."}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_profile(request):
+    usuario = request.user
+    try:
+        estudiante = Estudiantes.objects.get(usuario=usuario)
+        return Response({
+            "nickname": estudiante.nickname,
+            "correoelectronico": usuario.correoelectronico,
+            "fotoPerfil": usuario.fotoperfil if usuario.fotoperfil else "",
+            "contrasena": estudiante.contrasena,  # Devuelve la contraseña sin encriptar
+        }, status=status.HTTP_200_OK)
+    except Estudiantes.DoesNotExist:
+        try:
+            docente = Docente.objects.get(usuario=usuario)
+            return Response({
+                "nombre": docente.nombre,
+                "correoelectronico": usuario.correoelectronico,
+                "fotoPerfil": usuario.fotoperfil if usuario.fotoperfil else "",
+                "contrasena": docente.contrasena,  # Devuelve la contraseña sin encriptar
+            }, status=status.HTTP_200_OK)
+        except Docente.DoesNotExist:
+            return Response({"error": "Perfil no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_user_profile(request):
+    usuario = request.user
+    data = request.data
+
+    try:
+        estudiante = Estudiantes.objects.get(usuario=usuario)
+        estudiante.nickname = data.get("nickname", estudiante.nickname)
+        error_contrasena = validar_contrasena(data.get('contrasena'))
+        if error_contrasena:
+            return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            estudiante.contrasena = data.get("contrasena", estudiante.contrasena)
+            estudiante.save()
+            usuario.set_password(estudiante.contrasena)  # Encriptar en Usuario
+            usuario.save()
+            return Response({"message": "Perfil de estudiante actualizado correctamente."}, status=status.HTTP_200_OK)
+    except Estudiantes.DoesNotExist:
+        try:
+            docente = Docente.objects.get(usuario=usuario)
+            docente.nombre = data.get("nombre", docente.nombre)
+            docente.apellidopaterno = data.get("apellidopaterno", docente.apellidopaterno)
+            docente.apellidomaterno = data.get("apellidomaterno", docente.apellidomaterno)
+            docente.correoalternativo = data.get("correoalternativo", docente.correoalternativo)
+            docente.numerocelular = data.get("numerocelular", docente.numerocelular)
+            docente.descripcionperfil = data.get("descripcionperfil", docente.descripcionperfil)
+            docente.save()
+            return Response({"message": "Perfil de docente actualizado correctamente."}, status=status.HTTP_200_OK)
+        except Docente.DoesNotExist:
+            return Response({"error": "Perfil no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_profile_photo(request):
+    usuario = request.user
+    file = request.FILES.get("file")
+
+    if not file:
+        return Response({"error": "No se seleccionó ninguna imagen."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        gauth = GoogleAuth()
+        gauth.LocalWebserverAuth()
+        drive = GoogleDrive(gauth)
+
+        uploaded_file = drive.CreateFile({'title': file.name})
+        uploaded_file.SetContentFile(file.temporary_file_path())
+        uploaded_file.Upload()
+
+        file_url = f"https://drive.google.com/uc?id={uploaded_file['id']}"
+        usuario.fotoperfil = file_url
+        usuario.save()
+
+        return Response({"fotoPerfil": file_url}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -26,13 +26,13 @@ const Footer = () => {
                 <p style={{ marginBottom: "10px" }}>
                     <strong>Contáctanos:</strong>
                 </p>
-                <p style={{ margin: "5px 0", display: "flex", alignItems: "center", gap: "10px" }}>
+                {/* <p style={{ margin: "5px 0", display: "flex", alignItems: "center", gap: "10px" }}>
                     <FontAwesomeIcon icon={faWhatsapp} style={{ color: "white" }} /> 5527166934
-                </p>
+                </p>*/}
                 <p style={{ margin: "5px 0", display: "flex", alignItems: "center", gap: "10px" }}>
                     <FontAwesomeIcon icon={faFacebook} style={{ color: "white" }} />
                     <a
-                        href="https://www.facebook.com/YUE-LearningC"
+                        href="https://www.facebook.com/profile.php?id=61561107116721"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ color: "white", textDecoration: "none" }}
@@ -63,7 +63,7 @@ const Footer = () => {
                 >
                     Ayuda
                 </Link>
-                <p style={{ marginTop: "10px" }}>&copy; 2024 YUE, Inc.</p>
+                <p style={{ marginTop: "10px" }}>&copy; Copyright 2024 YUE, Inc.</p>
             </div>
         </footer>
     );

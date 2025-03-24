@@ -29,7 +29,7 @@ const MainContent = () => {
             >
 
                 <h2 style={{margin: 10}}>
-                    “Transforma el desafío en oportunidad con nuestra página web”
+                    “Transforma el desafío en oportunidad con nuestra aplicación web”
                 </h2>
             </div>
         </div>
