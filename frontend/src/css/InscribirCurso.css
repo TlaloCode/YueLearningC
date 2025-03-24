@@ -1,0 +1,111 @@
+.course-detail-container {
+    width: 100%;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.course-content {
+    display: flex;
+    max-width: 800px;
+    width: 100%;
+    max-width: 1500px;
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #5f9bcc;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 20px;
+    align-self: flex-start; /* 👈 importante para que se alinee a la izquierda */
+}
+
+
+
+.title-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* para que no se rompa en pantallas pequeñas */
+    gap: 180px;
+}
+
+.course-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #222;
+    margin: 0;
+}
+
+.course-author {
+    font-size: 16px;
+    color: #555;
+    margin: 5px 0;
+}
+
+.course-rating.right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stars {
+    display: flex;
+}
+
+.star {
+    color: gold;
+    font-size: 22px;
+}
+
+.star.gray {
+    color: lightgray;
+}
+
+.rating-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.course-image {
+    width: 50%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.course-description {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+.btn-inscribirse {
+    background-color: #5f9bcc;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-inscribirse:hover {
+    background-color: #1e5673;
+}

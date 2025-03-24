@@ -1,0 +1,90 @@
+.compilador-container {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    padding-top: 80px;
+    display: flex;
+    flex-direction: column;
+}
+
+.compilador-content {
+    max-width: 1600px;
+    width: 500%;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #5f9bcc;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.descripcion {
+    font-size: 16px;
+    color: #444;
+}
+
+.lista-instrucciones {
+    padding-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.lista-instrucciones li {
+    margin-bottom: 8px;
+}
+
+.editor-section {
+    display: flex;
+    gap: 10px;
+    height: 500px;
+    border-top: 3px solid teal;
+    border-bottom: 3px solid teal;
+    margin-bottom: 20px;
+}
+
+.codigo {
+    width: 50%;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: none;
+    font-family: monospace;
+    font-size: 18px;
+    resize: none;
+    height: 100%;
+    border-right: 1px solid #ccc;
+}
+
+.salida {
+    width: 50%;
+    background-color: #000;
+    color: #0f0;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 18px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.btn-ejecutar {
+    display: block;
+    background-color: #1e4f91;
+    color: white;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    margin: auto;
+    cursor: pointer;
+}

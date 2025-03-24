@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/CreateCourse.css";
-import { FaPlus, FaVideo, FaFileAlt, FaImage, FaArrowLeft } from "react-icons/fa";
+import { FaPlus, FaImage, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
@@ -72,8 +72,6 @@ const CreateCourse = () => {
             alert("Error de red.");
         }
     };
-
-
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />

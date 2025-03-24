@@ -129,3 +129,63 @@ h3 {
     object-fit: cover;
     border: 3px solid white;
 }
+
+.sidebar {
+    position: fixed;
+    top: 300px; /* Ajusta el valor para mover la barra lateral */
+    left: 0px; /* Ajusta el valor para mover la barra lateral hacia la izquierda */
+    width: 40px; /* Ancho de la barra lateral */
+    padding: 20px; /* Espacio interno */
+    border-radius: 5px; /* Bordes redondeados */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column; /* Los elementos dentro de la barra se organizan en columna */
+    gap: 45px; /* Espaciado entre los botones, ajustado para no estar tan lejos */
+    align-items: center; /* Alinea los elementos al centro */
+}
+
+.sidebar-item {
+    display: flex;
+    flex-direction: column; /* Cambia la dirección de los elementos a columna */
+    align-items: center; /* Centra el contenido dentro de los items */
+    gap: 5px; /* Espacio entre el ícono y el texto */
+}
+
+.sidebar-button {
+    background-color: #5f9bcc; /* Color de fondo de los botones */
+    color: white;
+    padding: 18px 12px; /* Ajuste de los márgenes de los botones */
+    font-size: 15px; /* Ajusté el tamaño de la fuente para hacerlo más pequeño */
+    text-align: center;
+    border-radius: 15px;
+    cursor: pointer;
+    width: 111px; /* Hace que los botones tengan un ancho más adecuado */
+    height: 70px; /* Se define un alto fijo para los botones */
+    transition: background-color 0.3s;
+    display: flex;
+    flex-direction: column; /* Alinea el texto y el icono en columna */
+    justify-content: center; /* Centra el texto y el icono */
+    align-items: center;  /* Centra el texto y el icono */
+    transform: rotate(270deg); /* Gira el texto para que se vea vertical */
+}
+
+.sidebar-button:hover {
+    background-color: #1e5673; /* Color más oscuro cuando se pasa el ratón por encima */
+}
+
+/* Estilo de los iconos */
+.sidebar-button i {
+    font-size: 30px; /* Ajusta el tamaño de los íconos */
+    margin-bottom: 5px; /* Espacio entre el ícono y el texto */
+}
+
+/* Asegura que el texto se vea debajo del ícono */
+.sidebar-button span {
+    font-size: 15px; /* Ajusta el tamaño del texto */
+    transform: rotate(360deg); /* Rotación del texto para que quede vertical */
+}
+
+
+
+
+

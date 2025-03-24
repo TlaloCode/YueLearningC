@@ -1,0 +1,110 @@
+.evalua-container {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    padding-top: 80px;
+}
+
+.evalua-wrapper {
+    display: flex;
+    padding: 30px 60px;
+    gap: 40px;
+    max-width: 1400px;
+    margin: auto;
+}
+
+.sidebar-menu {
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.sidebar-menu button {
+    padding: 14px;
+    background-color: #b4cef2;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.sidebar-menu .active {
+    background-color: #7da4d6;
+    color: white;
+}
+
+.sidebar-menu .rate-course {
+    background-color: #3ebd4f;
+    color: white;
+    font-weight: bold;
+}
+
+.quiz-section {
+    flex: 1;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #5f9bcc;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.quiz-card {
+    background: #ececec;
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+}
+
+.quiz-card h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.question {
+    margin-bottom: 20px;
+}
+
+.question p {
+    margin-bottom: 10px;
+}
+
+.question label {
+    display: block;
+    margin: 6px 0;
+    font-size: 15px;
+}
+
+.submit-btn {
+    background-color: #5f9bcc;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.quiz-navigation {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.nav-btn {
+    background-color: #ddd;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
