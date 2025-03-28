@@ -17,6 +17,12 @@ const TeacherCourses = () => {
         description: "",
     });
 
+
+    const handleCourseClick = (courseId) => {
+        navigate(`/teacher-course-detail/${courseId}`);
+    };
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setProfile({ ...profile, [name]: value });
@@ -112,7 +118,7 @@ const TeacherCourses = () => {
                     {courses.length > 0 ? (
                         <div className="courses-grid">
                             {courses.map((course) => (
-                                <div key={course.id} className="course-card">
+                                <div key={course.id} className="course-card"  onClick={() => handleCourseClick(course.id)}>
                                     <img
                                         src={course.image || genericCourse}
                                         alt={course.title}

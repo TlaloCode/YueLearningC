@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/StudentCourses.css";
@@ -8,14 +9,20 @@ import userPlaceholder from "../assets/default-user.jpg";
 
 
 const StudentCourses = () => {
+    const navigate = useNavigate();
     const [student, setStudent] = useState({});
     const [courses, setCourses] = useState([]);
     const [allCourses, setAllCourses] = useState([]);
     const [teachers, setTeachers] = useState([]);
 
+    const handleCourseClick = (courseId) => {
+        navigate(`/inscribir-curso/${courseId}`);
+    };
+
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token) return;
+
 
         const fetchData = async () => {
             try {
@@ -136,8 +143,8 @@ const StudentCourses = () => {
                 <h2>Todos los cursos</h2>
                 <div className="courses-grid">
                     {allCourses.map((course) => (
-                        <div key={course.id} className="course-card">
-                            <img src={course.image || genericCourse} alt={course.title} className="course-image" />
+                        <div key={course.id} className="course-card" onClick={() => handleCourseClick(course.id)}>
+                            <img src={course.image || genericCourse} alt={course.title} className="course-image"/>
                             <h3>{course.title}</h3>
                             <span className="course-author">Creado por {course.author}</span>
                         </div>
@@ -145,7 +152,7 @@ const StudentCourses = () => {
                 </div>
             </div>
 
-            <Footer />
+            <Footer/>
         </div>
     );
 };

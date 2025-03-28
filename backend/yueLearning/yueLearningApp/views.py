@@ -291,16 +291,28 @@ def get_enrolled_courses(request):
     cursos_data = []
     for inscripcion in inscripciones:
         curso = inscripcion.id_curso
+        docente_info = "Desconocido"
+
+        # Verificar si existe un docente para el curso
+        if curso.id_docente:
+            try:
+                # Acceder a la tabla Docente
+                docente = Docente.objects.get(usuario=curso.id_docente)
+                docente_info = f"{docente.nombre} {docente.apellidopaterno}"
+            except Docente.DoesNotExist:
+                pass  # Si no se encuentra el docente, dejamos "Desconocido"
+
         if curso:
             cursos_data.append({
                 "id": curso.id_curso,
                 "title": curso.nombrecurso,
                 "description": curso.descripcioncurso,
                 "image": curso.imagen_url,
-                "author": f"{curso.id_docente.nombre} {curso.id_docente.apellidopaterno}" if curso.id_docente else "Desconocido"
+                "author": docente_info  # Ahora mostramos la información del docente correctamente
             })
 
     return Response(cursos_data)
+
 
 
 @api_view(['GET'])
@@ -325,6 +337,54 @@ def get_all_courses(request):
         })
 
     return Response(data)
+
+@api_view(['GET'])
+def get_course_details(request, course_id):
+    try:
+        curso = Curso.objects.get(id_curso=course_id)
+        docente_info = "Desconocido"
+        if curso.id_docente:
+            try:
+                docente = Docente.objects.get(usuario=curso.id_docente)
+                docente_info = f"{docente.nombre} {docente.apellidopaterno}"
+            except Docente.DoesNotExist:
+                pass
+
+        course_data = {
+            "id": curso.id_curso,
+            "title": curso.nombrecurso,
+            "description": curso.descripcioncurso,
+            "image": curso.imagen_url,
+            "author": docente_info,
+            "rating": curso.calificacion or 0
+        }
+
+        return Response(course_data)
+    except Curso.DoesNotExist:
+        return Response({"error": "Curso no encontrado"}, status=404)
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def inscribir_curso(request):
+    estudiante = request.user
+    curso_id = request.data.get("curso_id")
+
+    try:
+        curso = Curso.objects.get(id_curso=curso_id)
+    except Curso.DoesNotExist:
+        return Response({"error": "Curso no encontrado"}, status=404)
+
+    # Verificar si ya está inscrito
+    if Inscripciones.objects.filter(id_usuario=estudiante, id_curso=curso).exists():
+        return Response({"error": "Ya estás inscrito en este curso"}, status=400)
+
+    # Crear inscripción
+    Inscripciones.objects.create(id_usuario=estudiante, id_curso=curso)
+    return Response({"message": "Inscripción exitosa"})
+
+
 
 @api_view(['GET'])
 def get_teachers_with_courses(request):

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import "../css/TeacherProfile.css";
+import "@fontsource/roboto"
 import userImagePlaceholder from "../assets/default-user.jpg";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import Header from "../components/Header"; // Importa el header
