@@ -97,7 +97,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'YUELearningC',
         'USER': 'root',
-        'PASSWORD': 'yu3L3arn1ng.C',
+        'PASSWORD': 'root',
         'HOST': 'localhost',  # Si usas un servidor remoto, pon su IP o dominio.
         'PORT': '3306',  # Puerto por defecto de MySQL.
         'OPTIONS': {
