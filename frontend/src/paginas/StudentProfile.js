@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import "../css/StudentProfile.css";
+import "@fontsource/roboto"
 import userPlaceholder from "../assets/default-user.jpg";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
@@ -9,6 +10,7 @@ import Header from "../components/Header";
 
 const StudentProfile = () => {
     const navigate = useNavigate();
+    const [editFields, setEditFields] = useState({});
     const [profile, setProfile] = useState({
         username: localStorage.getItem("nombre"),
         institutionalEmail: localStorage.getItem("correo"),
@@ -22,6 +24,11 @@ const StudentProfile = () => {
     const handleRedirect = () => {
         navigate('/mis-cursos-estudiante');
     };
+
+    const enableEdit = (fieldName) => {
+        setEditFields({ ...editFields, [fieldName]: true });
+    };
+
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -163,25 +170,65 @@ const StudentProfile = () => {
                         </div>
                         <div className="profile-right">
                             <h3>Datos Personales</h3>
-                            <div className="input-group">
+                            <div className="input-group"
+                                 style={{
+                                     display: "flex",
+                                     flexDirection: "row",
+                                     alignItems: "center",
+                                     marginBottom: "15px",
+                                     width: "100%",
+                                 }}>
                                 <label>Nombre de usuario (nickname)</label>
                                 <input type="text" name="username"
                                        placeholder="Tu nombre de usuario" value={profile.username}
-                                       onChange={handleChange}/>
-                                <button className="edit-btn">✏️</button>
+                                       onChange={handleChange}
+                                       disabled={!editFields["username"]}
+                                style={{
+                                    width: "80%",
+                                    borderRadius: "10px",
+                                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                                }}/>
+                                <button type="button" className="edit-btn"
+                                        onClick={() => enableEdit("username")}
+                                >✏️</button>
                             </div>
-                            <div className="input-group">
+                            <div className="input-group"
+                                 style={{
+                                     display: "flex",
+                                     flexDirection: "row",
+                                     alignItems: "center",
+                                     marginBottom: "15px",
+                                     width: "100%",
+                                 }}>
                                 <label>Correo institucional</label>
                                 <input type="email" name="institutionalEmail"
                                        placeholder="Tu correo institucional" value={profile.institutionalEmail}
-                                       onChange={handleChange} disabled/>
-                                <button className="edit-btn">✏️</button>
+                                       onChange={handleChange} disabled
+                                       style={{
+                                           width: "80%",
+                                           borderRadius: "10px",
+                                           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                                       }}/>
                             </div>
-                            <div className="input-group">
+                            <div className="input-group"
+                                 style={{
+                                     display: "flex",
+                                     flexDirection: "row",
+                                     alignItems: "center",
+                                     marginBottom: "15px",
+                                     width: "100%",
+                                 }}>
                                 <label>Contraseña</label>
                                 <input type="password" name="password"
-                                       placeholder="**********" value={profile.password} onChange={handleChange}/>
-                                <button className="edit-btn">✏️</button>
+                                       placeholder="**********" value={profile.password} onChange={handleChange}
+                                       disabled={!editFields["password"]}
+                                       style={{
+                                           width: "80%",
+                                           borderRadius: "10px",
+                                           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                                       }}/>
+                                <button className="edit-btn" onClick={() => enableEdit("password")}
+                                >✏️</button>
                             </div>
                             <div className="profile-buttons">
                                 <button className="btn-save" onClick={handleSave}>Actualizar</button>

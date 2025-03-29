@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/TeacherCourseDetail.css";
@@ -9,6 +10,9 @@ import {FaStar, FaChevronRight, FaChevronLeft, FaPlusCircle, FaTrash } from "rea
 
 
 const TeacherCourseDetail = () => {
+    const { courseId } = useParams();
+    const [course, setCourse] = useState(null);
+
     const [videos] = useState([
         { id: 1, title: "01 - Introducción a la Arquitectura de Von Neumann", image: require("../assets/c-course.jpg") },
         { id: 2, title: "02 - Estructura de un sistema de Von Neumann", image: require("../assets/c-course.jpg") },
@@ -31,6 +35,33 @@ const TeacherCourseDetail = () => {
     const handleOpenRecursoModal = () => setShowRecursoModal(true);
     const handleCloseRecursoModal = () => setShowRecursoModal(false);
 
+    useEffect(() => {
+        const fetchCourseDetails = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            const response = await fetch(`http://127.0.0.1:8000/api/get-course-details/${courseId}/`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCourse(data);
+            } else {
+                console.error("Error al obtener el curso");
+            }
+        };
+
+        fetchCourseDetails();
+    }, [courseId]);
+
+    if (!course) {
+        return <div>Cargando...</div>;
+    }
 
     return (
         <div className="app-container">
@@ -48,7 +79,7 @@ const TeacherCourseDetail = () => {
             </div>
 
             <div className="course-info">
-                <h2 className="course-title">Arquitectura de Von Neumann</h2>
+                <h2 className="course-title">{course.title}</h2>
                 <div className="course-rating">
                     <FaStar className="star" />
                     <FaStar className="star" />

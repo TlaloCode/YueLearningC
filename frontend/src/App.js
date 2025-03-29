@@ -45,6 +45,8 @@ const App = () => {
               <Route path="/crear-curso" element={<CreateCourse />} />
               <Route path="/mis-cursos-estudiante" element={<StudentCourses />} />
               <Route path="/curso-detalle" element={<TeacherCourseDetail />} />
+              <Route path="/teacher-course-detail/:courseId" element={<TeacherCourseDetail />} />
+              <Route path="/inscribir-curso/:courseId" element={<InscribirCurso />} />
               <Route path="/inscribir-curso" element={<InscribirCurso />} /> {/* Ruta para la inscripción al curso */}
               <Route path="/lista-videos" element={<ListaVideos />} /> {/* Ruta para la inscripción al curso */}
               <Route path="/evalua-conocimientos" element={<EvaluaConocimientos />} /> {/* Ruta para la inscripción al curso */}
