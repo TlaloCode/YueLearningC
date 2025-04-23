@@ -21,6 +21,7 @@ import CalificarCurso from "./paginas/CalificarCurso";
 import Diagnostico from "./paginas/Diagnostico";
 import Compilador from "./paginas/Compilador";
 import Podio from "./paginas/Podio";
+import VistaVideo from "./paginas/VistaVideo";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -55,6 +56,7 @@ const App = () => {
               <Route path="/diagnostico" element={<Diagnostico/>} /> {/* Ruta para la inscripción al curso */}
               <Route path="/compilador" element={<Compilador/>} /> {/* Ruta para la inscripción al curso */}
               <Route path="/podio" element={<Podio/>} /> {/* Ruta para la inscripción al curso */}
+              <Route path="/vista-video" element={<VistaVideo/>} /> {/* Ruta para la inscripción al curso */}
 
 
           </Routes>

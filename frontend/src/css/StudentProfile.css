@@ -4,6 +4,18 @@ html, body {
     margin: 0;
     display: flex;
     flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+}
+.layout-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+}
+.scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    background: #f5f5f5;
 }
 
 /* Contenedor general que asegura que el footer se mantenga abajo */
@@ -17,7 +29,7 @@ html, body {
 .profile-container {
     max-width: 900px;
     margin: auto;
-    padding: 60px 40px;
+    padding: 90px 40px 100px;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -40,9 +52,9 @@ html, body {
 .profile-content {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 30px;
     align-items: center; /* Asegurar que los elementos estén alineados */
-    padding-top: 35px; /* Aumentar espacio superior */
+    padding-top: 55px; /* Aumentar espacio superior */
 }
 
 .profile-left {
@@ -70,10 +82,9 @@ html, body {
 
 .edit-photo {
     position: absolute;
-    bottom: 10px; /* Ajuste de posición */
-    left: 50%;
-    transform: translateX(-50%); /* Centra el botón horizontalmente */
-    background: white;
+    bottom: -5px;
+    left: 100%;
+    transform: translateX(-30%);
     border: none;
     cursor: pointer;
     font-size: 16px;
@@ -86,15 +97,16 @@ html, body {
     border: none;
     color: red;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 70px;
     display: flex;
     align-items: center;
     gap: 5px; /* Espaciado entre el icono y el texto */
 }
 
 .profile-courses {
-    margin-top: 20px;
+    margin-top: 50px;
     text-align: center;
+    cursor: pointer;
 }
 
 .profile-courses h3 {
@@ -105,7 +117,7 @@ html, body {
 .profile-courses span {
     font-size: 60px; /* Aumentar tamaño del ícono 🎓 */
     display: block;
-    margin-top: 5px;
+    margin-top: 0px;
 }
 
 .profile-right {
@@ -117,7 +129,7 @@ html, body {
 .input-group {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .input-group label {
@@ -132,13 +144,13 @@ html, body {
     cursor: pointer;
     font-size: 16px;
     margin-left: 10px; /* Espacio entre el input y el botón */
-    padding: 5px;
+    padding: 1zpx;
 }
 
 .profile-buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 .btn-save {

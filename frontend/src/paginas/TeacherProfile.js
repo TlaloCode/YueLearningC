@@ -130,87 +130,115 @@ const TeacherProfile = () => {
     };
 
     return (
-        <div>
-            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
-        <div className="app-container">
-            <Header /> {/* Header fijo */}
+        <>
+            <Header />
 
-            <div className="profile-container">
-                <h2 className="profile-title">Mi Perfil</h2>
+            <div className="app-container">
+                <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
+                <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
 
-                <div className="profile-content">
-                    {/* Sección izquierda: Imagen y opciones */}
-                    <div className="profile-sidebar">
-                        <div className="profile-picture">
-                            <img src={userImagePlaceholder} alt="Perfil" />
-                            <div className="edit-icon"><FaEdit /></div>
+                <div className="profile-container">
+                    <h2 className="profile-title">Mi perfil</h2>
+
+                    <div className="profile-content">
+                        {/* Sección izquierda: Imagen y opciones */}
+                        <div className="profile-sidebar">
+                            <div className="top-section">
+                                <div className="profile-picture">
+                                    <img src={userImagePlaceholder} alt="Perfil" />
+                                    <div className="edit-icon"><FaEdit /></div>
+                                </div>
+                                <h3>Todos mis cursos</h3>
+                                <span
+                                    role="img"
+                                    aria-label="Cursos"
+                                    className="course-icon"
+                                    onClick={handleNavigation}
+                                >
+                🎓
+              </span>
+                            </div>
+
+                            <div className="bottom-section">
+                                <button className="delete-profile">
+                                    <FaTrash /> Eliminar mi perfil
+                                </button>
+                            </div>
                         </div>
-                        <button className="delete-profile"><FaTrash /> Eliminar mi perfil</button>
-                        <h3>Todos mis cursos</h3>
-                        <span role="img" aria-label="Cursos" className="course-icon" onClick={handleNavigation}>🎓</span>
-                    </div>
 
-                    {/* Sección derecha: Datos personales */}
-                    <div className="profile-form">
-                        <h3 className="profile-section-title">Datos Personales</h3>
+                        {/* Sección derecha: Datos personales */}
+                        <div className="profile-form">
+                            <h3 className="profile-section-title">Datos personales</h3>
 
-                        {/* Campos de formulario */}
-                        {[
-                            { label: "Nombre", name: "name" },
-                            { label: "Apellido Paterno", name: "lastName" },
-                            { label: "Apellido Materno", name: "middleName" },
-                            { label: "Correo Institucional", name: "institutionalEmail", type: "email", disabled: true },
-                            { label: "Contraseña", name: "password", type: "password" },
-                            { label: "Confirmar Contraseña", name: "confirmPassword", type: "password" },
-                            { label: "Correo Alternativo", name: "alternateEmail", type: "email"},
-                            { label: "Número de Celular", name: "phone", type: "tel" },
-                        ].map((field, index) => (
-                            <div className="form-group" key={index}>
-                                <label>{field.label}</label>
+                            {[
+                                { label: "Nombre", name: "name" },
+                                { label: "Apellido paterno", name: "lastName" },
+                                { label: "Apellido materno", name: "middleName" },
+                                { label: "Correo institucional", name: "institutionalEmail", type: "email", disabled: true },
+                                { label: "Contraseña", name: "password", type: "password" },
+                                { label: "Confirmar contraseña", name: "confirmPassword", type: "password" },
+                                { label: "Correo alternativo", name: "alternateEmail", type: "email" },
+                                { label: "Número de celular", name: "phone", type: "tel" },
+                            ].map((field, index) => (
+                                <div className="form-group" key={index}>
+                                    <label>{field.label}</label>
+                                    <div className="input-group">
+                                        <input
+                                            type={field.type || "text"}
+                                            name={field.name}
+                                            value={profile[field.name]}
+                                            onChange={handleChange}
+                                            placeholder={`Ingrese ${field.label.toLowerCase()}`}
+                                            disabled={field.disabled || !editFields[field.name]}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="edit-btn"
+                                            onClick={() => enableEdit(field.name)}
+                                        >
+                                            ✏️
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Descripción */}
+                            <div className="form-group">
+                                <label>Descripción del perfil</label>
                                 <div className="input-group">
-                                    <input
-                                        type={field.type || "text"}
-                                        name={field.name}
-                                        value={profile[field.name]}
-                                        onChange={handleChange}
-                                        placeholder={`Ingrese ${field.label.toLowerCase()}`}
-                                        disabled={field.name === "institutionalEmail" || !editFields[field.name]}
-                                    />
-                                    <button type="button" className="edit-btn"
-                                            onClick={() => enableEdit(field.name)}>✏️
+                <textarea
+                    name="description"
+                    value={profile.description}
+                    onChange={handleChange}
+                    placeholder="Escribe sobre ti..."
+                    disabled={!editFields.description}
+                />
+                                    <button
+                                        type="button"
+                                        className="edit-btn"
+                                        onClick={() => enableEdit("description")}
+                                    >
+                                        ✏️
                                     </button>
                                 </div>
                             </div>
-                        ))}
 
-                        {/* Descripción */}
-                        <div className="form-group">
-                            <label>Descripción del perfil</label>
-                            <textarea
-                                name="description"
-                                value={profile.description}
-                                onChange={handleChange}
-                                placeholder="Escribe sobre ti..."
-                                disabled={!editFields.description}
-                            />
-                            <button type="button" className="edit-btn" onClick={() => enableEdit("description")}>✏️
-                            </button>
-                        </div>
-
-                        {/* Botones de acción */}
-                        <div className="profile-buttons">
-                            <button className="btn-save" onClick={handleSave}>Actualizar</button>
-                            <button className="btn-cancel" onClick={handleCancel}>Cancelar</button>
+                            {/* Botones de acción */}
+                            <div className="profile-buttons">
+                                <button className="btn-save" onClick={handleSave}>Actualizar</button>
+                                <button className="btn-cancel" onClick={handleCancel}>Cancelar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <Footer /> {/* Footer fijo */}
-        </div>
-        </div>
+            </div>
+            <Footer />
+        </>
     );
+
+
+
 };
 
 export default TeacherProfile;
