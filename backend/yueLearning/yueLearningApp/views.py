@@ -1,6 +1,9 @@
 import hashlib
 import re
+import io
 import uuid
+import tempfile
+import requests
 from datetime import timedelta
 from rest_framework import status
 from django.shortcuts import render
@@ -17,6 +20,10 @@ from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .drive_service import upload_file_to_drive
 
 
 refresh = None
@@ -214,24 +221,47 @@ def upload_profile_photo(request):
 
     if not file:
         return Response({"error": "No se seleccionó ninguna imagen."}, status=status.HTTP_400_BAD_REQUEST)
-
+    elif not file.content_type.startswith("image/"):
+        return Response({"error": "Solo se permiten archivos de imagen."}, status=400)
     try:
-        gauth = GoogleAuth()
-        gauth.LocalWebserverAuth()
-        drive = GoogleDrive(gauth)
+        # Convertir el archivo a stream para pasarlo a Google Drive
+        file_stream = io.BytesIO(file.read())
 
-        uploaded_file = drive.CreateFile({'title': file.name})
-        uploaded_file.SetContentFile(file.temporary_file_path())
-        uploaded_file.Upload()
+        # Usar el servicio modularizado
 
-        file_url = f"https://drive.google.com/uc?id={uploaded_file['id']}"
-        usuario.fotoperfil = file_url
+        # Guardar el link en el modelo
+        file_id = upload_file_to_drive(file_stream, file.name)
+        usuario.fotoperfil = file_id
         usuario.save()
 
-        return Response({"fotoPerfil": file_url}, status=status.HTTP_200_OK)
+        return Response({"fotoPerfil": file_id}, status=status.HTTP_200_OK)
+
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_profile_photo(request):
+    try:
+        usuario = request.user
+        file_id = usuario.fotoperfil
+
+
+        if not file_id or "drive.google.com" in file_id or "data:image" in file_id:
+            return Response({"error": "No se encontró imagen válida."}, status=404)
+
+        # Obtener la imagen directamente desde Google Drive
+        drive_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        response = requests.get(drive_url)
+
+
+        if response.status_code == 200:
+            return HttpResponse(response.content, content_type="image/jpeg")
+        else:
+            return Response({"error": "No se pudo obtener la imagen desde Drive."}, status=500)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -400,4 +430,43 @@ def get_teachers_with_courses(request):
         })
 
     return Response(data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_course_videos(request, course_id):
+    try:
+        curso = Curso.objects.get(id_curso=course_id)
+        # Obtener los videos asociados a este curso
+        videos = Video.objects.filter(id_curso=curso).all()
+
+        # Serializar los datos de los videos
+        videos_data = []
+        for video in videos:
+            videos_data.append({
+                "id": video.id_video,
+                "title": video.titulovideo,
+                "description": video.descripcion,
+                "video": video.video,  # Aquí va la URL o el enlace del video
+            })
+
+        return Response(videos_data)
+
+    except Curso.DoesNotExist:
+        return Response({"error": "Curso no encontrado"}, status=404)
+
+
+@api_view(['GET'])
+def get_teacher_photo(request, file_id):
+    try:
+        print(file_id)
+        drive_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        response = requests.get(drive_url)
+
+        if response.status_code == 200:
+            return HttpResponse(response.content, content_type="image/jpeg")
+        else:
+            return Response({"error": "No se pudo descargar la imagen"}, status=500)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 

@@ -107,7 +107,22 @@ class Inscripciones(models.Model):
 
 # Email Verification Token (kept unchanged)
 def default_expiration():
-    return now() + timedelta(hours=24) 
+    return now() + timedelta(hours=24)
+
+
+
+
+
+class Video(models.Model):
+    id_video = models.AutoField(db_column='ID_Video', primary_key=True)  # Field name made lowercase.
+    id_curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='ID_Curso', blank=True, null=True)  # Field name made lowercase.
+    titulovideo = models.CharField(db_column='TituloVideo', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    descripcion = models.TextField(db_column='Descripcion', blank=True, null=True)  # Field name made lowercase.
+    video = models.CharField(db_column='Video', max_length=255, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'video'
 
 class EmailVerificationToken(models.Model):
     usuario_id = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='ID_Usuario')

@@ -26,6 +26,7 @@ const Header = () => {
         localStorage.removeItem("correo");
         localStorage.removeItem("rol");
         localStorage.removeItem("fotoPerfil");
+        sessionStorage.removeItem("cachedProfileImage");
 
         // Redirigir a la página de inicio de sesión
         navigate('/login');
@@ -44,14 +45,53 @@ const Header = () => {
         // Obtener datos del usuario desde localStorage
         const token = localStorage.getItem("token");
         const rol = localStorage.getItem("rol");
-        const fotoPerfil = localStorage.getItem("fotoPerfil"); // Foto de perfil
+
+        const cachedImage = sessionStorage.getItem("cachedProfileImage");
+
+        if (cachedImage) {
+            setUsuario({ rol, fotoPerfil: cachedImage });
+            return;
+        }
+
+        // Si no está en caché, descargarla
+        const fetchProfileImage = async () => {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/profile-photo/", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+
+                    reader.onloadend = () => {
+                        const base64data = reader.result;
+                        sessionStorage.setItem("cachedProfileImage", base64data);
+                        setUsuario({ rol, fotoPerfil: base64data });
+                    };
+
+                    reader.readAsDataURL(blob);
+                }
+                else{
+                    if(token)
+                    {
+                        setUsuario({
+                            rol,
+                            fotoPerfil:defaultLogo, // Usa la foto de perfil si existe, de lo contrario, usa la predeterminada
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error al descargar imagen de perfil:", error);
+            }
+        };
 
         if (token) {
-            setUsuario({
-                rol,
-                fotoPerfil: fotoPerfil || defaultLogo, // Usa la foto de perfil si existe, de lo contrario, usa la predeterminada
-            });
+            fetchProfileImage();
         }
+
     }, []);
 
     return (
@@ -105,17 +145,17 @@ const Header = () => {
                                 border: "none",
                             }}
                         >
-                    <img
-                        src={defaultLogo}
-                        alt="Perfil"
-                        style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: "50%",
-                            cursor: "pointer",
-                        }}
-                    />
-                </button>
+                            <img
+                                src={usuario.fotoPerfil || defaultLogo}
+                                alt="Perfil"
+                                style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: "50%",
+                                    cursor: "pointer",
+                                }}
+                            />
+                        </button>
                         {/* Menú desplegable */}
                         {menuAbierto && (
                             <div style={{

@@ -3,6 +3,7 @@ from . import views
 from .views import registrar_usuario , login_usuario, verificar_correo, create_course
 from .views import get_user_profile, update_user_profile, upload_profile_photo, get_teacher_courses
 from .views import get_enrolled_courses, get_all_courses, get_teachers_with_courses, get_course_details, inscribir_curso
+from .views import get_course_videos, get_profile_photo, get_teacher_photo
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -14,6 +15,7 @@ urlpatterns = [
     path('update-user-profile/', update_user_profile, name='update_user_profile'),
     path('get-user-profile/', get_user_profile, name='get_user_profile'),
     path('upload-profile-photo/', upload_profile_photo, name='upload_profile_photo'),
+    path('profile-photo/', get_profile_photo, name='get_profile_photo'),
     path('get-teacher-courses/', get_teacher_courses, name='get_teacher_courses'),
     path('create-course/', create_course, name='create_course'),
     path('get-enrolled-courses/', get_enrolled_courses, name='get_enrolled_courses'),
@@ -21,5 +23,8 @@ urlpatterns = [
     path('get-teachers-with-courses/', get_teachers_with_courses, name='get_teachers_with_courses'),
     path('get-course-details/<int:course_id>/', get_course_details, name='get_course_details'),
     path('inscribir-curso/', inscribir_curso, name='inscribir_curso'),
+    path('get-videos/<int:course_id>/', get_course_videos, name='get_course_videos'),
+    path('teacher-photo/<str:file_id>/', get_teacher_photo, name='get_teacher_photo'),
+
 
 ]

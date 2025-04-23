@@ -42,6 +42,7 @@
 
 .quiz-section {
     flex: 1;
+    margin-left: 150px;
 }
 
 .back-button {

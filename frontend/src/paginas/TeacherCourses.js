@@ -15,6 +15,7 @@ const TeacherCourses = () => {
         middleName: "",
         institutionalEmail: "",
         description: "",
+        fotoPerfil: "",
     });
 
 
@@ -47,12 +48,14 @@ const TeacherCourses = () => {
 
                 if (profileRes.ok) {
                     const data = await profileRes.json();
+                    const cachedImage = sessionStorage.getItem("cachedProfileImage");
                     setProfile({
                         name: data.nombre,
                         lastName: data.apellidopaterno,
                         middleName: data.apellidomaterno,
                         institutionalEmail: data.correoelectronico,
                         description: data.descripcionperfil,
+                        fotoPerfil: cachedImage || "",
                     });
                 }
 
@@ -90,7 +93,7 @@ const TeacherCourses = () => {
 
             <div className="profile-section">
                 <div className="profile-info">
-                    <img src={require("../assets/default-user.jpg")} alt="Profile" className="profile-image" />
+                    <img src={profile.fotoPerfil || defaultLogo} alt="Profile" className="profile-image" />
                     <div className="profile-details">
                         <h2 className="profile-name">
                             {profile.name} {profile.lastName} {profile.middleName}

@@ -30,6 +30,14 @@ const AgregarVideo = ({ onClose }) => {
                             value={videoTitle}
                             onChange={(e) => setVideoTitle(e.target.value)}
                             required
+                            style={{
+                                width: "100%",
+                                padding: "10px 10px 10px 40px",
+                                borderRadius: "20px",
+                                border: "1px solid #ccc",
+                                outline: "none",
+                                fontFamily: "Roboto, sans-serif",
+                            }}
                         />
                     </div>
 
@@ -50,7 +58,14 @@ const AgregarVideo = ({ onClose }) => {
                         <textarea
                             className="video-description"
                             placeholder="Descripción del video, el profesor podrá agregar caracteres especiales o links"
-                            disabled
+                            style={{
+                                width: "100%",
+                                padding: "10px 10px 10px 40px",
+                                borderRadius: "20px",
+                                border: "1px solid #ccc",
+                                outline: "none",
+                                fontFamily: "Roboto, sans-serif",
+                            }}
                         />
                     </div>
 

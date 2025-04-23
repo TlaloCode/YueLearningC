@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/RecursosApoyo.css";
+import SideBarMenu from "../components/SiderBarMenu";
 import { FaArrowLeft } from "react-icons/fa";
 
 const RecursosApoyo = () => {
@@ -21,12 +22,7 @@ const RecursosApoyo = () => {
             <Header />
 
             <div className="recursos-wrapper">
-                <div className="sidebar-menu">
-                    <button>Lista de videos</button>
-                    <button>Quiz</button>
-                    <button>Practicar</button>
-                    <button className="active">Recursos</button>
-                </div>
+                <SideBarMenu/>
 
                 <div className="recursos-content">
                     <div className="back-button">

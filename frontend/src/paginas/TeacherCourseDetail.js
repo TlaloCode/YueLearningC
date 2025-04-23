@@ -12,6 +12,7 @@ import {FaStar, FaChevronRight, FaChevronLeft, FaPlusCircle, FaTrash } from "rea
 const TeacherCourseDetail = () => {
     const { courseId } = useParams();
     const [course, setCourse] = useState(null);
+    const [teacher, setTeacher] = useState(null);
 
     const [videos] = useState([
         { id: 1, title: "01 - Introducción a la Arquitectura de Von Neumann", image: require("../assets/c-course.jpg") },
@@ -56,6 +57,26 @@ const TeacherCourseDetail = () => {
             }
         };
 
+        const fetchTeacherDetails = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            const response = await fetch("http://127.0.0.1:8000/api/get-user-profile/", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.ok)
+            {
+                const data = await response.json();
+                setTeacher(data);
+            }else {
+                console.error("Error al obtener el docente");
+            }
+        };
+        fetchTeacherDetails()
         fetchCourseDetails();
     }, [courseId]);
 
@@ -71,9 +92,9 @@ const TeacherCourseDetail = () => {
                 <div className="profile-info">
                     <img src={require("../assets/c-course.jpg")} alt="Profile" className="profile-image" />
                     <div className="profile-details">
-                        <h2 className="profile-name">López Ruiz Gabriela de Jesús</h2>
-                        <a href="mailto:usuario@ipn.mx" className="profile-email">usuario@ipn.mx</a>
-                        <p className="profile-bio">Soy una profesora con el propósito de motivar a mis estudiantes...</p>
+                        <h2 className="profile-name">{teacher.nombre || "Sin autor"}</h2>
+                        <a href="mailto:usuario@ipn.mx" className="profile-email">{teacher.correoelectronico || "Sin correo"}</a>
+                        <p className="profile-bio">{teacher.descripcionperfil || "Descripcion"}</p>
                     </div>
                 </div>
             </div>

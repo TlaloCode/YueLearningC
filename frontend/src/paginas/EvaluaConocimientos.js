@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/EvaluaConocimientos.css";
+import SideBarMenu from "../components/SiderBarMenu";
 import { FaArrowLeft } from "react-icons/fa";
 
 const EvaluaConocimientos = () => {
@@ -10,13 +11,7 @@ const EvaluaConocimientos = () => {
             <Header />
 
             <div className="evalua-wrapper">
-                <div className="sidebar-menu">
-                    <button>Lista de videos</button>
-                    <button className="active">Quiz</button>
-                    <button>Practicar</button>
-                    <button>Recursos</button>
-                    <button className="rate-course">📌 Calificar curso</button>
-                </div>
+                <SideBarMenu/>
 
                 <div className="quiz-section">
                     <div className="back-button">

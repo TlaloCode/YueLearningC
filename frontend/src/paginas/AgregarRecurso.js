@@ -33,6 +33,14 @@ const AgregarRecurso = ({ onClose }) => {
                             placeholder="Ingrese el título del recurso"
                             value={titulo}
                             onChange={(e) => setTitulo(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "10px 10px 10px 40px",
+                                borderRadius: "20px",
+                                border: "1px solid #ccc",
+                                outline: "none",
+                                fontFamily: "Roboto, sans-serif",
+                            }}
                         />
                     </div>
 
@@ -44,6 +52,14 @@ const AgregarRecurso = ({ onClose }) => {
                             placeholder="Descripción del recurso"
                             value={descripcion}
                             onChange={(e) => setDescripcion(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "10px 10px 10px 40px",
+                                borderRadius: "20px",
+                                border: "1px solid #ccc",
+                                outline: "none",
+                                fontFamily: "Roboto, sans-serif",
+                            }}
                         />
                     </div>
 
