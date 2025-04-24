@@ -117,7 +117,7 @@ html, body {
 .profile-courses span {
     font-size: 60px; /* Aumentar tamaño del ícono 🎓 */
     display: block;
-    margin-top: 0px;
+    margin-top: 1px;
 }
 
 .profile-right {
@@ -144,7 +144,7 @@ html, body {
     cursor: pointer;
     font-size: 16px;
     margin-left: 10px; /* Espacio entre el input y el botón */
-    padding: 1zpx;
+    padding: 1px;
 }
 
 .profile-buttons {
