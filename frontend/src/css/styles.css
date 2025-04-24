@@ -1,6 +1,6 @@
 /* Cambiar fuente del header */
 .header {
-    font-family: "Arial", sans-serif; /* Cambia por la fuente que desees */
+    font-family: 'Roboto', sans-serif;
     font-size: 18px;
     position: fixed;
     top: 0;

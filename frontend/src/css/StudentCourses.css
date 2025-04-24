@@ -4,12 +4,14 @@
     align-items: center;
     width: 100%;
     background-color: #f5f5f5;
+    font-family: 'Roboto', sans-serif;
 }
 
 .profile-section {
     width: 100%;
     padding: 40px 80px;
     background-color: #eaeaea;
+    font-family: 'Roboto', sans-serif;
 }
 
 .profile-info {
