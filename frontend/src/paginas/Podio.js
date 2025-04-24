@@ -4,7 +4,6 @@ import Header from "../components/Header";
 import Footer from "../components/footer";
 import { MdArrowBack } from "react-icons/md"
 import "@fontsource/poppins";
-import imagen from "../assets/c-course.jpg"; // Asegúrate de que la imagen exista
 
 const Podio = () => {
     const top3 = [
