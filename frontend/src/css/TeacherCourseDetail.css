@@ -118,11 +118,19 @@
     padding-bottom: 10px;
 }
 
+.video-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
 .video-card {
     width: 200px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espacio entre grupos */
 }
-
 .video-image {
     width: 100%;
     height: 120px;
@@ -164,4 +172,15 @@
 
 .delete-icon:hover {
     transform: scale(1.2); /* ✅ Efecto al pasar el mouse */
+}
+
+.edit-icon-react {
+    color: #0066cc;
+    cursor: pointer;
+    font-size: 18px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.edit-icon-react:hover {
+    transform: scale(1.2);
 }

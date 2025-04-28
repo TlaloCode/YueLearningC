@@ -1,14 +1,20 @@
 import hashlib
 import re
 import io
+import os
 import uuid
 import tempfile
 import requests
+import httplib2
+from io import BytesIO
+from celery import shared_task
+from django.conf import settings
 from datetime import timedelta
 from rest_framework import status
 from django.shortcuts import render
 from django.core.mail import send_mail
 from django.utils.timezone import now
+from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from rest_framework.response import Response
 from django.contrib.auth.hashers import check_password
@@ -16,10 +22,14 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+from googleapiclient.http import MediaFileUpload
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -372,6 +382,9 @@ def get_all_courses(request):
 def get_course_details(request, course_id):
     try:
         curso = Curso.objects.get(id_curso=course_id)
+        videos = Video.objects.filter(id_curso=course_id).values('id_video', 'titulovideo', 'video')
+        recursos = RecursoApoyo.objects.filter(id_curso=course_id).values('id_recurso', 'titulorecurso', 'urlrecurso')
+
         docente_info = "Desconocido"
         if curso.id_docente:
             try:
@@ -386,7 +399,9 @@ def get_course_details(request, course_id):
             "description": curso.descripcioncurso,
             "image": curso.imagen_url,
             "author": docente_info,
-            "rating": curso.calificacion or 0
+            "rating": curso.calificacion or 0,
+            "videos": list(videos),
+            "recursos": list(recursos)
         }
 
         return Response(course_data)
@@ -454,6 +469,28 @@ def get_course_videos(request, course_id):
     except Curso.DoesNotExist:
         return Response({"error": "Curso no encontrado"}, status=404)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_course_resource(request, course_id):
+    try:
+        curso = Curso.objects.get(id_curso=course_id)
+        # Obtener los videos asociados a este curso
+        recursos = RecursoApoyo.objects.filter(id_curso=curso).all()
+
+        # Serializar los datos de los videos
+        resources_data = []
+        for recurso in recursos:
+            resources_data.append({
+                "id": recurso.id_recurso,
+                "title": recurso.titulorecurso,
+                "recurso": recurso.urlrecurso,  # Aquí va la URL o el enlace del video
+            })
+
+        return Response(resources_data)
+
+    except Curso.DoesNotExist:
+        return Response({"error": "Curso no encontrado"}, status=404)
+
 
 @api_view(['GET'])
 def get_teacher_photo(request, file_id):
@@ -470,3 +507,198 @@ def get_teacher_photo(request, file_id):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def subir_video(request, id_curso):
+    titulo = request.data.get("titulo")
+    descripcion = request.data.get("descripcion")
+    archivo = request.FILES.get("video")
+
+
+    if not archivo:
+        return Response({"error": "No se seleccionó ningún archivo."}, status=400)
+    if archivo.size > 524288000:  # 500MB
+        return Response({"error": "El archivo es demasiado grande."}, status=400)
+
+    print("Tipo de archivo:", type(archivo))
+    print("Es archivo temporal:", hasattr(archivo, 'temporary_file_path'))
+
+    try:
+        # Conexión con Google Drive
+        SCOPES = ['https://www.googleapis.com/auth/drive']
+        SERVICE_ACCOUNT_FILE = 'credentials/service_account.json'  # Actualiza la ruta si es diferente
+        http = httplib2.Http(timeout=300)  # 300 segundos (5 minutos)
+        credentials = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+        service = build('drive', 'v3', credentials=credentials, static_discovery=False)
+
+
+        if not hasattr(archivo, 'temporary_file_path'):
+            return Response({"error": "El archivo no puede ser procesado como archivo físico"}, status=400)
+
+        file_content = archivo.read()
+        media = MediaIoBaseUpload(
+            BytesIO(file_content),
+            mimetype=archivo.content_type,
+            chunksize=1024*1024,
+            resumable=True
+        )
+
+        # Subir archivo a Drive
+        file_metadata = {'name': archivo.name}
+        #file_content = archivo.read()
+        #media = MediaIoBaseUpload(BytesIO(file_content), mimetype=archivo.content_type)
+
+        uploaded_file = service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
+        ).execute()
+
+        file_id = uploaded_file.get('id')
+
+        # Hacerlo público
+        service.permissions().create(
+            fileId=file_id,
+            body={'type': 'anyone', 'role': 'reader'}
+        ).execute()
+
+        # Guardar en la base de datos
+        curso = Curso.objects.get(id_curso=id_curso)
+        Video.objects.create(
+            id_curso=curso,
+            titulovideo=titulo,
+            descripcion=descripcion,
+            video=file_id
+        )
+
+        return Response({"message": "Video subido y registrado correctamente", "file_id": file_id})
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_video(request, id_video):
+    try:
+        video = Video.objects.get(id_video=id_video)
+
+        # Primero eliminar de Google Drive (opcional)
+        try:
+            credentials = service_account.Credentials.from_service_account_file(
+                'credentials/service_account.json',
+                scopes=['https://www.googleapis.com/auth/drive']
+            )
+            service = build('drive', 'v3', credentials=credentials)
+
+            # Aquí 'video.video' es el file_id
+            service.files().delete(fileId=video.video).execute()
+        except Exception as drive_error:
+            print(f"⚠️ No se pudo eliminar el archivo de Drive: {drive_error}")
+
+        # Ahora eliminar de la base de datos
+        video.delete()
+
+        return Response({"message": "Video eliminado correctamente."}, status=200)
+
+    except Video.DoesNotExist:
+        return Response({"error": "Video no encontrado."}, status=404)
+    except Exception as e:
+        print("❌ Error al eliminar video:", str(e))
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def get_video_detail(request, id_video):
+    try:
+        video = Video.objects.get(id_video=id_video)
+        return Response({
+            "id": video.id_video,
+            "titulo": video.titulovideo,
+            "descripcion": video.descripcion,
+            "file_id": video.video
+        })
+    except Video.DoesNotExist:
+        return Response({"error": "Video no encontrado"}, status=404)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def subir_recurso(request, id_curso):
+    try:
+        titulo = request.data.get('titulo')
+        descripcion = request.data.get('descripcion')
+        archivo = request.FILES.get('archivo')
+
+        if not archivo:
+            return Response({"error": "No se seleccionó ningún archivo."}, status=400)
+
+        # Conexión a Google Drive
+        SCOPES = ['https://www.googleapis.com/auth/drive']
+        SERVICE_ACCOUNT_FILE = 'credentials/service_account.json'  # Asegúrate que apunta bien
+
+        credentials = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        service = build('drive', 'v3', credentials=credentials)
+
+        # Subir el archivo
+        file_metadata = {'name': archivo.name}
+        file_path = archivo.temporary_file_path()  # Usa archivo temporal
+        media = MediaFileUpload(file_path, mimetype=archivo.content_type)
+
+        uploaded_file = service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
+        ).execute()
+
+        file_id = uploaded_file.get('id')
+
+        # Hacer el recurso público
+        service.permissions().create(
+            fileId=file_id,
+            body={'type': 'anyone', 'role': 'reader'}
+        ).execute()
+
+        # Guardar en base de datos
+        curso = Curso.objects.get(id_curso=id_curso)
+        RecursoApoyo.objects.create(
+            id_curso=curso,
+            titulorecurso=titulo,
+            urlrecurso=file_id
+        )
+
+        return Response({"message": "Recurso subido y registrado correctamente.", "file_id": file_id})
+
+    except Exception as e:
+        print("Error en subir_recurso:", e)
+        return Response({"error": str(e)}, status=500)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_recurso(request, id_recurso):
+    try:
+        recurso = RecursoApoyo.objects.get(id_recurso=id_recurso)
+
+        # Eliminar archivo de Google Drive
+        try:
+            credentials = service_account.Credentials.from_service_account_file(
+                'credentials/service_account.json',
+                scopes=['https://www.googleapis.com/auth/drive']
+            )
+            service = build('drive', 'v3', credentials=credentials)
+
+            service.files().delete(fileId=recurso.urlrecurso).execute()
+        except Exception as drive_error:
+            print(f"⚠️ No se pudo eliminar el archivo de Drive: {drive_error}")
+
+        # Ahora eliminar de la base de datos
+        recurso.delete()
+
+        return Response({"message": "Recurso eliminado correctamente."}, status=200)
+
+    except RecursoApoyo.DoesNotExist:
+        return Response({"error": "Recurso no encontrado."}, status=404)
+    except Exception as e:
+        print("❌ Error al eliminar recurso:", str(e))
+        return Response({"error": str(e)}, status=500)

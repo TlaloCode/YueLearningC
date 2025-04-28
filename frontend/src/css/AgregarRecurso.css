@@ -94,7 +94,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: 200%;
     max-width: 600px;
     height: 100px;
     background: #3c0606;
@@ -105,7 +105,7 @@
 }
 
 .upload-icon {
-    font-size: 30px;
+    font-size: 20px;
     color: #666;
 }
 
@@ -123,7 +123,7 @@
 
 /* Estilo de la descripción del recurso */
 .resource-description {
-    width: 80%;
+    width: 70%;
     padding: 10px;
     background: #f4f4f4;
     border-radius: 6px;

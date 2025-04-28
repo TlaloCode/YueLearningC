@@ -3,8 +3,8 @@ from . import views
 from .views import registrar_usuario , login_usuario, verificar_correo, create_course
 from .views import get_user_profile, update_user_profile, upload_profile_photo, get_teacher_courses
 from .views import get_enrolled_courses, get_all_courses, get_teachers_with_courses, get_course_details, inscribir_curso
-from .views import get_course_videos, get_profile_photo, get_teacher_photo
-
+from .views import get_course_videos, get_profile_photo, get_teacher_photo, subir_video, get_video_detail
+from .views import subir_recurso, get_course_resource, delete_video, delete_recurso
 urlpatterns = [
     path("", views.index, name="index"),
     #path('register-student/', registrar_estudiante, name='registrar_estudiante'),
@@ -25,6 +25,13 @@ urlpatterns = [
     path('inscribir-curso/', inscribir_curso, name='inscribir_curso'),
     path('get-videos/<int:course_id>/', get_course_videos, name='get_course_videos'),
     path('teacher-photo/<str:file_id>/', get_teacher_photo, name='get_teacher_photo'),
+    path('subir-video/<int:id_curso>/', subir_video, name='subir_video'),
+    path('delete-video/<int:id_video>/', delete_video, name='delete_video'),
+    path('get-video-detail/<int:id_video>/', get_video_detail, name='get_video_detail'),
+    path('subir-recurso/<int:id_curso>/', subir_recurso, name='subir_recurso'),
+    path('delete-recurso/<int:id_recurso>/', delete_recurso, name='delete_recurso'),
+    path('get-course-resource/<int:course_id>/', get_course_resource, name='get_course_resource'),
+
 
 
 ]

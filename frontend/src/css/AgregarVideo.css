@@ -78,14 +78,13 @@
 }
 
 .video-description {
-    width: 100%;
+    width: 50px;
     height: 50%;
     padding: 10px;
-    background: #ddd;
+    background: white;
     border-radius: 6px;
     border: none;
-    text-align: center;
-    color: gray;
+    color: #000000;
 }
 
 .button-group {
@@ -102,11 +101,11 @@
 }
 
 .btn-success {
-    background: #4caf50;
+    background: #0077DD;
     color: white;
 }
 
 .btn-danger {
-    background: #d9534f;
+    background: #6c6c6c;
     color: white;
 }

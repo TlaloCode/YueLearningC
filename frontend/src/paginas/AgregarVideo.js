@@ -1,19 +1,49 @@
 import React, { useState } from "react";
 import "../css/AgregarVideo.css";
 import { FaUpload } from "react-icons/fa";
+import {useParams} from "react-router-dom";
 
 const AgregarVideo = ({ onClose }) => {
+    const { courseId } = useParams();
     const [videoTitle, setVideoTitle] = useState("");
     const [videoFile, setVideoFile] = useState(null);
+    const [videoDescription, setVideoDescription] = useState("");
 
     const handleFileChange = (e) => {
         setVideoFile(e.target.files[0]);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Video agregado:", { videoTitle, videoFile });
-        onClose(); // Cierra el modal después de agregar
+
+        const formData = new FormData();
+        formData.append("titulo", videoTitle);
+        formData.append("descripcion", videoDescription); // Asegúrate de usar useState para este campo
+        formData.append("video", videoFile);
+
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/subir-video/${courseId}/`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("✅ Video agregado correctamente");
+                onClose();
+            } else {
+                alert("❌ Error al subir video: " + (data.error || "desconocido"));
+            }
+        } catch (error) {
+            console.error("Error al subir el video:", error);
+            alert("❌ Error en la conexión");
+        }
     };
 
     return (
@@ -66,12 +96,28 @@ const AgregarVideo = ({ onClose }) => {
                                 outline: "none",
                                 fontFamily: "Roboto, sans-serif",
                             }}
+                            value={videoDescription}
+                            onChange={(e) => setVideoDescription(e.target.value)}
                         />
                     </div>
 
                     <div className="button-group">
-                        <button type="submit" className="btn btn-success">Agregar</button>
-                        <button type="button" className="btn btn-danger" onClick={onClose}>Cancelar</button>
+                        <button type="submit" className="btn btn-success"
+                                onChange={handleSubmit}
+                                style={
+                                    {
+                                        backgroundColor: "#0077DD",
+                                        border: "2px solid #0077DD",
+                                    }
+                                }
+                        >Agregar</button>
+                        <button type="button" className="btn btn-danger" onClick={onClose}
+                                style={
+                                    {
+                                        backgroundColor: "#6c6c6c",
+                                        border: "2px solid #6c6c6c",
+                                    }
+                                }>Cancelar</button>
                     </div>
                 </form>
             </div>

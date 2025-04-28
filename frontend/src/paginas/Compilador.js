@@ -3,8 +3,10 @@ import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/Compilador.css";
 import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Compilador = () => {
+    const navigate = useNavigate();
     const [codigo, setCodigo] = useState(`#include <stdio.h>\n\nint main() {\n    printf("Hello World!");\n    return 0;\n}`);
     const [salida, setSalida] = useState("Hello World!");
 
@@ -19,7 +21,7 @@ const Compilador = () => {
             <Header />
 
             <div className="compilador-content">
-                <div className="back-button">
+                <div className="back-button" onClick={() => navigate(-1)}>
                     <FaArrowLeft /> <span>Atrás</span>
                 </div>
 

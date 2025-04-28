@@ -21,6 +21,7 @@ import CalificarCurso from "./paginas/CalificarCurso";
 import Diagnostico from "./paginas/Diagnostico";
 import Compilador from "./paginas/Compilador";
 import Podio from "./paginas/Podio";
+import VistaVideo from "./paginas/VistaVideo";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -51,13 +52,16 @@ const App = () => {
               <Route path="/lista-videos" element={<ListaVideos />} /> {/* Ruta para la inscripción al curso */}
               <Route path="/lista-videos/:courseId" element={<ListaVideos />} />
               <Route path="/evalua-conocimientos" element={<EvaluaConocimientos />} /> {/* Ruta para la inscripción al curso */}
+              <Route path="/evalua-conocimientos/:courseId" element={<EvaluaConocimientos />} />
               <Route path="/recursos-apoyo" element={<RecursosApoyo />} /> {/* Ruta para la inscripción al curso */}
+              <Route path="/recursos-apoyo/:courseId" element={<RecursosApoyo />} />
               <Route path="/calificar-curso" element={<CalificarCurso/>} /> {/* Ruta para la inscripción al curso */}
               <Route path="/diagnostico" element={<Diagnostico/>} /> {/* Ruta para la inscripción al curso */}
               <Route path="/compilador" element={<Compilador/>} /> {/* Ruta para la inscripción al curso */}
+              <Route path="/compilador/:courseId" element={<Compilador/>} />
               <Route path="/podio" element={<Podio/>} /> {/* Ruta para la inscripción al curso */}
-
-
+              <Route path="/vista-video" element={<VistaVideo/>} />
+              <Route path="/vista-video/:idVideo" element={<VistaVideo/>} />
           </Routes>
       </div>
       </Router>

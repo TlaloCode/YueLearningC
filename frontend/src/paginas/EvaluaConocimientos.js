@@ -4,8 +4,10 @@ import Footer from "../components/footer";
 import "../css/EvaluaConocimientos.css";
 import SideBarMenu from "../components/SiderBarMenu";
 import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const EvaluaConocimientos = () => {
+    const navigate = useNavigate();
     return (
         <div className="evalua-container">
             <Header />
@@ -14,7 +16,7 @@ const EvaluaConocimientos = () => {
                 <SideBarMenu/>
 
                 <div className="quiz-section">
-                    <div className="back-button">
+                    <div className="back-button" onClick={() => navigate(-1)}>
                         <FaArrowLeft /> <span>Atrás</span>
                     </div>
 

@@ -110,9 +110,6 @@ def default_expiration():
     return now() + timedelta(hours=24)
 
 
-
-
-
 class Video(models.Model):
     id_video = models.AutoField(db_column='ID_Video', primary_key=True)  # Field name made lowercase.
     id_curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='ID_Curso', blank=True, null=True)  # Field name made lowercase.
@@ -123,6 +120,16 @@ class Video(models.Model):
     class Meta:
         managed = False
         db_table = 'video'
+
+class RecursoApoyo(models.Model):
+    id_recurso = models.AutoField(db_column='ID_Recurso', primary_key=True)
+    id_curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='ID_Curso', blank=True, null=True)
+    titulorecurso = models.CharField(db_column='TituloRecurso', max_length=100, blank=True, null=True)
+    urlrecurso = models.CharField(db_column='URLRecurso', max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False  # Ya que la tabla ya existe en la base
+        db_table = 'recursosapoyo'
 
 class EmailVerificationToken(models.Model):
     usuario_id = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='ID_Usuario')

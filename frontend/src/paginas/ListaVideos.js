@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/ListaVideos.css";
 import { useParams } from "react-router-dom";
+import placeholder from "../assets/c-course.jpg";
 import { FaStar, FaArrowLeft } from "react-icons/fa";
 import SideBarMenu from "../components/SiderBarMenu";
 
@@ -11,6 +13,8 @@ const ListaVideos = () => {
     const [videos, setVideos] = useState([]);
     const [courseName, setCourseName] = useState(""); // ✅ Nombre del curso
     const [courseAuthor, setCourseAuthor] = useState(""); // ✅ Nombre del curso
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchVideos = async () => {
@@ -64,10 +68,12 @@ const ListaVideos = () => {
             <div className="content-wrapper">
                 <SideBarMenu/>
                 <div className="video-section">
+                    <div className="back-button" style={{marginBottom: "20px", marginLeft: "10px"}}
+                         onClick={() => navigate(-1)}>
+                        <FaArrowLeft/> <span>Atrás</span>
+                    </div>
                     <div className="video-header">
-                        <div className="back-button">
-                            <FaArrowLeft /> <span>Atrás</span>
-                        </div>
+                        <br/>
 
                         <div className="video-title-rating">
                             <div>
@@ -75,11 +81,11 @@ const ListaVideos = () => {
                                 <p>{courseAuthor || "Sin autor"}</p>
                             </div>
                             <div className="stars-rating">
-                                <FaStar className="star" />
-                                <FaStar className="star" />
-                                <FaStar className="star" />
-                                <FaStar className="star" />
-                                <FaStar className="star gray" />
+                                <FaStar className="star"/>
+                                <FaStar className="star"/>
+                                <FaStar className="star"/>
+                                <FaStar className="star"/>
+                                <FaStar className="star gray"/>
                                 <span className="rating">4.0</span>
                             </div>
                         </div>
@@ -88,8 +94,10 @@ const ListaVideos = () => {
                     <div className="video-list">
                         {videos.length > 0 ? (
                             videos.map((video) => (
-                                <div key={video.id} className="video-card">
-                                    <img src={video.image} alt={video.title} />
+                                <div key={video.id} className="video-card"
+                                     onClick={() => navigate(`/vista-video/${video.id}`)}
+                                     style={{ cursor: "pointer" }}>
+                                    <img src={video.image || placeholder} alt={video.title}/>
                                     <div className="video-info">
                                         <h3>{video.title}</h3>
                                         <p>{video.description}</p>
@@ -103,7 +111,7 @@ const ListaVideos = () => {
                 </div>
             </div>
 
-            <Footer />
+            <Footer/>
         </div>
     );
 };
