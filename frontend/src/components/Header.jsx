@@ -2,13 +2,25 @@ import React, {useState, useEffect} from "react";
 import "@fontsource/roboto";
 import logo from "../Img/logo.JPG"
 import defaultLogo from "../Img/default-profile.png"
+import menuHamburguesa from "../assets/menuHamburguesa.png"; // Asegúrate que esté en esa ruta
 import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 const Header = () => {
     const navigate = useNavigate();
     const [usuario, setUsuario] = useState(null); // Estado para almacenar datos del usuario
-    const [menuAbierto, setMenuAbierto] = useState(false); // Estado para el menú desplegable
+    const [menuLateralAbierto, setMenuLateralAbierto] = useState(false);
+    const [menuPerfilAbierto, setMenuPerfilAbierto] = useState(false);
 
+    const menuBtnStyle = {
+        width: "100%",
+        padding: "12px 15px",
+        border: "none",
+        background: "none",
+        textAlign: "left",
+        cursor: "pointer",
+        fontSize: "1rem",
+        borderBottom: "1px solid #ddd"
+    };
 
     const handleNavigation = () => {
         const token = localStorage.getItem("token");
@@ -110,6 +122,62 @@ const Header = () => {
             }}
         >
             <div className="d-flex align-items-center">
+                {/* 🔻 MENÚ HAMBURGUESA */}
+                <div style={{ position: "relative" }}>
+                    <button
+                        onClick={() => {
+                            setMenuLateralAbierto(!menuLateralAbierto);
+                            setMenuPerfilAbierto(false); // Cierra el otro menú
+                        }}
+                        style={{
+                            background: "transparent",
+                            border: "none",
+                            marginRight: "15px",
+                            padding: 0
+                        }}
+                    >
+                        <img
+                            src={menuHamburguesa}
+                            alt="Menú"
+                            style={{ width: 35, height: 35, cursor: "pointer" }}
+                        />
+                    </button>
+
+                    {/* 🔽 Menú lateral */}
+                    {menuLateralAbierto  && (
+                        <div style={{
+                            position: "absolute",
+                            top: "50px",
+                            left: 0,
+                            background: "#fff",
+                            color: "#000",
+                            borderRadius: "10px",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+                            zIndex: 1001,
+                            width: "180px",
+                            fontWeight: "500"
+                        }}>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => navigate("/diagnostico")}
+                            >
+                                Evaluación diagnóstica
+                            </button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => navigate("/mis-cursos-estudiante")}
+                            >
+                                Mis cursos
+                            </button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => navigate("/podio")}
+                            >
+                                Podio
+                            </button>
+                        </div>
+                    )}
+                </div>
                 <button
                     onClick={homeNavigation} // Redirige a login
                     style={{
@@ -139,7 +207,10 @@ const Header = () => {
                 {usuario ? (
                     <div style={{ position: "relative" }}>
                         <button
-                            onClick={() => setMenuAbierto(!menuAbierto)}
+                            onClick={() => {
+                                setMenuPerfilAbierto(!menuPerfilAbierto);
+                                setMenuLateralAbierto(false); // Cierra el otro menú
+                            }}
                             style={{
                                 background: "transparent",
                                 border: "none",
@@ -157,7 +228,7 @@ const Header = () => {
                             />
                         </button>
                         {/* Menú desplegable */}
-                        {menuAbierto && (
+                        {menuPerfilAbierto  && (
                             <div style={{
                                 position: "absolute",
                                 right: 0,

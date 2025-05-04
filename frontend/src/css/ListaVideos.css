@@ -9,7 +9,7 @@
 .content-wrapper {
     display: flex;
     padding: 30px 60px;
-    max-width: 1900px;
+    max-width: 1300px;
     width: 250%;
     margin: 0 auto;
     gap: 40px;
@@ -108,6 +108,7 @@
 
 .video-card {
     display: flex;
+    flex-direction: row;
     gap: 20px;
     background: white;
     padding: 15px;

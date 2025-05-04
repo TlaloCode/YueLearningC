@@ -38,7 +38,7 @@ const AboutUs = () => {
                 {/* Información */}
                 <div style={{ flex: "1" }}>
                     <p style={{ fontSize: "1rem", lineHeight: "1.5", textAlign: "justify" }}>
-                        <strong>YUE-Learning C</strong> es una página web educativa diseñada para fungir como
+                        <strong>YUE-Learning C</strong> es una aplicación web educativa diseñada para fungir como
                         herramienta de apoyo para la enseñanza de programación en lenguaje C. Dirigido a
                         estudiantes de la <strong>Escuela Superior de Cómputo (ESCOM)</strong>, este proyecto
                         busca transformar el aprendizaje en una experiencia accesible y práctica.

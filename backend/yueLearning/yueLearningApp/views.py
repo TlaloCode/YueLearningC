@@ -9,6 +9,7 @@ import httplib2
 from io import BytesIO
 from celery import shared_task
 from django.conf import settings
+from django.db.models import Avg
 from datetime import timedelta
 from rest_framework import status
 from django.shortcuts import render
@@ -22,7 +23,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -702,3 +703,141 @@ def delete_recurso(request, id_recurso):
     except Exception as e:
         print("❌ Error al eliminar recurso:", str(e))
         return Response({"error": str(e)}, status=500)
+
+
+from .models import Cuestionario, Pregunta, Opcion
+
+@api_view(['GET'])
+def obtener_preguntas_por_curso(request, courseId):
+    cuestionarios = Cuestionario.objects.filter(id_curso=courseId)
+
+    data = []
+    for cuestionario in cuestionarios:
+        preguntas = Pregunta.objects.filter(id_cuestionario=cuestionario)
+        preguntas_data = []
+        for pregunta in preguntas:
+            opciones = Opcion.objects.filter(id_pregunta=pregunta)
+            preguntas_data.append({
+                "id_pregunta": pregunta.id_pregunta,
+                "textopregunta": pregunta.textopregunta,
+                "opciones": [
+                    {
+                        "id_opciones": opcion.id_opciones,
+                        "textoopcion": opcion.textoopcion  # Asume que agregaste este campo
+                    }
+                    for opcion in opciones
+                ]
+            })
+
+        data.append({
+            "id_cuestionario": cuestionario.id_cuestionario,
+            "titulo": cuestionario.titulocuestionario,
+            "preguntas": preguntas_data
+        })
+
+    return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_diagnostico(request):
+    try:
+        cuestionario = Cuestionario.objects.get(es_diagnostico=True)
+    except Cuestionario.DoesNotExist:
+        return Response({"error": "No se encontró el cuestionario diagnóstico."}, status=404)
+
+    preguntas = Pregunta.objects.filter(id_cuestionario=cuestionario)
+    preguntas_data = []
+
+    for pregunta in preguntas:
+        opciones = Opcion.objects.filter(id_pregunta=pregunta)
+        preguntas_data.append({
+            "id_pregunta": pregunta.id_pregunta,
+            "textopregunta": pregunta.textopregunta,
+            "opciones": [
+                {
+                    "id_opciones": opcion.id_opciones,
+                    "textoopcion": opcion.textoopcion  # Este campo debe existir
+                }
+                for opcion in opciones
+            ]
+        })
+
+    return Response({
+        "id_cuestionario": cuestionario.id_cuestionario,
+        "titulo": cuestionario.titulocuestionario,
+        "preguntas": preguntas_data
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def calificar_respuestas(request):
+    respuestas = request.data.get("respuestas", {})  # { ID_Pregunta: ID_OpcionSeleccionada }
+    curso_id = request.data.get("curso")
+    usuario = request.user
+
+    correctas = 0
+    total = 0
+
+    for id_pregunta, id_opcion in respuestas.items():
+        try:
+            opcion = Opcion.objects.get(id_opciones=id_opcion, id_pregunta=id_pregunta)
+            if opcion.es_correcta:
+                correctas += 1
+            total += 1
+        except Opcion.DoesNotExist:
+            continue
+
+    if total == 0:
+        return Response({"error": "No se enviaron respuestas válidas."}, status=400)
+
+    calificacion = round((correctas / total) * 10, 1)
+
+    from .models import Calificaciones, Curso
+    curso = Curso.objects.get(id_curso=curso_id)
+
+    Calificaciones.objects.update_or_create(
+        id_usuario=usuario,
+        id_curso=curso,
+        defaults={"calificacion": calificacion}
+    )
+
+    return Response({"calificacion": calificacion})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_podio(request):
+    usuario_actual_id = request.user.id
+
+    # 1. Obtener promedios por usuario
+    promedios = (
+        Calificaciones.objects
+        .values('id_usuario')
+        .annotate(promedio=Avg('calificacion'))
+        .order_by('-promedio')
+    )
+
+    # 2. Armar lista con nombre e imagen
+    lista_podio = []
+    for pos, entrada in enumerate(promedios, start=1):
+        try:
+            estudiante = Estudiantes.objects.get(id=entrada['id_usuario'])
+        except Estudiantes.DoesNotExist:
+            continue
+
+        lista_podio.append({
+            "id_usuario": estudiante.id,
+            "nombre": estudiante.nombre,
+            "imagen": estudiante.imagen.url if estudiante.imagen else None,
+            "promedio": round(entrada['promedio'], 2),
+            "lugar": pos
+        })
+
+    # 3. Identificar lugar del usuario actual
+    mi_posicion = next((item for item in lista_podio if item["id_usuario"] == usuario_actual_id), None)
+
+    return Response({
+        "top": lista_podio[:10],
+        "mi_posicion": mi_posicion
+    })

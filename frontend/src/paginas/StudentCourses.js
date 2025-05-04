@@ -103,6 +103,7 @@ const StudentCourses = () => {
                     </div>
                 </div>
             </div>
+            {/*
             <div className="sidebar">
                 <div className="sidebar-item">
                     <button className="sidebar-button">
@@ -123,7 +124,7 @@ const StudentCourses = () => {
                     </button>
                 </div>
             </div>
-
+*/}
             <div className="courses-section">
                 <h2>Mis cursos</h2>
                 <div className="courses-grid">

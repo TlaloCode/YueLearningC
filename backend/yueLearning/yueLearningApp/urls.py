@@ -4,7 +4,9 @@ from .views import registrar_usuario , login_usuario, verificar_correo, create_c
 from .views import get_user_profile, update_user_profile, upload_profile_photo, get_teacher_courses
 from .views import get_enrolled_courses, get_all_courses, get_teachers_with_courses, get_course_details, inscribir_curso
 from .views import get_course_videos, get_profile_photo, get_teacher_photo, subir_video, get_video_detail
-from .views import subir_recurso, get_course_resource, delete_video, delete_recurso
+from .views import subir_recurso, get_course_resource, delete_video, delete_recurso, calificar_respuestas
+from .views import obtener_preguntas_por_curso, get_diagnostico, get_podio
+
 urlpatterns = [
     path("", views.index, name="index"),
     #path('register-student/', registrar_estudiante, name='registrar_estudiante'),
@@ -31,6 +33,10 @@ urlpatterns = [
     path('subir-recurso/<int:id_curso>/', subir_recurso, name='subir_recurso'),
     path('delete-recurso/<int:id_recurso>/', delete_recurso, name='delete_recurso'),
     path('get-course-resource/<int:course_id>/', get_course_resource, name='get_course_resource'),
+    path('cuestionarios/<int:courseId>/', obtener_preguntas_por_curso, name='obtener_preguntas_por_curso'),
+    path('respuestas/', calificar_respuestas, name='calificar_respuestas'),
+    path('diagnostico/', get_diagnostico, name='get_diagnostico'),
+    path('podio/', get_podio, name='get_podio'),
 
 
 

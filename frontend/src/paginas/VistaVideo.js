@@ -57,7 +57,7 @@ const VideoDetalle = () => {
 
                 <div className="video-preview">
                     <iframe
-                        src={`https://drive.google.com/file/d/${videoData.file_id}/preview`}
+                        src={videoUrl}
                         width="100%"
                         style={{maxWidth: "900px", height: "500px"}}
                         allow="autoplay"

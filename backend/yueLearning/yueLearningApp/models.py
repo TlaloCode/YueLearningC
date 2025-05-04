@@ -131,6 +131,37 @@ class RecursoApoyo(models.Model):
         managed = False  # Ya que la tabla ya existe en la base
         db_table = 'recursosapoyo'
 
+class Cuestionario(models.Model):
+    id_cuestionario = models.AutoField(db_column='ID_Cuestionario', primary_key=True)
+    id_curso = models.ForeignKey('Curso', models.DO_NOTHING, db_column='ID_Curso', blank=True, null=True)
+    titulocuestionario = models.CharField(db_column='TituloCuestionario', max_length=100, blank=True, null=True)
+    descripcion = models.TextField(db_column='Descripcion', blank=True, null=True)
+    es_diagnostico = models.BooleanField(db_column='EsDiagnostico', default=False)
+
+    class Meta:
+        db_table = 'cuestionarios'
+
+
+class Pregunta(models.Model):
+    id_pregunta = models.AutoField(db_column='ID_Pregunta', primary_key=True)
+    id_cuestionario = models.ForeignKey(Cuestionario, models.DO_NOTHING, db_column='ID_Cuestionario', blank=True, null=True)
+    textopregunta = models.TextField(db_column='TextoPregunta', blank=True, null=True)
+    imagenpregunta = models.CharField(db_column='ImagenPregunta', max_length=255, blank=True, null=True)
+
+    class Meta:
+        db_table = 'preguntas'
+
+
+class Opcion(models.Model):
+    id_opciones = models.AutoField(db_column='ID_Opciones', primary_key=True)
+    id_pregunta = models.ForeignKey(Pregunta, models.DO_NOTHING, db_column='ID_Pregunta', blank=True, null=True)
+    textoopcion = models.TextField(db_column='TextoOpcion', blank=True, null=True)
+    es_correcta = models.BooleanField(db_column='EsCorrecta', default=False)
+
+    class Meta:
+        managed = True
+        db_table = 'opciones'
+
 class EmailVerificationToken(models.Model):
     usuario_id = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='ID_Usuario')
     token = models.UUIDField(default=uuid.uuid4, unique=True)

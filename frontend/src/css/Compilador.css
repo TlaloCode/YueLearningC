@@ -7,11 +7,27 @@
 }
 
 .compilador-content {
-    max-width: 1600px;
-    width: 500%;
-    margin: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     padding: 40px 20px;
 }
+
+
+.compilador-wrapper {
+    display: flex;
+    flex-direction: row;
+    max-width: 1300px;
+    width: 100%;
+    margin: auto;
+    padding: 20px;
+}
+
+.sidebar-fija {
+    width: 200px;
+    flex-shrink: 0;
+}
+
 
 .back-button {
     display: flex;

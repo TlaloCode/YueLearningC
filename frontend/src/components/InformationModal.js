@@ -26,7 +26,7 @@ const InformationModal = ({ message, onClose }) => {
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    backgroundColor: "#73b2ec",
+                    backgroundColor: "#f8dc7e",
                     padding: "20px",
                     borderRadius: "15px",
                     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
