@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../components/HeaderLogin";
+import Header from "../components/Header";
 import Footer from "../components/footer";
 
 const PrivacyPolicy = () => {
@@ -19,34 +19,33 @@ const PrivacyPolicy = () => {
                 overflowY: "auto",
                 marginTop: "80px" // Espacio para que el contenido no quede oculto bajo el Header
             }}>
-                <h2>Política de Privacidad</h2>
-                <p>Última actualización: 2024</p>
+                <h2>Política de privacidad</h2>
+                <p>Última actualización: Mayo de 2024</p>
                 <p>
-                    En YUE-Learning C respetamos tu privacidad. Esta política describe cómo recopilamos, usamos y protegemos tu información personal.
+                    En YUE-Learning C se respeta tu privacidad. Esta política describe cómo recopilamos, usamos y protegemos tu información personal.
                 </p>
-                <h3>Recolección de Datos</h3>
+                <h3>Recolección de datos</h3>
                 <p>
-                    Los datos que recopilamos incluyen: nickname (estudiante), nombre completo (docente), correo electrónico y contraseña encriptada.<br />
+                    Los datos que recopilamos incluyen: Nombre de usuario (para estudiante), nombre completo (para docente), correo electrónico y contraseña encriptada.<br />
                     También recolectamos datos de uso, como cursos inscritos y progreso en actividades.
                 </p>
-                <h3>Uso de Datos</h3>
+                <h3>Uso de datos</h3>
                 <p>
                     Los datos recopilados se utilizan para:<br />
                     - Gestionar tu cuenta y progreso académico.<br />
                     - Ofrecerte acceso a contenido.<br />
-                    - Enviar notificaciones relevantes sobre tus cursos.
                 </p>
-                <h3>Compartición de Información</h3>
+                <h3>Distribución de información</h3>
                 <p>
-                    No compartimos tu información personal con terceros, excepto cuando sea requerido por ley.
+                    YUE-Learning C no comparte tu información personal con terceros, excepto cuando sea requerido por ley.
                 </p>
-                <h3>Derechos del Usuario</h3>
+                <h3>Derechos del usuario</h3>
                 <p>
-                    Puedes solicitar acceso, corrección o eliminación de tus datos directamente en la aplicación web en “Perfil”.
+                    El usuario puede solicitar acceso, corrección o eliminación de tus datos directamente en la aplicación web en la sección “Perfil”.
                 </p>
-                <h3>Cambios en la Política</h3>
+                <h3>Cambios en la política</h3>
                 <p>
-                    Esta política puede actualizarse. Para más información, contáctanos en facebook como YUE-Learning C.
+                    Esta política puede actualizarse. Para más información, favor de contactar al correo electrónico oficial: yuelearning2025a011@gmail.com o en redes sociales.
                 </p>
             </div>
             <Footer />

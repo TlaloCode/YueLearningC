@@ -11,6 +11,11 @@ const Podio = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [miLugar, setMiLugar] = useState(null);
 
+    const getImagenURL = (imagenId) => {
+        if (!imagenId) return userPlaceholder;
+        return `https://drive.google.com/thumbnail?id=${imagenId}`;
+    };
+
     useEffect(() => {
         const fetchPodio = async () => {
             const token = localStorage.getItem("token");
@@ -26,6 +31,7 @@ const Podio = () => {
 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log(data);
                     setUsuarios(data.top || []);
                     setMiLugar(data.mi_posicion || null);
                 } else {
@@ -55,7 +61,7 @@ const Podio = () => {
                 <div className="podium-visual">
                     {top3.map((user, index) => (
                         <div key={index} className={`podium podium-${user.lugar || index + 1}`}>
-                            <img src={user.imagen || userPlaceholder} alt={user.nombre} className="podium-img" />
+                            <img src={getImagenURL(user.imagen)} alt={user.nombre} className="podium-img"/>
                             <span className="username">{user.nombre}</span>
                             <div className="trofeo">
                                 <FaTrophy /> <span>{index + 1}º</span>
@@ -68,7 +74,7 @@ const Podio = () => {
             <div className="podio-resto">
                 {miLugar && (
                     <div className="mi-lugar">
-                        <img src={miLugar.imagen || userPlaceholder} alt="Tú" />
+                        <img src={getImagenURL(miLugar.imagen)} alt="Tú"/>
                         <p><strong>{miLugar.lugar}º lugar</strong></p>
                         <span>{miLugar.nombre}</span>
                     </div>
@@ -78,7 +84,7 @@ const Podio = () => {
                 <h3>Posiciones</h3>
                     {posicionesRestantes.map((p, i) => (
                         <div className="fila" key={i}>
-                            <img src={p.imagen || userPlaceholder} alt={p.nombre} />
+                            <img src={getImagenURL(p.imagen)} alt={p.nombre}/>
                             <span>{p.nombre}</span>
                             <span className="lugar">{i + 4}º</span>
                         </div>

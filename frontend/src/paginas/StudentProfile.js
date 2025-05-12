@@ -313,9 +313,9 @@ const StudentProfile = () => {
                                      marginBottom: "15px",
                                      width: "90%",
                                  }}>
-                                <label style={{width: '100%'}}>Correo institucional</label>
+                                <label style={{width: '100%'}}>Correo electrónico institucional</label>
                                 <input type="email" name="institutionalEmail"
-                                       placeholder="Tu correo institucional" value={profile.institutionalEmail}
+                                       placeholder="Tu correo electrónico institucional" value={profile.institutionalEmail}
                                        onChange={handleChange} disabled
                                        style={{
                                            width: "80%",
@@ -350,7 +350,7 @@ const StudentProfile = () => {
                                 <button className="btn-save" onClick={handleSave}>Actualizar</button>
                                 <button className="btn-cancel">Cancelar</button>
                             </div>
-                            <button className="delete-profile">🗑️ Eliminar mi perfil</button>
+                            <button className="delete-profile">🗑️ Eliminar perfil</button>
                         </div>
                     </div>
                 </div>

@@ -274,7 +274,7 @@ const TeacherProfile = () => {
                             {label: "Nombre", name: "name"},
                             {label: "Apellido paterno", name: "lastName"},
                             {label: "Apellido materno", name: "middleName"},
-                            {label: "Correo institucional", name: "institutionalEmail", type: "email", disabled: true},
+                            {label: "Correo electrónico institucional", name: "institutionalEmail", type: "email", disabled: true},
                             {label: "Contraseña", name: "password", type: "password"},
                             {label: "Confirmar contraseña", name: "confirmPassword", type: "password"},
                             {label: "Correo alternativo", name: "alternateEmail", type: "email"},
@@ -341,7 +341,7 @@ const TeacherProfile = () => {
                                 }
                             }>Cancelar</button>
                         </div>
-                        <button className="delete-profile"><FaTrash/> Eliminar mi perfil</button>
+                        <button className="delete-profile"><FaTrash/> Eliminar perfil</button>
                     </div>
                 </div>
             </div>

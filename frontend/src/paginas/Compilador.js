@@ -10,7 +10,9 @@ import Editor from "@monaco-editor/react";
 
 const Compilador = () => {
     const navigate = useNavigate();
+    const [entrada, setEntrada] = useState("");
     const [codigo, setCodigo] = useState(`#include <stdio.h>
+
 
 int main() {
     printf("Hola mundo desde C!");
@@ -28,12 +30,10 @@ int main() {
                 body: JSON.stringify({
                     language: "c",
                     version: "10.2.0",
-                    files: [
-                        {
-                            content: codigo
-                        }
-                    ]
+                    files: [{ content: codigo }],
+                    stdin: entrada
                 })
+
             });
 
             const result = await response.json();
@@ -90,10 +90,21 @@ int main() {
                             <pre>{salida}</pre>
                         </div>
                     </div>
-
+                    <div className="entrada-section">
+                        <label htmlFor="entrada">Entrada (stdin):</label>
+                        <textarea
+                            id="entrada"
+                            rows="4"
+                            className="entrada"
+                            value={entrada}
+                            onChange={(e) => setEntrada(e.target.value)}
+                            placeholder="Aquí puedes escribir lo que scanf leería, por ejemplo: 5 8"
+                        />
+                    </div>
                     <button className="btn-ejecutar" onClick={ejecutarCodigo}>
                         Ejecutar
                     </button>
+
                 </div>
             </div>
 

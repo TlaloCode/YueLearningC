@@ -67,7 +67,8 @@ def registrar_usuario(request):
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not data.get("contrasena") == data.get("confirm_password"):
+    if not data.get("contrasena") == data.get("confirmPassword"):
+        print("Hola")
         return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
 
     if Usuario.objects.filter(correoelectronico=data.get('correoelectronico')).exists():
@@ -774,7 +775,7 @@ def get_diagnostico(request):
 @permission_classes([IsAuthenticated])
 def calificar_respuestas(request):
     respuestas = request.data.get("respuestas", {})  # { ID_Pregunta: ID_OpcionSeleccionada }
-    curso_id = request.data.get("curso")
+    curso_id = request.data.get("curso", None)
     usuario = request.user
 
     correctas = 0
@@ -794,14 +795,25 @@ def calificar_respuestas(request):
 
     calificacion = round((correctas / total) * 10, 1)
 
-    from .models import Calificaciones, Curso
-    curso = Curso.objects.get(id_curso=curso_id)
+    # 🔁 Si es diagnóstico
+    if curso_id is None:
+        # Se puede usar ID_Curso = NULL o 0 para guardar en la tabla
+        Calificaciones.objects.update_or_create(
+            id_usuario=usuario,
+            id_curso=None,  # o puedes usar un curso diagnóstico fijo
+            defaults={"calificacion": calificacion}
+        )
+    else:
+        try:
+            curso = Curso.objects.get(id_curso=curso_id)
+        except Curso.DoesNotExist:
+            return Response({"error": "Curso no encontrado."}, status=404)
 
-    Calificaciones.objects.update_or_create(
-        id_usuario=usuario,
-        id_curso=curso,
-        defaults={"calificacion": calificacion}
-    )
+        Calificaciones.objects.update_or_create(
+            id_usuario=usuario,
+            id_curso=curso,
+            defaults={"calificacion": calificacion}
+        )
 
     return Response({"calificacion": calificacion})
 
@@ -810,31 +822,35 @@ def calificar_respuestas(request):
 def get_podio(request):
     usuario_actual_id = request.user.id
 
-    # 1. Obtener promedios por usuario
-    promedios = (
-        Calificaciones.objects
+    # Obtener promedios de usuarios que tienen calificación
+    promedios_dict = {
+        item['id_usuario']: item['promedio']
+        for item in Calificaciones.objects
         .values('id_usuario')
         .annotate(promedio=Avg('calificacion'))
-        .order_by('-promedio')
-    )
+    }
 
-    # 2. Armar lista con nombre e imagen
+    estudiantes = Estudiantes.objects.select_related('usuario').all()
     lista_podio = []
-    for pos, entrada in enumerate(promedios, start=1):
-        try:
-            estudiante = Estudiantes.objects.get(id=entrada['id_usuario'])
-        except Estudiantes.DoesNotExist:
-            continue
+
+    for estudiante in estudiantes:
+        promedio = promedios_dict.get(estudiante.usuario.id, 0.0)
 
         lista_podio.append({
-            "id_usuario": estudiante.id,
-            "nombre": estudiante.nombre,
-            "imagen": estudiante.imagen.url if estudiante.imagen else None,
-            "promedio": round(entrada['promedio'], 2),
-            "lugar": pos
+            "id_usuario": estudiante.usuario.id,
+            "nombre": estudiante.nickname,
+            "imagen": estudiante.usuario.fotoperfil or "",
+            "promedio": round(promedio, 2),
         })
 
-    # 3. Identificar lugar del usuario actual
+    # Ordenar descendente por promedio
+    lista_podio.sort(key=lambda x: x["promedio"], reverse=True)
+
+    # Agregar posición
+    for i, estudiante in enumerate(lista_podio, start=1):
+        estudiante["lugar"] = i
+
+    # Buscar posición del usuario actual
     mi_posicion = next((item for item in lista_podio if item["id_usuario"] == usuario_actual_id), None)
 
     return Response({
