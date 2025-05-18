@@ -1,8 +1,12 @@
 import React from "react";
 import "@fontsource/roboto";
-import coding from "../../Img/coding.jpg"
+import coding from "../../Img/coding.jpg";
+import {useNavigate} from "react-router-dom";
 
 const Inicio = () => {
+    const navigate = useNavigate();
+    const token = localStorage.getItem("token");
+
     return (
         <div style={{ position: "relative", height: "500px", overflow: "hidden" }}>
             {/* Imagen de fondo */}
@@ -31,7 +35,11 @@ const Inicio = () => {
             >
                 <button
                     className="btn btn-primary btn-lg"
-                    onClick={() => (window.location.href = "/login")} // Redirige a login
+                    onClick={() => {
+                        if (!token) {
+                            navigate(`/login`);
+                        }
+                    }}
                     style={{
                         backgroundColor: "#003366", // Azul oscuro
                         borderColor: "#003366",

@@ -1,12 +1,50 @@
-import React from "react";
+import React, {useState} from "react";
 import Header from "../components/HeaderLogin";
 import Footer from "../components/footer";
 import escom from "../Img/ESCOM.jpeg";
+import InformationModal from "../components/InformationModal";
+import ErrorModal from "../components/ErrorModal";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 const RecoverPassword = () => {
+    const navigate = useNavigate();
+    const [correo, setCorreo] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [InformationMessage, setInformationMessage] = useState("");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setInformationMessage("");
+        setErrorMessage("");
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/recuperar-contrasena/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ correo }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setInformationMessage(data.message || "Correo enviado con éxito.");
+                setCorreo("");
+                navigate('/login');
+            } else {
+                setErrorMessage(data.error || "No se pudo enviar el correo.");
+            }
+        } catch (err) {
+            setErrorMessage("Error de conexión. Intenta más tarde.");
+            console.error(err);
+        }
+    };
+
     return (
         <div>
             <Header />
+            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
+            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
             <div
                 style={{
                     backgroundImage: `url(${escom})`,
@@ -32,11 +70,13 @@ const RecoverPassword = () => {
                     <h2 style={{ fontFamily: "Roboto, sans-serif", marginBottom: "20px" }}>
                         Recuperar contraseña
                     </h2>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <div style={{ marginBottom: "15px", position: "relative" }}>
                             <input
                                 type="email"
                                 placeholder="Correo Electrónico"
+                                value={correo}
+                                onChange={(e) => setCorreo(e.target.value)}
                                 style={{
                                     width: "100%",
                                     padding: "10px 10px 10px 40px",

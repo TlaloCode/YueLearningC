@@ -70,3 +70,14 @@
     padding: 10px 20px;
     cursor: pointer;
 }
+
+.opcion-correcta {
+    color: green;
+    font-weight: bold;
+}
+
+.opcion-incorrecta {
+    color: red;
+    font-weight: bold;
+}
+

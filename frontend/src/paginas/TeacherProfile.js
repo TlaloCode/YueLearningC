@@ -8,6 +8,7 @@ import Header from "../components/Header"; // Importa el header
 import Footer from "../components/footer"; // Importa el footer
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 const TeacherProfile = () => {
     const navigate = useNavigate();
@@ -28,6 +29,8 @@ const TeacherProfile = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
     const [editFields, setEditFields] = useState({});
+    const [confirmationMessage, setConfirmationMessage] = useState("");
+    const [pendingDelete, setPendingDelete] = useState(false);
 
     const enableEdit = (fieldName) => {
         setEditFields({ ...editFields, [fieldName]: true });
@@ -39,6 +42,34 @@ const TeacherProfile = () => {
 
     const handleNavigation = () => {
         navigate('/mis-cursos');
+    };
+
+
+    const handleDeleteAccount = async () => {
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/eliminar-cuenta/", {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.message || "Cuenta eliminada correctamente.");
+                localStorage.clear();
+                sessionStorage.clear();
+                navigate("/login");
+            } else {
+                setErrorMessage(data.error || "Ocurrió un error al eliminar la cuenta.");
+            }
+        } catch (error) {
+            console.error("Error al eliminar cuenta:", error);
+            setErrorMessage("Error de conexión al intentar eliminar la cuenta.");
+        }
     };
 
     const handleFileChange = async (e) => {
@@ -237,7 +268,18 @@ const TeacherProfile = () => {
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
             <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
-        <div className="app-container" style={{backgroundColor: "rgba(0,51,102,0.3)"}}>
+            <ConfirmationModal
+                message={confirmationMessage}
+                onClose={() => {
+                    setConfirmationMessage("");
+                    setPendingDelete(false);
+                }}
+                onConfirm={() => {
+                    setConfirmationMessage("");
+                    handleDeleteAccount(); // función que eliminará la cuenta
+                }}
+            />
+            <div className="app-container" style={{backgroundColor: "rgba(0,51,102,0.3)"}}>
             <Header /> {/* Header fijo */}
 
             <div className="profile-container">
@@ -341,7 +383,14 @@ const TeacherProfile = () => {
                                 }
                             }>Cancelar</button>
                         </div>
-                        <button className="delete-profile"><FaTrash/> Eliminar perfil</button>
+                        <button className="delete-profile"
+                                onClick={() => {
+                                    setConfirmationMessage("¿Estás seguro de que deseas eliminar tu cuenta?");
+                                    setPendingDelete(true);
+                                }}
+                                style={{
+                                    marginTop: "80px",
+                                }}><FaTrash/> Eliminar perfil</button>
                     </div>
                 </div>
             </div>

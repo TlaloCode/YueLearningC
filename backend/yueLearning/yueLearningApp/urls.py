@@ -5,7 +5,8 @@ from .views import get_user_profile, update_user_profile, upload_profile_photo, 
 from .views import get_enrolled_courses, get_all_courses, get_teachers_with_courses, get_course_details, inscribir_curso
 from .views import get_course_videos, get_profile_photo, get_teacher_photo, subir_video, get_video_detail
 from .views import subir_recurso, get_course_resource, delete_video, delete_recurso, calificar_respuestas
-from .views import obtener_preguntas_por_curso, get_diagnostico, get_podio
+from .views import obtener_preguntas_por_curso, get_diagnostico, get_podio, eliminar_cuenta, recuperar_contrasena
+from .views import calificar_curso, buscar_cursos
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -13,7 +14,9 @@ urlpatterns = [
     #path('register-teacher/', registrar_docente, name='registrar_docente'),
     path('register-user/', registrar_usuario, name='registrar_usuario'),
     path('login/', login_usuario, name='login_usuario'),
+    path("recuperar-contrasena/", recuperar_contrasena),
     path('verify-email/', verificar_correo, name='verificar_correo'),
+    path("buscar-cursos/", buscar_cursos),
     path('update-user-profile/', update_user_profile, name='update_user_profile'),
     path('get-user-profile/', get_user_profile, name='get_user_profile'),
     path('upload-profile-photo/', upload_profile_photo, name='upload_profile_photo'),
@@ -37,6 +40,8 @@ urlpatterns = [
     path('respuestas/', calificar_respuestas, name='calificar_respuestas'),
     path('diagnostico/', get_diagnostico, name='get_diagnostico'),
     path('podio/', get_podio, name='get_podio'),
+    path("calificar-curso/", calificar_curso),
+    path("eliminar-cuenta/", eliminar_cuenta),
 
 
 

@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
+import "../css/AgregarRecurso.css";
 import {useParams} from "react-router-dom";
+import PantallaCarga from "../components/PantallaCarga";
 
 const AgregarRecurso = ({ onClose }) => {
     const { courseId } = useParams();
     const [titulo, setTitulo] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [archivo, setArchivo] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const handleFileChange = (e) => {
         setArchivo(e.target.files[0]);
@@ -13,6 +17,7 @@ const AgregarRecurso = ({ onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);  // Mostrar pantalla de carga
 
         if (!archivo) {
             alert("Por favor selecciona un archivo.");
@@ -36,6 +41,7 @@ const AgregarRecurso = ({ onClose }) => {
             });
 
             const data = await response.json();
+            setIsLoading(false);  // Ocultar carga
 
             if (response.ok) {
                 alert("✅ Recurso agregado correctamente");
@@ -45,7 +51,7 @@ const AgregarRecurso = ({ onClose }) => {
             }
         } catch (error) {
             console.error("Error al subir recurso:", error);
-            alert("❌ Error en la conexión");
+            setIsLoading(false);
         }
     };
 
@@ -128,6 +134,7 @@ const AgregarRecurso = ({ onClose }) => {
                     </div>
                 </form>
             </div>
+            {isLoading && <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..." />}
         </div>
     );
 };

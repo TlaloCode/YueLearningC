@@ -5,6 +5,7 @@ import "@fontsource/roboto"
 import userPlaceholder from "../assets/default-user.jpg";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 import Footer from "../components/footer";
 import Header from "../components/Header";
 
@@ -21,6 +22,8 @@ const StudentProfile = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
+    const [confirmationMessage, setConfirmationMessage] = useState("");
+    const [pendingDelete, setPendingDelete] = useState(false);
     const handleRedirect = () => {
         navigate('/mis-cursos-estudiante');
     };
@@ -169,52 +172,32 @@ const StudentProfile = () => {
         }
     };
 
-
-
-    const handleUpload = async () => {
+    const handleDeleteAccount = async () => {
         const token = localStorage.getItem("token");
 
-        if (!selectedFile) {
-            alert("Selecciona una imagen primero.");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("file", selectedFile);
-
         try {
-            const respuesta = await fetch("http://127.0.0.1:8000/api/upload-profile-photo/", {
-                method: "POST",
+            const response = await fetch("http://127.0.0.1:8000/api/eliminar-cuenta/", {
+                method: "DELETE",
                 headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-                body: formData
+                    Authorization: `Bearer ${token}`
+                }
             });
-            console.log("Respuesta cruda del backend:", respuesta);
-            const data = await respuesta.json();
-            console.log("Contenido de la respuesta:", data);
 
-            if (respuesta.ok) {
-                // ¡Aquí aseguramos que se use el link de Drive!
-                setProfile(prev => ({
-                    ...prev,
-                    fotoPerfil: data.fotoPerfil,
-                    preview: null  // Limpiamos el preview base64
-                }));
+            const data = await response.json();
 
-                alert("Imagen subida correctamente");
+            if (response.ok) {
+                alert(data.message || "Cuenta eliminada correctamente.");
+                localStorage.clear();
+                sessionStorage.clear();
+                navigate("/login");
             } else {
-                alert(data.error || "Error al subir la imagen");
+                setErrorMessage(data.error || "Ocurrió un error al eliminar la cuenta.");
             }
         } catch (error) {
-            console.error("Error al subir la imagen:", error);
-            alert("Error en la carga de imagen");
+            console.error("Error al eliminar cuenta:", error);
+            setErrorMessage("Error de conexión al intentar eliminar la cuenta.");
         }
     };
-
-
-
-
 
     const handleSave = async () => {
         const token = localStorage.getItem("token");
@@ -244,10 +227,22 @@ const StudentProfile = () => {
         }
     };
 
+
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")}/>
             <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")}/>
+            <ConfirmationModal
+                message={confirmationMessage}
+                onClose={() => {
+                    setConfirmationMessage("");
+                    setPendingDelete(false);
+                }}
+                onConfirm={() => {
+                    setConfirmationMessage("");
+                    handleDeleteAccount(); // función que eliminará la cuenta
+                }}
+            />
             {/* Contenedor principal para ajustar el layout */}
             <Header/>
             <div className="app-container" style={{backgroundColor: "rgba(0,51,102,0.3)"}}>
@@ -350,7 +345,14 @@ const StudentProfile = () => {
                                 <button className="btn-save" onClick={handleSave}>Actualizar</button>
                                 <button className="btn-cancel">Cancelar</button>
                             </div>
-                            <button className="delete-profile">🗑️ Eliminar perfil</button>
+                            <button className="delete-profile"
+                                    onClick={() => {
+                                        setConfirmationMessage("¿Estás seguro de que deseas eliminar tu cuenta?");
+                                        setPendingDelete(true);
+                                    }}
+                            style={{
+                                marginTop: "80px",
+                            }}>🗑️ Eliminar perfil</button>
                         </div>
                     </div>
                 </div>

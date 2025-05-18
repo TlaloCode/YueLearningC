@@ -56,12 +56,13 @@ const App = () => {
               <Route path="/recursos-apoyo" element={<RecursosApoyo />} /> {/* Ruta para la inscripción al curso */}
               <Route path="/recursos-apoyo/:courseId" element={<RecursosApoyo />} />
               <Route path="/calificar-curso" element={<CalificarCurso/>} /> {/* Ruta para la inscripción al curso */}
+              <Route path="/calificar-curso/:courseId" element={<CalificarCurso/>} /> {/* Ruta para la inscripción al curso */}
               <Route path="/diagnostico" element={<Diagnostico/>} /> {/* Ruta para la inscripción al curso */}
               <Route path="/compilador" element={<Compilador/>} /> {/* Ruta para la inscripción al curso */}
               <Route path="/compilador/:courseId" element={<Compilador/>} />
               <Route path="/podio" element={<Podio/>} /> {/* Ruta para la inscripción al curso */}
               <Route path="/vista-video" element={<VistaVideo/>} />
-              <Route path="/vista-video/:idVideo" element={<VistaVideo/>} />
+              <Route path="/vista-video/:courseId/:idVideo" element={<VistaVideo/>} />
           </Routes>
       </div>
       </Router>

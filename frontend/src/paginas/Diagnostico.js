@@ -11,6 +11,8 @@ const Diagnostico = () => {
     const [preguntas, setPreguntas] = useState([]);
     const [respuestas, setRespuestas] = useState({});
     const [titulo, setTitulo] = useState("Diagnóstico");
+    const [respuestasEvaluadas, setRespuestasEvaluadas] = useState([]);
+    const [evaluado, setEvaluado] = useState(false);
 
     useEffect(() => {
         const fetchDiagnostico = async () => {
@@ -64,6 +66,8 @@ const Diagnostico = () => {
             if (response.ok) {
                 const result = await response.json();
                 alert(`Tu calificación diagnóstica es: ${result.calificacion}`);
+                setRespuestasEvaluadas(result.detalle);
+                setEvaluado(true);
             } else {
                 const errorData = await response.json();
                 alert("Error al calificar: " + (errorData.error || "desconocido"));
@@ -91,23 +95,38 @@ const Diagnostico = () => {
 
                 <div className="diagnostico-card">
                     <h3>Diagnóstico</h3>
-
                     {preguntas.map((pregunta, index) => (
                         <div className="question" key={pregunta.id_pregunta}>
                             <p><strong>{index + 1}. {pregunta.textopregunta}</strong></p>
-                            {pregunta.opciones.map((opcion) => (
-                                <label key={opcion.id_opciones}>
-                                    <input
-                                        type="radio"
-                                        name={`q${pregunta.id_pregunta}`}
-                                        checked={respuestas[pregunta.id_pregunta] === opcion.id_opciones}
-                                        onChange={() => handleChange(pregunta.id_pregunta, opcion.id_opciones)}
-                                    />
-                                    {opcion.textoopcion}
-                                </label>
-                            ))}
+
+                            {Array.isArray(pregunta.opciones) && pregunta.opciones.map((opcion) => {
+                                const evaluacion = respuestasEvaluadas.find(r => r.id_pregunta === pregunta.id_pregunta);
+                                const esSeleccionada = respuestas[pregunta.id_pregunta] === opcion.id_opciones;
+                                const esCorrecta = evaluacion && opcion.id_opciones === evaluacion.id_correcta;
+                                const esIncorrecta = evaluacion && esSeleccionada && !esCorrecta;
+
+                                let clase = "";
+                                if (evaluado) {
+                                    if (esCorrecta) clase = "opcion-correcta";
+                                    else if (esIncorrecta) clase = "opcion-incorrecta";
+                                }
+
+                                return (
+                                    <label key={opcion.id_opciones} className={clase}>
+                                        <input
+                                            type="radio"
+                                            name={`q${pregunta.id_pregunta}`}
+                                            checked={esSeleccionada}
+                                            disabled={evaluado}
+                                            onChange={() => handleChange(pregunta.id_pregunta, opcion.id_opciones)}
+                                        />
+                                        {opcion.textoopcion}
+                                    </label>
+                                );
+                            })}
                         </div>
                     ))}
+
                     <button className="submit-btn" onClick={handleSubmit}>Enviar</button>
                 </div>
             </div>

@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import "@fontsource/roboto";
 import logo from "../Img/logo.JPG"
 import defaultLogo from "../Img/default-profile.png"
+import PantallaCarga from "../components/PantallaCarga";
 import menuHamburguesa from "../assets/menuHamburguesa.png"; // Asegúrate que esté en esa ruta
 import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
@@ -10,6 +11,11 @@ const Header = () => {
     const [usuario, setUsuario] = useState(null); // Estado para almacenar datos del usuario
     const [menuLateralAbierto, setMenuLateralAbierto] = useState(false);
     const [menuPerfilAbierto, setMenuPerfilAbierto] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [busqueda, setBusqueda] = useState("");
+    const [resultados, setResultados] = useState([]);
+
+
 
     const menuBtnStyle = {
         width: "100%",
@@ -23,7 +29,6 @@ const Header = () => {
     };
 
     const handleNavigation = () => {
-        const token = localStorage.getItem("token");
         if (usuario.rol === "estudiante") {
             navigate('/perfil-estudiante');
         } else if (usuario.rol === "docente") {
@@ -62,6 +67,7 @@ const Header = () => {
 
         if (cachedImage) {
             setUsuario({ rol, fotoPerfil: cachedImage });
+            setLoading(false);
             return;
         }
 
@@ -82,6 +88,7 @@ const Header = () => {
                         const base64data = reader.result;
                         sessionStorage.setItem("cachedProfileImage", base64data);
                         setUsuario({ rol, fotoPerfil: base64data });
+                        setLoading(false);
                     };
 
                     reader.readAsDataURL(blob);
@@ -93,6 +100,7 @@ const Header = () => {
                             rol,
                             fotoPerfil:defaultLogo, // Usa la foto de perfil si existe, de lo contrario, usa la predeterminada
                         });
+                        setLoading(false);
                     }
                 }
             } catch (error) {
@@ -105,6 +113,14 @@ const Header = () => {
         }
 
     }, []);
+
+    const handleMisCursos = () => {
+        if (usuario?.rol === "estudiante") {
+            navigate("/mis-cursos-estudiante");
+        } else if (usuario?.rol === "docente") {
+            navigate("/mis-cursos");
+        }
+    };
 
     return (
         <header
@@ -165,7 +181,7 @@ const Header = () => {
                             </button>
                             <button
                                 style={menuBtnStyle}
-                                onClick={() => navigate("/mis-cursos-estudiante")}
+                                onClick={handleMisCursos}
                             >
                                 Mis cursos
                             </button>
@@ -196,6 +212,37 @@ const Header = () => {
                 <input
                     type="text"
                     placeholder="Ingresa el nombre del curso o del docente"
+                    value={busqueda}
+                    onChange={async (e) => {
+                        const query = e.target.value;
+                        setBusqueda(query);
+
+                        if (query.trim() === "") {
+                            setResultados([]);
+                            return;
+                        }
+
+                        const token = localStorage.getItem("token");
+                        const rol = localStorage.getItem("rol");
+
+                        if (!token || rol !== "estudiante") {
+                            setResultados([]);
+                            return;
+                        }
+
+                        try {
+                            const res = await fetch(`http://127.0.0.1:8000/api/buscar-cursos/?q=${encodeURIComponent(query)}`);
+                            if (res.ok) {
+                                const data = await res.json();
+                                setResultados(data);
+                            } else {
+                                setResultados([]);
+                            }
+                        } catch (err) {
+                            console.error("Error al buscar cursos:", err);
+                            setResultados([]);
+                        }
+                    }}
                     className="form-control"
                     style={{
                         width: "400px",
@@ -204,8 +251,43 @@ const Header = () => {
                         fontWeight: "600",
                     }}
                 />
+
+                {resultados.length > 0 && (
+                    <div style={{
+                        position: "absolute",
+                        top: "60px",
+                        right: "220px",
+                        width: "400px",
+                        backgroundColor: "#fff",
+                        color: "black",
+                        border: "1px solid #ccc",
+                        borderRadius: "5px",
+                        zIndex: 1002,
+                        maxHeight: "250px",
+                        overflowY: "auto",
+                    }}>
+                        {resultados.map((curso) => (
+                            <div
+                                key={curso.id}
+                                onClick={() => {
+                                    navigate(`/inscribir-curso/${curso.id}`);
+                                    setResultados([]);
+                                    setBusqueda("");
+                                }}
+                                style={{
+                                    padding: "10px",
+                                    cursor: "pointer",
+                                    borderBottom: "1px solid #eee"
+                                }}
+                            >
+                                <strong>{curso.nombrecurso}</strong> <br/>
+                                <small>{curso.nombre_docente}</small>
+                            </div>
+                        ))}
+                    </div>
+                )}
                 {usuario ? (
-                    <div style={{ position: "relative" }}>
+                    <div style={{position: "relative"}}>
                         <button
                             onClick={() => {
                                 setMenuPerfilAbierto(!menuPerfilAbierto);
@@ -228,7 +310,7 @@ const Header = () => {
                             />
                         </button>
                         {/* Menú desplegable */}
-                        {menuPerfilAbierto  && (
+                        {menuPerfilAbierto && (
                             <div style={{
                                 position: "absolute",
                                 right: 0,
@@ -240,7 +322,7 @@ const Header = () => {
                                 zIndex: 1001,
                                 textAlign: "center"
                             }}>
-                                <p style={{ margin: "10px 0", fontWeight: "bold" }}>{usuario.nickname}</p>
+                                <p style={{margin: "10px 0", fontWeight: "bold"}}>{usuario.nickname}</p>
                                 <button
                                     onClick={handleNavigation}
                                     style={{
@@ -268,7 +350,7 @@ const Header = () => {
                                 >
                                     Cerrar sesión
                                 </button>
-            </div>
+                            </div>
                         )}
                     </div>
                 ) : (
@@ -292,6 +374,9 @@ const Header = () => {
                     </button>
                 )}
             </div>
+            {loading && localStorage.getItem("token") && (
+                <PantallaCarga mensaje="Cargando perfil..."/>
+            )}
         </header>
     );
 };

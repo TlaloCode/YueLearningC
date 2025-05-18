@@ -95,7 +95,7 @@ const ListaVideos = () => {
                         {videos.length > 0 ? (
                             videos.map((video) => (
                                 <div key={video.id} className="video-card"
-                                     onClick={() => navigate(`/vista-video/${video.id}`)}
+                                     onClick={() => navigate(`/vista-video/${courseId}/${video.id}`)}
                                      style={{ cursor: "pointer" }}>
                                     <img src={video.image || placeholder} alt={video.title}/>
                                     <div className="video-info">

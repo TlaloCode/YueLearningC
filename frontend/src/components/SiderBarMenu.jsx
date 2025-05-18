@@ -12,13 +12,16 @@ const SideBarMenu = () => {
                 Lista de videos
             </NavLink>
             <NavLink to={`/evalua-conocimientos/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
-                Quiz
+                Cuestionarios
             </NavLink>
             <NavLink to={`/compilador/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
                 Practicar
             </NavLink>
             <NavLink to={`/recursos-apoyo/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
                 Recursos
+            </NavLink>
+            <NavLink to={`/calificar-curso/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
+                Calica este curso
             </NavLink>
         </div>
     );

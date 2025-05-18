@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 
 const VideoDetalle = () => {
     const navigate = useNavigate();
-    const { idVideo } = useParams();
+    const { idVideo,courseId } = useParams();
     const [videoData, setVideoData] = useState(null);
 
     useEffect(() => {

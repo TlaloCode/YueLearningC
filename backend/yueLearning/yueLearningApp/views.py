@@ -6,8 +6,10 @@ import uuid
 import tempfile
 import requests
 import httplib2
+from math import ceil
 from io import BytesIO
 from celery import shared_task
+from django.db.models import Q
 from django.conf import settings
 from django.db.models import Avg
 from datetime import timedelta
@@ -113,16 +115,17 @@ def login_usuario(request):
     password = data.get("contrasena")
     print(data)
     usuario = Usuario.objects.filter(correoelectronico=correo).first()
-    print(usuario)
     if not usuario:
-        return Response({"error": "Correo o contraseña incorrectos."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Correo o contraseña incorrectos."},
+        status=status.HTTP_400_BAD_REQUEST)
 
     if usuario.estatuscorreo != "Verificado":
-        return Response({"error": "Debes verificar tu correo antes de iniciar sesión."}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "Debes verificar tu correo antes de iniciar sesión."},
+        status=status.HTTP_403_FORBIDDEN)
 
     if not usuario.check_password(password):
-        return Response({"error": "Correo o contraseña incorrectos."}, status=status.HTTP_400_BAD_REQUEST)
-
+        return Response({"error": "Correo o contraseña incorrectos."},
+        status=status.HTTP_400_BAD_REQUEST)
     refresh = RefreshToken.for_user(usuario)
 
     # Determinar el rol del usuario
@@ -137,6 +140,47 @@ def login_usuario(request):
         "rol": rol,
     }, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def recuperar_contrasena(request):
+    correo = request.data.get("correo")
+
+    if not correo:
+        return Response({"error": "Debes proporcionar un correo electrónico."}, status=400)
+
+    try:
+        # 1. Buscar el usuario por correo
+        usuario = Usuario.objects.get(correoelectronico=correo)
+        usuario_id = usuario.id
+
+        # 2. Verificar si es estudiante
+        if Estudiantes.objects.filter(usuario_id=usuario_id).exists():
+            estudiante = Estudiantes.objects.get(usuario_id=usuario_id)
+            contrasena = estudiante.contrasena
+
+        # 3. Verificar si es docente
+        elif Docente.objects.filter(usuario_id=usuario_id).exists():
+            docente = Docente.objects.get(usuario_id=usuario_id)
+            contrasena = docente.contrasena
+
+        else:
+            return Response({"error": "No se encontró el perfil del usuario."}, status=404)
+
+        # 4. Enviar la contraseña por correo
+        send_mail(
+            subject="Recuperación de contraseña - YueLearningC",
+            message=f"Tu contraseña actual es: {contrasena}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[correo],
+            fail_silently=False,
+        )
+
+        return Response({"message": "La contraseña ha sido enviada a tu correo."}, status=200)
+
+    except Usuario.DoesNotExist:
+        return Response({"error": "El correo ingresado no está registrado en la plataforma."}, status=404)
+
+    except Exception as e:
+        return Response({"error": f"Error al enviar el correo: {str(e)}"}, status=500)
 
 @api_view(['GET'])
 def verificar_correo(request):
@@ -154,6 +198,29 @@ def verificar_correo(request):
     usuario.save()
     token_obj.delete()
     return Response({"message": "Correo verificado con éxito. Ya puedes iniciar sesión."}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def buscar_cursos(request):
+    query = request.GET.get("q", "").strip()
+
+    if not query:
+        return Response([])  # Si no hay búsqueda, devuelve vacío
+
+    cursos = Curso.objects.filter(
+        Q(nombrecurso__icontains=query) |
+        Q(id_docente__docente__nombre__icontains=query)  # Si el campo en Docente se llama 'nombre'
+    ).select_related("id_docente")[:10]  # Limita a 10 resultados
+
+    resultado = [
+        {
+            "id": curso.id_curso,
+            "nombrecurso": curso.nombrecurso,
+            "nombre_docente": curso.id_docente.docente.nombre
+        }
+        for curso in cursos
+    ]
+
+    return Response(resultado)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -314,13 +381,19 @@ def create_course(request):
     )
 
     if imagen:
-        # Aquí deberías guardar la imagen en algún lugar y asignar su URL real
-        curso.imagen_url = "http://tu-servidor.com/uploads/" + imagen.name  # Simulado
+        if not imagen.content_type.startswith("image/"):
+            return Response({"error": "Solo se permiten archivos de imagen."}, status=400)
+
+        try:
+            file_stream = io.BytesIO(imagen.read())
+            file_id = upload_file_to_drive(file_stream, imagen.name)
+            curso.imagen_url = file_id
+        except Exception as e:
+            return Response({"error": f"No se pudo subir la imagen: {str(e)}"}, status=500)
 
     curso.save()
 
-    return Response({"message": "Curso creado exitosamente", "id": curso.id_curso})
-
+    return Response({"message": "Curso creado exitosamente", "id": curso.id_curso}, status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -405,7 +478,6 @@ def get_course_details(request, course_id):
             "videos": list(videos),
             "recursos": list(recursos)
         }
-
         return Response(course_data)
     except Curso.DoesNotExist:
         return Response({"error": "Curso no encontrado"}, status=404)
@@ -431,7 +503,43 @@ def inscribir_curso(request):
     Inscripciones.objects.create(id_usuario=estudiante, id_curso=curso)
     return Response({"message": "Inscripción exitosa"})
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def calificar_curso(request):
+    id_curso = request.data.get("id_curso")
+    calificacion = request.data.get("calificacion")
 
+    if not id_curso or not calificacion:
+        return Response({"error": "Datos incompletos."}, status=400)
+
+    try:
+        estudiante = Estudiantes.objects.get(usuario=request.user)
+        curso = Curso.objects.get(id_curso=id_curso)
+
+        calificacion = int(calificacion)
+        if calificacion < 1 or calificacion > 5:
+            return Response({"error": "La calificación debe estar entre 1 y 5 estrellas."}, status=400)
+
+        # Crear o actualizar calificación del estudiante
+        CalificacionCurso.objects.update_or_create(
+            id_curso=curso,
+            id_usuario=estudiante,
+            defaults={"calificacion": calificacion}
+        )
+
+        # Calcular nuevo promedio y redondear a entero más cercano
+        promedio = CalificacionCurso.objects.filter(id_curso=curso).aggregate(avg=Avg("calificacion"))["avg"]
+        curso.calificacion = round(promedio)  # ← Solo se guarda el promedio redondeado
+        curso.save()
+
+        return Response({"message": "Calificación registrada correctamente."}, status=200)
+
+    except Curso.DoesNotExist:
+        return Response({"error": "Curso no encontrado."}, status=404)
+    except Estudiantes.DoesNotExist:
+        return Response({"error": "Usuario no es estudiante."}, status=403)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
 def get_teachers_with_courses(request):
@@ -815,7 +923,22 @@ def calificar_respuestas(request):
             defaults={"calificacion": calificacion}
         )
 
-    return Response({"calificacion": calificacion})
+    detalle_respuestas = []
+    for id_pregunta, id_opcion in respuestas.items():
+        try:
+            correcta = Opcion.objects.get(id_pregunta=id_pregunta, es_correcta=True)
+            detalle_respuestas.append({
+                "id_pregunta": int(id_pregunta),
+                "id_seleccionada": int(id_opcion),
+                "id_correcta": correcta.id_opciones
+            })
+        except:
+            continue
+
+    return Response({
+        "calificacion": calificacion,
+        "detalle": detalle_respuestas
+    })
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -857,3 +980,39 @@ def get_podio(request):
         "top": lista_podio[:10],
         "mi_posicion": mi_posicion
     })
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_cuenta(request):
+    usuario = request.user
+
+    try:
+        # Si es estudiante
+        if Estudiantes.objects.filter(usuario=usuario).exists():
+            Estudiantes.objects.filter(usuario=usuario).delete()
+            Inscripciones.objects.filter(id_usuario=usuario).delete()
+            Calificaciones.objects.filter(id_usuario=usuario).delete()
+            EmailVerificationToken.objects.filter(usuario_id=usuario).delete()
+            usuario.delete()
+            return Response({"message": "Cuenta de estudiante eliminada correctamente."}, status=200)
+
+        # Si es docente
+        elif Docente.objects.filter(usuario=usuario).exists():
+            cursos = Curso.objects.filter(id_docente=usuario)
+
+            for curso in cursos:
+                Video.objects.filter(id_curso=curso).delete()
+                RecursoApoyo.objects.filter(id_curso=curso).delete()
+                Inscripciones.objects.filter(id_curso=curso).delete()
+
+            cursos.delete()
+            Docente.objects.filter(usuario=usuario).delete()
+            EmailVerificationToken.objects.filter(usuario_id=usuario).delete()
+            usuario.delete()
+            return Response({"message": "Cuenta de docente eliminada correctamente."}, status=200)
+
+        return Response({"error": "Usuario no encontrado."}, status=404)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

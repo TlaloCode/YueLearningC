@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import "../css/AgregarVideo.css";
 import { FaUpload } from "react-icons/fa";
 import {useParams} from "react-router-dom";
+import PantallaCarga from "../components/PantallaCarga";
 
 const AgregarVideo = ({ onClose }) => {
     const { courseId } = useParams();
     const [videoTitle, setVideoTitle] = useState("");
     const [videoFile, setVideoFile] = useState(null);
     const [videoDescription, setVideoDescription] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleFileChange = (e) => {
         setVideoFile(e.target.files[0]);
@@ -15,10 +17,11 @@ const AgregarVideo = ({ onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);  // Mostrar pantalla de carga
 
         const formData = new FormData();
         formData.append("titulo", videoTitle);
-        formData.append("descripcion", videoDescription); // Asegúrate de usar useState para este campo
+        formData.append("descripcion", videoDescription);
         formData.append("video", videoFile);
 
         const token = localStorage.getItem("token");
@@ -33,6 +36,7 @@ const AgregarVideo = ({ onClose }) => {
             });
 
             const data = await response.json();
+            setIsLoading(false);  // Ocultar carga
 
             if (response.ok) {
                 alert("✅ Video agregado correctamente");
@@ -41,10 +45,11 @@ const AgregarVideo = ({ onClose }) => {
                 alert("❌ Error al subir video: " + (data.error || "desconocido"));
             }
         } catch (error) {
-            console.error("Error al subir el video:", error);
             alert("❌ Error en la conexión");
+            setIsLoading(false);
         }
     };
+
 
     return (
         <div className="modal-overlay">
@@ -122,6 +127,9 @@ const AgregarVideo = ({ onClose }) => {
                     </div>
                 </form>
             </div>
+            {isLoading && <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..." />}
+
+
         </div>
     );
 };

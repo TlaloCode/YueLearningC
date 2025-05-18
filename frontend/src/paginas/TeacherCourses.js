@@ -24,11 +24,6 @@ const TeacherCourses = () => {
     };
 
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProfile({ ...profile, [name]: value });
-    };
-
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token || token.trim() === "") {
@@ -87,6 +82,11 @@ const TeacherCourses = () => {
         navigate("/crear-curso");
     };
 
+    const construirURLDrive = (idImagen) => {
+        if (!idImagen) return genericCourse;
+        return `https://drive.google.com/thumbnail?id=${idImagen}&sz=w500`;
+    };
+
     return (
         <div className="app-container">
             <Header />
@@ -122,11 +122,8 @@ const TeacherCourses = () => {
                         <div className="courses-grid">
                             {courses.map((course) => (
                                 <div key={course.id} className="course-card"  onClick={() => handleCourseClick(course.id)}>
-                                    <img
-                                        src={course.image || genericCourse}
-                                        alt={course.title}
-                                        className="course-image"
-                                    />
+                                    <img src={construirURLDrive(course.image)} alt={course.title}
+                                         className="course-image"/>
                                     <h3>{course.title}</h3>
                                 </div>
                             ))}

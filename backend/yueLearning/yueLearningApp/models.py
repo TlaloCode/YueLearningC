@@ -162,6 +162,17 @@ class Opcion(models.Model):
         managed = True
         db_table = 'opciones'
 
+class CalificacionCurso(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_curso = models.ForeignKey("Curso", on_delete=models.CASCADE, db_column="ID_Curso")
+    id_usuario = models.ForeignKey("Estudiantes", on_delete=models.CASCADE, db_column="ID_Usuario")
+    calificacion = models.IntegerField()  # de 1 a 5
+
+    class Meta:
+        db_table = "calificacion_curso"
+        unique_together = ("id_curso", "id_usuario")
+
+
 class EmailVerificationToken(models.Model):
     usuario_id = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='ID_Usuario')
     token = models.UUIDField(default=uuid.uuid4, unique=True)

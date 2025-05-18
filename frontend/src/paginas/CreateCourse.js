@@ -63,7 +63,7 @@ const CreateCourse = () => {
             const data = await response.json();
             if (response.ok) {
                 alert("Curso creado con éxito.");
-                navigate("/cursos-docente");
+                navigate("/mis-cursos");
             } else {
                 alert(data.error || "Error al crear el curso.");
             }

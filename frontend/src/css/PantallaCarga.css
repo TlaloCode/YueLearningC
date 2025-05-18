@@ -1,0 +1,32 @@
+.pantalla-carga-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 102, 204, 0.5);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.pantalla-carga-icono {
+    width: 100px;
+    height: 100px;
+    animation: spin 2s linear infinite;
+}
+
+.pantalla-carga-texto {
+    margin-top: 15px;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    font-family: 'Roboto', sans-serif;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
