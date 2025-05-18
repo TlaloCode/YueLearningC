@@ -3,7 +3,6 @@ import "../css/VistaVideo.css";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import SideBarMenu from "../components/SiderBarMenu";
-import imagenVideo from "../assets/c-course.jpg";
 import { MdArrowBack } from "react-icons/md"; // Importa el ícono
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";

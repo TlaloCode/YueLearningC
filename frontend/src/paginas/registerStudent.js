@@ -6,7 +6,6 @@ import Footer from "../components/footer"
 import escom from "../Img/ESCOM.jpeg";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
-import login from "./login";
 
 const RegisterStudent = () => {
     const navigate = useNavigate();

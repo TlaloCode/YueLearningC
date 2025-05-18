@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/Diagnostico.css";
 import { FaArrowLeft } from "react-icons/fa";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const Diagnostico = () => {
     const navigate = useNavigate();
@@ -94,7 +94,7 @@ const Diagnostico = () => {
                 </p>
 
                 <div className="diagnostico-card">
-                    <h3>Diagnóstico</h3>
+                    <h3>{titulo}</h3>
                     {preguntas.map((pregunta, index) => (
                         <div className="question" key={pregunta.id_pregunta}>
                             <p><strong>{index + 1}. {pregunta.textopregunta}</strong></p>

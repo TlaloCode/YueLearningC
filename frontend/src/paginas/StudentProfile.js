@@ -35,7 +35,6 @@ const StudentProfile = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        const refresh_token = localStorage.getItem("refresh_token");
 
         if (!token || token.trim() === "") {
             alert("No tienes un token de autenticación. Inicia sesión.");
@@ -223,7 +222,6 @@ const StudentProfile = () => {
             }
         } catch (error) {
             setErrorMessage(data.error || "Ocurrió un error");
-            return;
         }
     };
 
