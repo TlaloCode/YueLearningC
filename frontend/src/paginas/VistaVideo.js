@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 
 const VideoDetalle = () => {
     const navigate = useNavigate();
-    const { idVideo,courseId } = useParams();
+    const { idVideo } = useParams();
     const [videoData, setVideoData] = useState(null);
 
     useEffect(() => {
@@ -61,6 +61,7 @@ const VideoDetalle = () => {
                         style={{maxWidth: "900px", height: "500px"}}
                         allow="autoplay"
                         allowFullScreen
+                        title="Video player"
                     ></iframe>
                 </div>
 

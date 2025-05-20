@@ -21,7 +21,7 @@ const SideBarMenu = () => {
                 Recursos
             </NavLink>
             <NavLink to={`/calificar-curso/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
-                Calica este curso
+                Califica este curso
             </NavLink>
         </div>
     );

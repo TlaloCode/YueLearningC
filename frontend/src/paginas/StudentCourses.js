@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/StudentCourses.css";
-import { FaStar, FaChevronRight,FaGraduationCap, FaBrain, FaTrophy } from "react-icons/fa";
+import { FaStar, FaChevronRight} from "react-icons/fa";
 import genericCourse from "../assets/c-course.jpg";
 import userPlaceholder from "../assets/default-user.jpg";
 

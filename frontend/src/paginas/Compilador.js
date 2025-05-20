@@ -9,6 +9,7 @@ import SideBarMenu from "../components/SiderBarMenu";
 import Editor from "@monaco-editor/react";
 
 const Compilador = () => {
+    const { courseId } = useParams();  // Obtener el courseId de la URL
     const navigate = useNavigate();
     const [entrada, setEntrada] = useState("");
     const [codigo, setCodigo] = useState(`#include <stdio.h>

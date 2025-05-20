@@ -25,12 +25,12 @@ const TeacherProfile = () => {
         fotoPerfil: "",
     });
 
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [setSelectedFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
     const [editFields, setEditFields] = useState({});
     const [confirmationMessage, setConfirmationMessage] = useState("");
-    const [pendingDelete, setPendingDelete] = useState(false);
+    const [setPendingDelete] = useState(false);
 
     const enableEdit = (fieldName) => {
         setEditFields({ ...editFields, [fieldName]: true });

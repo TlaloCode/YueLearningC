@@ -19,7 +19,6 @@ const Podio = () => {
     useEffect(() => {
         const fetchPodio = async () => {
             const token = localStorage.getItem("token");
-            const id = localStorage.getItem("id");
 
             try {
                 const response = await fetch("http://127.0.0.1:8000/api/podio/", {

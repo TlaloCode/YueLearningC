@@ -9,7 +9,7 @@ import courseImage from "../assets/c-course.jpg";
 import pdf from "../assets/pdf.png";
 import AgregarVideo from "../paginas/AgregarVideo";
 import AgregarRecurso from "../paginas/AgregarRecurso";
-import {FaStar, FaChevronRight,FaEdit, FaChevronLeft, FaPlusCircle, FaTrash } from "react-icons/fa";
+import {FaStar,FaEdit, FaChevronLeft, FaPlusCircle, FaTrash } from "react-icons/fa";
 
 
 const TeacherCourseDetail = () => {
