@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import React from "react";
 import "@fontsource/roboto";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWhatsapp, faFacebook } from "@fortawesome/free-brands-svg-icons";
+import {faFacebook} from "@fortawesome/free-brands-svg-icons";
 import "@fontsource/roboto";
 
 
@@ -63,7 +63,7 @@ const Footer = () => {
                 >
                     Ayuda
                 </Link>
-                <p style={{ marginTop: "10px" }}>&copy; Copyright 2024 YUE, Inc.</p>
+                <p style={{ marginTop: "10px" }}>2024-2025 YUE-Learning C.</p>
             </div>
         </footer>
     );

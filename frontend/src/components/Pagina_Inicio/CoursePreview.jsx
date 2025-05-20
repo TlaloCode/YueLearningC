@@ -1,24 +1,30 @@
 import React from "react";
 import "@fontsource/roboto";
+import { useNavigate } from "react-router-dom";
 import cursoImagen from "../../Img/curso.JPG"
 
 const CoursePreview = () => {
+    const navigate = useNavigate();
+    const token = localStorage.getItem("token");
+    const rol = localStorage.getItem("rol");
+
+
     // Simulación de datos (se sustituirá por datos de la base de datos en el futuro)
     const courses = [
         {
-            id: 1,
+            id: 3,
             image: cursoImagen,
             title: "Apuntadores",
             author: "Juárez Flores Jenifer Elizabeth",
         },
         {
-            id: 2,
+            id: 4,
             image: cursoImagen,
             title: "Funciones Recursivas",
             author: "Gómez Molina Ulises",
         },
         {
-            id: 3,
+            id: 5,
             image: cursoImagen,
             title: "Paso por Valor y Paso por Referencia",
             author: "Peralta Romero Aide Yunuen",
@@ -37,12 +43,19 @@ const CoursePreview = () => {
                 {courses.map((course) => (
                     <div
                         key={course.id}
+                        onClick={() => {
+                            if (token && rol === "estudiante") {
+                                navigate(`/inscribir-curso/${course.id}`);
+                            }
+                        }}
                         style={{
                             width: "300px",
                             border: "1px solid #ddd",
                             borderRadius: "10px",
                             overflow: "hidden",
                             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                            cursor: "pointer",
+                            transition: "transform 0.3s ease-in-out",
                         }}
                     >
                         <img

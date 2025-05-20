@@ -1,0 +1,46 @@
+.main-wrapper {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 80px; /* Ajusta esto según la altura de tu Header */
+}
+
+.sidebar-menu {
+    position: fixed;
+    top: 80px; /* Esta es la altura del header */
+    left: 0;
+    width: 200px;
+    height: calc(100vh - 80px); /* Altura total menos la del header */
+    padding: 20px 10px;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    box-sizing: border-box;
+    z-index: 10; /* Por debajo del header si este tiene mayor z-index */
+}
+
+.sidebar-menu a {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 15px 10px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #cce0ff;
+    color: black;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-menu a.active {
+    background-color: #80b3ff;
+    color: white;
+}
+
+.content {
+    margin-left: 220px; /* Da espacio al contenido para que no se encime */
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}

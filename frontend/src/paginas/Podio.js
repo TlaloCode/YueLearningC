@@ -1,27 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../css/Podio.css";
+import Header from "../components/Header";
+import Footer from "../components/footer";
 import { FaArrowLeft, FaTrophy } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import userPlaceholder from "../assets/default-user.jpg";
 
 const Podio = () => {
-    const top3 = [
-        { usuario: "AndyLow", imagen: require("../assets/logo.jpg"), lugar: 2 },
-        { usuario: "JeliFlores", imagen: require("../assets/logo.jpg"), lugar: 1 },
-        { usuario: "Cat68", imagen: require("../assets/logo.jpg"), lugar: 3 },
-    ];
+    const navigate = useNavigate();
+    const [usuarios, setUsuarios] = useState([]);
+    const [miLugar, setMiLugar] = useState(null);
 
-    const posiciones = [
-        { usuario: "DinosPPP", imagen: require("../assets/logo.jpg") },
-        { usuario: "MattyDBZ", imagen: require("../assets/logo.jpg") },
-        { usuario: "Yunus", imagen: require("../assets/logo.jpg") },
-        { usuario: "Xavier16", imagen: require("../assets/logo.jpg") },
-        { usuario: "UIGOGO", imagen: require("../assets/logo.jpg") },
-        { usuario: "Randz13F", imagen: require("../assets/logo.jpg") },
-        { usuario: "VanPAt", imagen: require("../assets/logo.jpg") },
-    ];
+    const getImagenURL = (imagenId) => {
+        if (!imagenId) return userPlaceholder;
+        return `https://drive.google.com/thumbnail?id=${imagenId}`;
+    };
+
+    useEffect(() => {
+        const fetchPodio = async () => {
+            const token = localStorage.getItem("token");
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/podio/", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    setUsuarios(data.top || []);
+                    setMiLugar(data.mi_posicion || null);
+                } else {
+                    alert("Error al cargar el podio.");
+                }
+            } catch (error) {
+                console.error("Error al obtener datos del podio:", error);
+            }
+        };
+
+        fetchPodio();
+    }, []);
+
+    const top3 = usuarios.slice(0, 3);
+    const posicionesRestantes = usuarios.slice(3, 10);
 
     return (
         <div className="podio-container">
-            <div className="podio-header">
+            <Header/>
+            <div className="podio-header" onClick={() => navigate(-1)}>
                 <FaArrowLeft className="back-icon" />
                 <span>Atrás</span>
             </div>
@@ -30,11 +59,11 @@ const Podio = () => {
                 <h2>¡Podio!</h2>
                 <div className="podium-visual">
                     {top3.map((user, index) => (
-                        <div key={index} className={`podium podium-${user.lugar}`}>
-                            <img src={user.imagen} alt={user.usuario} className="podium-img" />
-                            <span className="username">{user.usuario}</span>
+                        <div key={index} className={`podium podium-${user.lugar || index + 1}`}>
+                            <img src={getImagenURL(user.imagen)} alt={user.nombre} className="podium-img"/>
+                            <span className="username">{user.nombre}</span>
                             <div className="trofeo">
-                                <FaTrophy /> <span>{user.lugar}º</span>
+                                <FaTrophy /> <span>{index + 1}º</span>
                             </div>
                         </div>
                     ))}
@@ -42,27 +71,27 @@ const Podio = () => {
             </div>
 
             <div className="podio-resto">
-                <div className="mi-lugar">
-                    <img src={require("../assets/logo.jpg")} alt="Tú" />
-                    <p><strong>6º lugar</strong></p>
-                </div>
+                {miLugar && (
+                    <div className="mi-lugar">
+                        <img src={getImagenURL(miLugar.imagen)} alt="Tú"/>
+                        <p><strong>{miLugar.lugar}º lugar</strong></p>
+                        <span>{miLugar.nombre}</span>
+                    </div>
+                )}
 
                 <div className="tabla-posiciones">
-                    <h3>Posiciones</h3>
-                    {posiciones.map((p, i) => (
+                <h3>Posiciones</h3>
+                    {posicionesRestantes.map((p, i) => (
                         <div className="fila" key={i}>
-                            <img src={p.imagen} alt={p.usuario} />
-                            <span>{p.usuario}</span>
+                            <img src={getImagenURL(p.imagen)} alt={p.nombre}/>
+                            <span>{p.nombre}</span>
                             <span className="lugar">{i + 4}º</span>
                         </div>
                     ))}
                 </div>
             </div>
 
-            <footer className="footer-podio">
-                <span>Ayuda</span>
-                <span>© 2024 YUE, Inc.</span>
-            </footer>
+            <Footer />
         </div>
     );
 };

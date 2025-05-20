@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/StudentCourses.css";
-import { FaStar, FaChevronRight,FaGraduationCap, FaBrain, FaTrophy } from "react-icons/fa";
+import { FaStar, FaChevronRight} from "react-icons/fa";
 import genericCourse from "../assets/c-course.jpg";
 import userPlaceholder from "../assets/default-user.jpg";
 
@@ -14,10 +14,18 @@ const StudentCourses = () => {
     const [courses, setCourses] = useState([]);
     const [allCourses, setAllCourses] = useState([]);
     const [teachers, setTeachers] = useState([]);
+    const fotoPerfil = sessionStorage.getItem("cachedProfileImage");
+    const teacherImage = "";
 
     const handleCourseClick = (courseId) => {
         navigate(`/inscribir-curso/${courseId}`);
     };
+
+    const handleCourseSignedClick = (courseId) => {
+        navigate(`/lista-videos/${courseId}`);  // Redirige a la ruta con el ID del curso
+    };
+
+
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -52,7 +60,9 @@ const StudentCourses = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const teachersData = await resTeachers.json();
+
                 setTeachers(teachersData.slice(0, 3)); // Solo los primeros 3
+                console.log(teachersData);
 
             } catch (error) {
                 console.error("Error al cargar datos del estudiante:", error);
@@ -62,6 +72,9 @@ const StudentCourses = () => {
         fetchData();
     }, []);
 
+    const getTeacherPhotoURL = (fileId) =>
+        fileId ? `http://127.0.0.1:8000/api/teacher-photo/${fileId}/` : teacherImage;
+
 
 
     return (
@@ -69,7 +82,7 @@ const StudentCourses = () => {
             <Header />
             <div className="profile-section">
                 <div className="profile-info">
-                    <img src={require("../assets/c-course.jpg")} alt="Profile" className="profile-image" />
+                    <img src={fotoPerfil || userPlaceholder} alt="Foto de perfil" className="profile-image"/>
                     <div className="profile-details">
                         <h2 className="profile-name">{student.nickname}</h2>
                         <a href={`mailto:${student.correoelectronico}`} className="profile-email">
@@ -90,6 +103,7 @@ const StudentCourses = () => {
                     </div>
                 </div>
             </div>
+            {/*
             <div className="sidebar">
                 <div className="sidebar-item">
                     <button className="sidebar-button">
@@ -110,12 +124,12 @@ const StudentCourses = () => {
                     </button>
                 </div>
             </div>
-
+*/}
             <div className="courses-section">
                 <h2>Mis cursos</h2>
                 <div className="courses-grid">
                     {courses.map((course) => (
-                        <div key={course.id} className="course-card">
+                        <div key={course.id} className="course-card" onClick={() => handleCourseSignedClick(course.id)}>
                             <img src={course.image || genericCourse} alt={course.title} className="course-image" />
                             <h3>{course.title}</h3>
                             <span className="course-author">Creado por {course.author}</span>
@@ -132,7 +146,11 @@ const StudentCourses = () => {
                 <div className="teachers-grid">
                     {teachers.map((teacher) => (
                         <div key={teacher.id} className="teacher-card">
-                            <img src={teacher.image || userPlaceholder} className="teacher-image" />
+                            <img
+                                src={getTeacherPhotoURL(teacher.image)}
+                                alt={`Foto de ${teacher.name}`}
+                                className="teacher-image"
+                            />
                             <h4>{teacher.name}</h4>
                         </div>
                     ))}

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "@fontsource/roboto"
 import Header from "../components/HeaderLogin";
 import Footer from "../components/footer"
@@ -7,6 +8,7 @@ import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 
 const RegisterStudent = () => {
+    const navigate = useNavigate();
     // Definimos el estado para los datos del formulario
     const [formData, setFormData] = useState({
         nickname: "",
@@ -59,6 +61,7 @@ const RegisterStudent = () => {
                     confirmPassword: "",
                     termsAccepted: false,
                 });
+                navigate("/login");
             } else {
                 setErrorMessage(data.error || "Ocurrió un error en el registro");
 

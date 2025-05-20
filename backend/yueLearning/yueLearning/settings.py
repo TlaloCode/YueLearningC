@@ -33,7 +33,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'yuelearning2025a011@gmail.com'  # CORREO DE LA "EMPRESA"
 EMAIL_HOST_PASSWORD = 'ugacqosboufitsux'  # CONTRASEÑA DE APLICACIÓN DE GOOGLE
 ALLOWED_HOSTS = []
-
+DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
+FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000
 
 # Application definition
 
@@ -97,7 +98,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'YUELearningC',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': 'yu3L3arn1ng.C',
         'HOST': 'localhost',  # Si usas un servidor remoto, pon su IP o dominio.
         'PORT': '3306',  # Puerto por defecto de MySQL.
         'OPTIONS': {
@@ -178,3 +179,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AUTH_USER_MODEL = 'yueLearningApp.Usuario'
+
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]

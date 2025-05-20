@@ -5,6 +5,7 @@ import "@fontsource/roboto"
 import userPlaceholder from "../assets/default-user.jpg";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 import Footer from "../components/footer";
 import Header from "../components/Header";
 
@@ -15,12 +16,14 @@ const StudentProfile = () => {
         username: localStorage.getItem("nombre"),
         institutionalEmail: localStorage.getItem("correo"),
         password: "",
-        fotoPerfil: userPlaceholder
+        fotoPerfil: "",
+        preview: null
     });
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [setSelectedFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
-
+    const [confirmationMessage, setConfirmationMessage] = useState("");
+    const [setPendingDelete] = useState(false);
     const handleRedirect = () => {
         navigate('/mis-cursos-estudiante');
     };
@@ -32,15 +35,12 @@ const StudentProfile = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        const refresh_token = localStorage.getItem("refresh_token");
 
         if (!token || token.trim() === "") {
             alert("No tienes un token de autenticación. Inicia sesión.");
             return;
         }
 
-        console.log("Token:", token);
-        console.log("refresh token:", refresh_token);
 
         const fetchProfileData = async () => {
             const response = await fetch("http://127.0.0.1:8000/api/get-user-profile/", {
@@ -62,7 +62,7 @@ const StudentProfile = () => {
                         username: data.nickname,
                         password: data.contrasena,
                         institutionalEmail: data.correoelectronico,
-                        fotoPerfil: data.fotoPerfil || userPlaceholder,
+                        fotoPerfil: sessionStorage.getItem("cachedProfileImage"),
                     });
                 } else {
                     console.error("Error en la respuesta:", response.status, response.statusText);
@@ -74,51 +74,129 @@ const StudentProfile = () => {
             }
         };
 
+        const fetchProfileImage = async () => {
+            const token = localStorage.getItem("token");
+
+            const cachedImage = sessionStorage.getItem("cachedProfileImage");
+            if (cachedImage) {
+                console.log("Usando imagen cacheada desde sessionStorage");
+
+                setProfile(prev => ({
+                    ...prev,
+                    fotoPerfil: cachedImage
+                }));
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/profile-photo/", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    console.error("Error al obtener imagen:", response.status);
+                    return;
+                }
+
+                const blob = await response.blob();
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                    const base64data = reader.result;
+                    console.log("Imagen en base64:", base64data);
+
+                    setProfile(prev => ({
+                        ...prev,
+                        fotoPerfil: base64data
+                    }));
+
+                    sessionStorage.setItem("cachedProfileImage", base64data);
+                };
+
+                reader.readAsDataURL(blob); // CONVIERTE A BASE64
+
+            } catch (error) {
+                console.error("Error general al cargar imagen:", error);
+            }
+        };
         fetchProfileData();
+        fetchProfileImage();
     }, []);
 
     const handleChange = (e) => {
         setProfile({ ...profile, [e.target.name]: e.target.value });
     };
 
-    const handleFileChange = (e) => {
-        setSelectedFile(e.target.files[0]);
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        setSelectedFile(file);
+
+        if (file) {
+            const previewURL = URL.createObjectURL(file);
+            setProfile(prev => ({ ...prev, preview: previewURL }));
+
+            const token = localStorage.getItem("token");
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const respuesta = await fetch("http://127.0.0.1:8000/api/upload-profile-photo/", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await respuesta.json();
+
+                if (respuesta.ok) {
+                    setProfile(prev => ({
+                        ...prev,
+                        fotoPerfil: data.fotoPerfil,
+                        preview: null
+                    }));
+
+                    sessionStorage.setItem("cachedProfileImage", data.fotoPerfil);
+                    alert("Imagen subida correctamente");
+                } else {
+                    alert(data.error || "Error al subir la imagen");
+                }
+            } catch (error) {
+                console.error("Error al subir la imagen:", error);
+                alert("Error en la carga de imagen");
+            }
+        }
     };
 
-    const handleUpload = async () => {
-        const token = localStorage.getItem("token"); // Obtener el token
-
-        if (!selectedFile) {
-            alert("Selecciona una imagen primero.");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("file", selectedFile);
+    const handleDeleteAccount = async () => {
+        const token = localStorage.getItem("token");
 
         try {
-            const respuesta = await fetch("http://127.0.0.1:8000/api/upload-profile-photo/", {
-                method: "POST",
+            const response = await fetch("http://127.0.0.1:8000/api/eliminar-cuenta/", {
+                method: "DELETE",
                 headers: {
-                    "Authorization": `Bearer ${token}` // Agregar token de autenticación
-                },
-                body: formData
+                    Authorization: `Bearer ${token}`
+                }
             });
 
-            const data = await respuesta.json();
+            const data = await response.json();
 
-            if (respuesta.ok) {
-                setProfile(prevProfile => ({ ...prevProfile, fotoPerfil: data.fotoPerfil }));
-                alert("Imagen subida correctamente");
+            if (response.ok) {
+                alert(data.message || "Cuenta eliminada correctamente.");
+                localStorage.clear();
+                sessionStorage.clear();
+                navigate("/login");
             } else {
-                alert(data.error || "Error al subir la imagen");
+                setErrorMessage(data.error || "Ocurrió un error al eliminar la cuenta.");
             }
         } catch (error) {
-            console.error("Error al subir la imagen:", error);
-            alert("Error en la carga de imagen");
+            console.error("Error al eliminar cuenta:", error);
+            setErrorMessage("Error de conexión al intentar eliminar la cuenta.");
         }
     };
-
 
     const handleSave = async () => {
         const token = localStorage.getItem("token");
@@ -144,32 +222,56 @@ const StudentProfile = () => {
             }
         } catch (error) {
             setErrorMessage(data.error || "Ocurrió un error");
-            return;
         }
     };
 
+
     return (
         <div>
-            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
-            <div className="app-container"> {/* Contenedor principal para ajustar el layout */}
-                <Header/>
+            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")}/>
+            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")}/>
+            <ConfirmationModal
+                message={confirmationMessage}
+                onClose={() => {
+                    setConfirmationMessage("");
+                    setPendingDelete(false);
+                }}
+                onConfirm={() => {
+                    setConfirmationMessage("");
+                    handleDeleteAccount(); // función que eliminará la cuenta
+                }}
+            />
+            {/* Contenedor principal para ajustar el layout */}
+            <Header/>
+            <div className="app-container" style={{backgroundColor: "rgba(0,51,102,0.3)"}}>
                 <div className="profile-container">
                     <h2 className="profile-title">Mi Perfil</h2>
                     <div className="profile-content">
                         <div className="profile-left">
                             <div className="profile-image">
-                                <img src={userPlaceholder} alt="Foto de perfil"/>
-                                <button className="edit-photo">📷</button>
+                                <img
+                                    src={profile.fotoPerfil || userPlaceholder}
+                                    alt="Foto de perfil"
+                                    className="clickable-profile-image"
+                                    onClick={() => document.getElementById("fileInput").click()}
+                                />
+                                <input
+                                    type="file"
+                                    id="fileInput"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    style={{display: "none"}}
+                                />
+
                             </div>
-                            <button className="delete-profile">🗑️ Eliminar mi perfil</button>
                             <div className="profile-courses" onClick={handleRedirect}>
                                 <h3>Mis cursos</h3>
                                 <span>🎓</span>
                             </div>
                         </div>
-                        <div className="profile-right">
+                        <div className="profile-right" style={{fontFamily: "Roboto, sans-serif"}}>
                             <h3>Datos Personales</h3>
+                            <br/>
                             <div className="input-group"
                                  style={{
                                      display: "flex",
@@ -177,20 +279,24 @@ const StudentProfile = () => {
                                      alignItems: "center",
                                      marginBottom: "15px",
                                      width: "100%",
+                                     fontFamily: "Roboto, sans-serif"
                                  }}>
-                                <label>Nombre de usuario (nickname)</label>
+                                <label style={{width: '100%'}}>Nombre de usuario</label>
+                                <br/>
                                 <input type="text" name="username"
                                        placeholder="Tu nombre de usuario" value={profile.username}
                                        onChange={handleChange}
                                        disabled={!editFields["username"]}
-                                style={{
-                                    width: "80%",
-                                    borderRadius: "10px",
-                                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                                }}/>
+                                       style={{
+                                           width: "80%",
+                                           borderRadius: "20px",
+                                           border: "1px solid #ccc",
+                                           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                                       }}/>
                                 <button type="button" className="edit-btn"
                                         onClick={() => enableEdit("username")}
-                                >✏️</button>
+                                >✏️
+                                </button>
                             </div>
                             <div className="input-group"
                                  style={{
@@ -198,15 +304,16 @@ const StudentProfile = () => {
                                      flexDirection: "row",
                                      alignItems: "center",
                                      marginBottom: "15px",
-                                     width: "100%",
+                                     width: "90%",
                                  }}>
-                                <label>Correo institucional</label>
+                                <label style={{width: '100%'}}>Correo electrónico institucional</label>
                                 <input type="email" name="institutionalEmail"
-                                       placeholder="Tu correo institucional" value={profile.institutionalEmail}
+                                       placeholder="Tu correo electrónico institucional" value={profile.institutionalEmail}
                                        onChange={handleChange} disabled
                                        style={{
                                            width: "80%",
-                                           borderRadius: "10px",
+                                           borderRadius: "20px",
+                                           border: "1px solid #ccc",
                                            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                                        }}/>
                             </div>
@@ -218,29 +325,39 @@ const StudentProfile = () => {
                                      marginBottom: "15px",
                                      width: "100%",
                                  }}>
-                                <label>Contraseña</label>
+                                <label style={{width: '100%'}}>Contraseña</label>
                                 <input type="password" name="password"
                                        placeholder="**********" value={profile.password} onChange={handleChange}
                                        disabled={!editFields["password"]}
                                        style={{
                                            width: "80%",
-                                           borderRadius: "10px",
+                                           borderRadius: "20px",
+                                           border: "1px solid #ccc",
                                            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                                        }}/>
                                 <button className="edit-btn" onClick={() => enableEdit("password")}
-                                >✏️</button>
+                                >✏️
+                                </button>
                             </div>
-                            <div className="profile-buttons">
+                            <div className="profile-buttons" style={{fontFamily: "Roboto, sans-serif"}}>
                                 <button className="btn-save" onClick={handleSave}>Actualizar</button>
                                 <button className="btn-cancel">Cancelar</button>
                             </div>
+                            <button className="delete-profile"
+                                    onClick={() => {
+                                        setConfirmationMessage("¿Estás seguro de que deseas eliminar tu cuenta?");
+                                        setPendingDelete(true);
+                                    }}
+                            style={{
+                                marginTop: "80px",
+                            }}>🗑️ Eliminar perfil</button>
                         </div>
                     </div>
                 </div>
                 <Footer/>
             </div>
         </div>
-            );
-            };
+    );
+};
 
-            export default StudentProfile;
+export default StudentProfile;

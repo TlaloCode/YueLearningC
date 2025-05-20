@@ -15,6 +15,7 @@ const TeacherCourses = () => {
         middleName: "",
         institutionalEmail: "",
         description: "",
+        fotoPerfil: "",
     });
 
 
@@ -22,11 +23,6 @@ const TeacherCourses = () => {
         navigate(`/teacher-course-detail/${courseId}`);
     };
 
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProfile({ ...profile, [name]: value });
-    };
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -47,12 +43,14 @@ const TeacherCourses = () => {
 
                 if (profileRes.ok) {
                     const data = await profileRes.json();
+                    const cachedImage = sessionStorage.getItem("cachedProfileImage");
                     setProfile({
                         name: data.nombre,
                         lastName: data.apellidopaterno,
                         middleName: data.apellidomaterno,
                         institutionalEmail: data.correoelectronico,
                         description: data.descripcionperfil,
+                        fotoPerfil: cachedImage || "",
                     });
                 }
 
@@ -84,13 +82,18 @@ const TeacherCourses = () => {
         navigate("/crear-curso");
     };
 
+    const construirURLDrive = (idImagen) => {
+        if (!idImagen) return genericCourse;
+        return `https://drive.google.com/thumbnail?id=${idImagen}&sz=w500`;
+    };
+
     return (
         <div className="app-container">
             <Header />
 
             <div className="profile-section">
                 <div className="profile-info">
-                    <img src={require("../assets/default-user.jpg")} alt="Profile" className="profile-image" />
+                    <img src={profile.fotoPerfil || defaultLogo} alt="Profile" className="profile-image" />
                     <div className="profile-details">
                         <h2 className="profile-name">
                             {profile.name} {profile.lastName} {profile.middleName}
@@ -119,11 +122,8 @@ const TeacherCourses = () => {
                         <div className="courses-grid">
                             {courses.map((course) => (
                                 <div key={course.id} className="course-card"  onClick={() => handleCourseClick(course.id)}>
-                                    <img
-                                        src={course.image || genericCourse}
-                                        alt={course.title}
-                                        className="course-image"
-                                    />
+                                    <img src={construirURLDrive(course.image)} alt={course.title}
+                                         className="course-image"/>
                                     <h3>{course.title}</h3>
                                 </div>
                             ))}

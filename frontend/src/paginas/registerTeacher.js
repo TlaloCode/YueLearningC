@@ -5,8 +5,11 @@ import Footer from "../components/footer"
 import escom from "../Img/ESCOM.jpeg";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
+import {useNavigate} from "react-router-dom";
+
 
 const RegisterTeacher = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -52,7 +55,7 @@ const RegisterTeacher = () => {
 
 
             if (response.ok) {
-                setInformationMessage("Docente registrado con éxito");
+                setInformationMessage("Docente registrado con éxito. Revisa tu correo de verificación");
                 setFormData({  // Reiniciar el formulario después del registro
                     nombre: "",
                     apellidopaterno: "",
@@ -62,6 +65,7 @@ const RegisterTeacher = () => {
                     confirmPassword: "",
                     termsAccepted: false,
                 });
+                navigate("/login");
             } else {
                 setErrorMessage(data.error || "Ocurrió un error en el registro");  // Muestra el mensaje de error
             }

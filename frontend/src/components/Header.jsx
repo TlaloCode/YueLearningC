@@ -2,16 +2,33 @@ import React, {useState, useEffect} from "react";
 import "@fontsource/roboto";
 import logo from "../Img/logo.JPG"
 import defaultLogo from "../Img/default-profile.png"
+import PantallaCarga from "../components/PantallaCarga";
+import menuHamburguesa from "../assets/menuHamburguesa.png"; // Asegúrate que esté en esa ruta
 import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 const Header = () => {
     const navigate = useNavigate();
     const [usuario, setUsuario] = useState(null); // Estado para almacenar datos del usuario
-    const [menuAbierto, setMenuAbierto] = useState(false); // Estado para el menú desplegable
+    const [menuLateralAbierto, setMenuLateralAbierto] = useState(false);
+    const [menuPerfilAbierto, setMenuPerfilAbierto] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [busqueda, setBusqueda] = useState("");
+    const [resultados, setResultados] = useState([]);
 
+
+
+    const menuBtnStyle = {
+        width: "100%",
+        padding: "12px 15px",
+        border: "none",
+        background: "none",
+        textAlign: "left",
+        cursor: "pointer",
+        fontSize: "1rem",
+        borderBottom: "1px solid #ddd"
+    };
 
     const handleNavigation = () => {
-        const token = localStorage.getItem("token");
         if (usuario.rol === "estudiante") {
             navigate('/perfil-estudiante');
         } else if (usuario.rol === "docente") {
@@ -26,6 +43,7 @@ const Header = () => {
         localStorage.removeItem("correo");
         localStorage.removeItem("rol");
         localStorage.removeItem("fotoPerfil");
+        sessionStorage.removeItem("cachedProfileImage");
 
         // Redirigir a la página de inicio de sesión
         navigate('/login');
@@ -44,15 +62,65 @@ const Header = () => {
         // Obtener datos del usuario desde localStorage
         const token = localStorage.getItem("token");
         const rol = localStorage.getItem("rol");
-        const fotoPerfil = localStorage.getItem("fotoPerfil"); // Foto de perfil
+
+        const cachedImage = sessionStorage.getItem("cachedProfileImage");
+
+        if (cachedImage) {
+            setUsuario({ rol, fotoPerfil: cachedImage });
+            setLoading(false);
+            return;
+        }
+
+        // Si no está en caché, descargarla
+        const fetchProfileImage = async () => {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/profile-photo/", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+
+                    reader.onloadend = () => {
+                        const base64data = reader.result;
+                        sessionStorage.setItem("cachedProfileImage", base64data);
+                        setUsuario({ rol, fotoPerfil: base64data });
+                        setLoading(false);
+                    };
+
+                    reader.readAsDataURL(blob);
+                }
+                else{
+                    if(token)
+                    {
+                        setUsuario({
+                            rol,
+                            fotoPerfil:defaultLogo, // Usa la foto de perfil si existe, de lo contrario, usa la predeterminada
+                        });
+                        setLoading(false);
+                    }
+                }
+            } catch (error) {
+                console.error("Error al descargar imagen de perfil:", error);
+            }
+        };
 
         if (token) {
-            setUsuario({
-                rol,
-                fotoPerfil: fotoPerfil || defaultLogo, // Usa la foto de perfil si existe, de lo contrario, usa la predeterminada
-            });
+            fetchProfileImage();
         }
+
     }, []);
+
+    const handleMisCursos = () => {
+        if (usuario?.rol === "estudiante") {
+            navigate("/mis-cursos-estudiante");
+        } else if (usuario?.rol === "docente") {
+            navigate("/mis-cursos");
+        }
+    };
 
     return (
         <header
@@ -70,6 +138,62 @@ const Header = () => {
             }}
         >
             <div className="d-flex align-items-center">
+                {/* 🔻 MENÚ HAMBURGUESA */}
+                <div style={{ position: "relative" }}>
+                    <button
+                        onClick={() => {
+                            setMenuLateralAbierto(!menuLateralAbierto);
+                            setMenuPerfilAbierto(false); // Cierra el otro menú
+                        }}
+                        style={{
+                            background: "transparent",
+                            border: "none",
+                            marginRight: "15px",
+                            padding: 0
+                        }}
+                    >
+                        <img
+                            src={menuHamburguesa}
+                            alt="Menú"
+                            style={{ width: 35, height: 35, cursor: "pointer" }}
+                        />
+                    </button>
+
+                    {/* 🔽 Menú lateral */}
+                    {menuLateralAbierto  && (
+                        <div style={{
+                            position: "absolute",
+                            top: "50px",
+                            left: 0,
+                            background: "#fff",
+                            color: "#000",
+                            borderRadius: "10px",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+                            zIndex: 1001,
+                            width: "180px",
+                            fontWeight: "500"
+                        }}>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => navigate("/diagnostico")}
+                            >
+                                Evaluación diagnóstica
+                            </button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={handleMisCursos}
+                            >
+                                Mis cursos
+                            </button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => navigate("/podio")}
+                            >
+                                Podio
+                            </button>
+                        </div>
+                    )}
+                </div>
                 <button
                     onClick={homeNavigation} // Redirige a login
                     style={{
@@ -88,6 +212,37 @@ const Header = () => {
                 <input
                     type="text"
                     placeholder="Ingresa el nombre del curso o del docente"
+                    value={busqueda}
+                    onChange={async (e) => {
+                        const query = e.target.value;
+                        setBusqueda(query);
+
+                        if (query.trim() === "") {
+                            setResultados([]);
+                            return;
+                        }
+
+                        const token = localStorage.getItem("token");
+                        const rol = localStorage.getItem("rol");
+
+                        if (!token || rol !== "estudiante") {
+                            setResultados([]);
+                            return;
+                        }
+
+                        try {
+                            const res = await fetch(`http://127.0.0.1:8000/api/buscar-cursos/?q=${encodeURIComponent(query)}`);
+                            if (res.ok) {
+                                const data = await res.json();
+                                setResultados(data);
+                            } else {
+                                setResultados([]);
+                            }
+                        } catch (err) {
+                            console.error("Error al buscar cursos:", err);
+                            setResultados([]);
+                        }
+                    }}
                     className="form-control"
                     style={{
                         width: "400px",
@@ -96,28 +251,66 @@ const Header = () => {
                         fontWeight: "600",
                     }}
                 />
+
+                {resultados.length > 0 && (
+                    <div style={{
+                        position: "absolute",
+                        top: "60px",
+                        right: "220px",
+                        width: "400px",
+                        backgroundColor: "#fff",
+                        color: "black",
+                        border: "1px solid #ccc",
+                        borderRadius: "5px",
+                        zIndex: 1002,
+                        maxHeight: "250px",
+                        overflowY: "auto",
+                    }}>
+                        {resultados.map((curso) => (
+                            <div
+                                key={curso.id}
+                                onClick={() => {
+                                    navigate(`/inscribir-curso/${curso.id}`);
+                                    setResultados([]);
+                                    setBusqueda("");
+                                }}
+                                style={{
+                                    padding: "10px",
+                                    cursor: "pointer",
+                                    borderBottom: "1px solid #eee"
+                                }}
+                            >
+                                <strong>{curso.nombrecurso}</strong> <br/>
+                                <small>{curso.nombre_docente}</small>
+                            </div>
+                        ))}
+                    </div>
+                )}
                 {usuario ? (
-                    <div style={{ position: "relative" }}>
+                    <div style={{position: "relative"}}>
                         <button
-                            onClick={() => setMenuAbierto(!menuAbierto)}
+                            onClick={() => {
+                                setMenuPerfilAbierto(!menuPerfilAbierto);
+                                setMenuLateralAbierto(false); // Cierra el otro menú
+                            }}
                             style={{
                                 background: "transparent",
                                 border: "none",
                             }}
                         >
-                    <img
-                        src={defaultLogo}
-                        alt="Perfil"
-                        style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: "50%",
-                            cursor: "pointer",
-                        }}
-                    />
-                </button>
+                            <img
+                                src={usuario.fotoPerfil || defaultLogo}
+                                alt="Perfil"
+                                style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: "50%",
+                                    cursor: "pointer",
+                                }}
+                            />
+                        </button>
                         {/* Menú desplegable */}
-                        {menuAbierto && (
+                        {menuPerfilAbierto && (
                             <div style={{
                                 position: "absolute",
                                 right: 0,
@@ -129,7 +322,7 @@ const Header = () => {
                                 zIndex: 1001,
                                 textAlign: "center"
                             }}>
-                                <p style={{ margin: "10px 0", fontWeight: "bold" }}>{usuario.nickname}</p>
+                                <p style={{margin: "10px 0", fontWeight: "bold"}}>{usuario.nickname}</p>
                                 <button
                                     onClick={handleNavigation}
                                     style={{
@@ -157,7 +350,7 @@ const Header = () => {
                                 >
                                     Cerrar sesión
                                 </button>
-            </div>
+                            </div>
                         )}
                     </div>
                 ) : (
@@ -181,6 +374,9 @@ const Header = () => {
                     </button>
                 )}
             </div>
+            {loading && localStorage.getItem("token") && (
+                <PantallaCarga mensaje="Cargando perfil..."/>
+            )}
         </header>
     );
 };

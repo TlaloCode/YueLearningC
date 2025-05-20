@@ -1,8 +1,11 @@
 import React from "react";
-import Header from "../components/HeaderLogin";
+import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
 import Footer from "../components/footer";
+import {IoArrowBack} from "react-icons/io5";
 
 const TermsAndConditions = () => {
+    const navigate = useNavigate();
     return (
         <div style={{
             display: "flex",
@@ -19,39 +22,65 @@ const TermsAndConditions = () => {
                 overflowY: "auto",
                 marginTop: "80px" // Espacio para que no se oculte el contenido
             }}>
-                <h2>Términos y Condiciones</h2>
+                <button
+                    onClick={() => navigate(-1)}
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        background: "none",
+                        border: "none",
+                        color: "#1E3A8A",
+                        fontSize: "18px",
+                        cursor: "pointer",
+                        marginBottom: "20px"
+                    }}
+                >
+                    <IoArrowBack size={20} style={{marginRight: "5px"}}/>
+                    Atrás
+                </button>
+                <h2>Términos y condiciones</h2>
                 <p>
-                    Bienvenido/a a YUE-Learning C, una aplicación web creada para apoyar la enseñanza del lenguaje de programación C. Al utilizar nuestra página web, aceptas cumplir con los términos y condiciones aquí descritos.
+                    Bienvenido/a a YUE-Learning C, una aplicación web creada para fomentar la enseñanza del lenguaje de
+                    programación C. Al utilizar nuestra página web, aceptas cumplir con los términos y condiciones aquí
+                    descritos.
                 </p>
-                <h3>Registro y Uso de la Aplicación Web</h3>
+                <h3>Registro y Uso de la aplicación web</h3>
                 <p>
-                    Para registrarte en la aplicación web, debes proporcionar información real, como tu correo electrónico institucional y nombre de usuario.<br />
-                    Al registrarte, aceptas que eres parte de la comunidad de la ESCOM o tienes interés académico en el contenido ofrecido.<br />
-                    Solo puedes crear una cuenta por correo electrónico.<br />
+                    Para registrarse en la aplicación web, debe de proporcionar información real, como su correo
+                    electrónico institucional y nombre de usuario.<br/>
+                    Al registrarse, acepta que eres parte de la comunidad de la ESCOM o tiene interés académico en el
+                    contenido ofrecido.<br/>
+                    El usuario solo puede crear una cuenta por correo electrónico.<br/>
                     Es obligatorio aceptar estos términos al momento de registrarse.
                 </p>
-                <h3>Uso del Contenido</h3>
+                <h3>Uso del contenido</h3>
                 <p>
-                    El contenido proporcionado (videos, cuestionarios, ejercicios prácticos, y más) es para uso exclusivo en la enseñanza de programación.<br />
+                    El contenido proporcionado (videos, cuestionarios, ejercicios prácticos, y más) es para uso
+                    exclusivo en la enseñanza de programación.<br/>
                     Está prohibido copiar, distribuir o comercializar los materiales sin autorización.
                 </p>
-                <h3>Responsabilidades del Usuario</h3>
+                <h3>Responsabilidades del usuario</h3>
                 <p>
-                    Debes mantener tu información de acceso segura y no compartirla con terceros.<br />
-                    No debes realizar acciones que comprometan la integridad del sistema, como intentar acceder a áreas restringidas.<br />
-                    Debes hacer el registro con respeto (no usar palabras obsenas).
+                    Debe mantener tu información de acceso segura y no compartirla con terceros.<br/>
+                    No debe de realizar acciones que comprometan la integridad de la aplicación web, como intentar
+                    acceder a áreas restringidas.<br/>
+                    Debe hacer el registro evitando el uso de palabras antisonantes o vulgares.
                 </p>
-                <h3>Limitación de Responsabilidad</h3>
+                <h3>Limitación de responsabilidad</h3>
                 <p>
-                    YUE-Learning C no se hace responsable de resultados académicos o laborales específicos ni del mal uso de la misma aplicación web.
+                    YUE-Learning C no se hace responsable de resultados académicos o laborales específicos ni del mal
+                    uso de la misma aplicación web.
                 </p>
-                <h3>Cambios en los Términos</h3>
+                <h3>Cambios en los términos</h3>
                 <p>
-                    Nos reservamos el derecho de actualizar estos términos en cualquier momento. Notificaremos los cambios a través de la aplicación web.<br />
-                    Si tienes dudas sobre estos términos, contáctanos en facebook como YUE-Learning C.
+                    YUE-Learning C se reserva el derecho de actualizar los términos y condiciones establecidos en
+                    cualquier momento por motivos legales u organizacionales. Se notificarán los cambios a través de la
+                    aplicación web.<br/>
+                    Si presentas dudas sobre estos términos, favor de contactarnos por redes sociales o por el correo
+                    electrónico oficial: yuelearning2025a011@gmail.com.
                 </p>
             </div>
-            <Footer />
+            <Footer/>
         </div>
     );
 };

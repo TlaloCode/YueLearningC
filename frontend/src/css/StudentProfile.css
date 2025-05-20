@@ -170,3 +170,13 @@ footer {
     bottom: 0;
     margin-top: auto; /* Hace que el footer siempre esté pegado abajo */
 }
+
+.clickable-profile-image {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border-radius: 50%;
+}
+
+.clickable-profile-image:hover {
+    transform: scale(1.03);
+}

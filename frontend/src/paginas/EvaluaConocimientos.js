@@ -1,59 +1,127 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/EvaluaConocimientos.css";
+import SideBarMenu from "../components/SiderBarMenu";
 import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const EvaluaConocimientos = () => {
+    const navigate = useNavigate();
+    const { courseId } = useParams();
+    const [preguntas, setPreguntas] = useState([]);
+    const [respuestas, setRespuestas] = useState({});
+    const [tituloCuestionario, setTituloCuestionario] = useState("");
+
+    useEffect(() =>{
+
+        const fetchPreguntas = async () => {
+            const token = localStorage.getItem("token");
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/cuestionarios/${courseId}/`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.length > 0) {
+                        setPreguntas(data[0].preguntas);
+                        setTituloCuestionario(data[0].titulo || "Cuestionario");
+                    } else {
+                        setPreguntas([]);
+                        setTituloCuestionario("No se encontraron cuestionarios.");
+                    }
+                } else {
+                    const errorData = await response.json();
+                    alert("Error al cargar preguntas: " + (errorData.error || "desconocido"));
+                }
+            } catch (error) {
+                console.error("Error al obtener preguntas:", error);
+                alert("Ocurrió un error de conexión.");
+            }
+        };
+
+        fetchPreguntas();
+    }, [courseId]);
+
+    const handleChange = (id_pregunta, id_opcion) => {
+        setRespuestas({ ...respuestas, [id_pregunta]: id_opcion });
+    };
+
+    const handleSubmit = async () => {
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/respuestas/", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    curso: courseId,
+                    respuestas: respuestas
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(`Tu calificación es: ${result.calificacion}`);
+            } else {
+                const errorData = await response.json();
+                alert("Error al enviar respuestas: " + (errorData.error || "desconocido"));
+            }
+        } catch (error) {
+            console.error("Error al calificar:", error);
+            alert("Ocurrió un error de conexión al enviar respuestas.");
+        }
+    };
+
     return (
         <div className="evalua-container">
             <Header />
 
             <div className="evalua-wrapper">
-                <div className="sidebar-menu">
-                    <button>Lista de videos</button>
-                    <button className="active">Quiz</button>
-                    <button>Practicar</button>
-                    <button>Recursos</button>
-                    <button className="rate-course">📌 Calificar curso</button>
-                </div>
+                <SideBarMenu/>
 
                 <div className="quiz-section">
-                    <div className="back-button">
+                    <div className="back-button" onClick={() => navigate(-1)}>
                         <FaArrowLeft /> <span>Atrás</span>
                     </div>
 
                     <h1>Evalúa tus conocimientos</h1>
-                    <p>01 - Introducción a la arquitectura de Von Newman</p>
+                    <p>{tituloCuestionario}</p>
 
                     <div className="quiz-card">
-                        <h3>Formulario video 01</h3>
+                        {preguntas.length > 0 ? (
+                            preguntas.map((pregunta, index) => (
+                                <div className="question" key={pregunta.id_pregunta}>
+                                    <p><strong>{index + 1}. {pregunta.textopregunta}</strong></p>
+                                    {pregunta.opciones.map((opcion) => (
+                                        <label key={opcion.id_opciones}>
+                                            <input
+                                                type="radio"
+                                                name={`q${pregunta.id_pregunta}`}
+                                                checked={respuestas[pregunta.id_pregunta] === opcion.id_opciones}
+                                                onChange={() => handleChange(pregunta.id_pregunta, opcion.id_opciones)}
+                                            />
+                                            {opcion.textoopcion}
+                                        </label>
+                                    ))}
+                                </div>
+                            ))
+                        ) : (
+                            <p>No hay preguntas disponibles para este curso.</p>
+                        )}
 
-                        <div className="question">
-                            <p><strong>1. ¿Qué es un apuntador en programación?</strong></p>
-                            <label><input type="radio" name="q1" /> Una variable que almacena datos.</label>
-                            <label><input type="radio" name="q1" /> Una variable que almacena la dirección de memoria de otro dato.</label>
-                            <label><input type="radio" name="q1" /> Una función que organiza los datos en memoria.</label>
-                            <label><input type="radio" name="q1" /> Un tipo de bucle que controla el flujo del programa.</label>
-                        </div>
-
-                        <div className="question">
-                            <p><strong>2. ¿Cuál de las siguientes declaraciones define correctamente un apuntador en C?</strong></p>
-                            <label><input type="radio" name="q2" /> int ptr*;</label>
-                            <label><input type="radio" name="q2" /> int ptr();</label>
-                            <label><input type="radio" name="q2" /> int &ptr;</label>
-                            <label><input type="radio" name="q2" /> int *ptr;</label>
-                        </div>
-
-                        <div className="question">
-                            <p><strong>3. ¿Qué significa int *ptr = NULL; en C?</strong></p>
-                            <label><input type="radio" name="q3" /> ptr es un apuntador que apunta al valor 0.</label>
-                            <label><input type="radio" name="q3" /> ptr es un apuntador que no apunta a ninguna dirección válida.</label>
-                            <label><input type="radio" name="q3" /> ptr es una variable entera inicializada en 0.</label>
-                            <label><input type="radio" name="q3" /> ptr es un tipo de función.</label>
-                        </div>
-
-                        <button className="submit-btn">Enviar</button>
+                        <button className="submit-btn" onClick={handleSubmit}>Enviar</button>
                     </div>
 
                     <div className="quiz-navigation">

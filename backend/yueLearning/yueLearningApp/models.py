@@ -107,7 +107,71 @@ class Inscripciones(models.Model):
 
 # Email Verification Token (kept unchanged)
 def default_expiration():
-    return now() + timedelta(hours=24) 
+    return now() + timedelta(hours=24)
+
+
+class Video(models.Model):
+    id_video = models.AutoField(db_column='ID_Video', primary_key=True)  # Field name made lowercase.
+    id_curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='ID_Curso', blank=True, null=True)  # Field name made lowercase.
+    titulovideo = models.CharField(db_column='TituloVideo', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    descripcion = models.TextField(db_column='Descripcion', blank=True, null=True)  # Field name made lowercase.
+    video = models.CharField(db_column='Video', max_length=255, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'video'
+
+class RecursoApoyo(models.Model):
+    id_recurso = models.AutoField(db_column='ID_Recurso', primary_key=True)
+    id_curso = models.ForeignKey(Curso, models.DO_NOTHING, db_column='ID_Curso', blank=True, null=True)
+    titulorecurso = models.CharField(db_column='TituloRecurso', max_length=100, blank=True, null=True)
+    urlrecurso = models.CharField(db_column='URLRecurso', max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False  # Ya que la tabla ya existe en la base
+        db_table = 'recursosapoyo'
+
+class Cuestionario(models.Model):
+    id_cuestionario = models.AutoField(db_column='ID_Cuestionario', primary_key=True)
+    id_curso = models.ForeignKey('Curso', models.DO_NOTHING, db_column='ID_Curso', blank=True, null=True)
+    titulocuestionario = models.CharField(db_column='TituloCuestionario', max_length=100, blank=True, null=True)
+    descripcion = models.TextField(db_column='Descripcion', blank=True, null=True)
+    es_diagnostico = models.BooleanField(db_column='EsDiagnostico', default=False)
+
+    class Meta:
+        db_table = 'cuestionarios'
+
+
+class Pregunta(models.Model):
+    id_pregunta = models.AutoField(db_column='ID_Pregunta', primary_key=True)
+    id_cuestionario = models.ForeignKey(Cuestionario, models.DO_NOTHING, db_column='ID_Cuestionario', blank=True, null=True)
+    textopregunta = models.TextField(db_column='TextoPregunta', blank=True, null=True)
+    imagenpregunta = models.CharField(db_column='ImagenPregunta', max_length=255, blank=True, null=True)
+
+    class Meta:
+        db_table = 'preguntas'
+
+
+class Opcion(models.Model):
+    id_opciones = models.AutoField(db_column='ID_Opciones', primary_key=True)
+    id_pregunta = models.ForeignKey(Pregunta, models.DO_NOTHING, db_column='ID_Pregunta', blank=True, null=True)
+    textoopcion = models.TextField(db_column='TextoOpcion', blank=True, null=True)
+    es_correcta = models.BooleanField(db_column='EsCorrecta', default=False)
+
+    class Meta:
+        managed = True
+        db_table = 'opciones'
+
+class CalificacionCurso(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_curso = models.ForeignKey("Curso", on_delete=models.CASCADE, db_column="ID_Curso")
+    id_usuario = models.ForeignKey("Estudiantes", on_delete=models.CASCADE, db_column="ID_Usuario")
+    calificacion = models.IntegerField()  # de 1 a 5
+
+    class Meta:
+        db_table = "calificacion_curso"
+        unique_together = ("id_curso", "id_usuario")
+
 
 class EmailVerificationToken(models.Model):
     usuario_id = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='ID_Usuario')

@@ -38,7 +38,7 @@
     background: #e5e5e5;
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .diagnostico-card h3 {
@@ -70,3 +70,14 @@
     padding: 10px 20px;
     cursor: pointer;
 }
+
+.opcion-correcta {
+    color: green;
+    font-weight: bold;
+}
+
+.opcion-incorrecta {
+    color: red;
+    font-weight: bold;
+}
+

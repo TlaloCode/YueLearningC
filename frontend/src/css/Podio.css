@@ -15,7 +15,7 @@
 }
 
 .podio-top3 {
-    background: url("../assets/logo.jpg") no-repeat center/cover;
+    background: #1e4f91;
     padding: 40px 20px;
     color: white;
     text-align: center;
@@ -61,7 +61,7 @@
 }
 
 .podio-resto {
-    background-color: #271d78;
+    background-color: #0469c6;
     padding: 20px 30px;
     display: flex;
     justify-content: space-between;

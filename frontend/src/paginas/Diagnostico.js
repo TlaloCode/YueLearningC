@@ -1,16 +1,89 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/Diagnostico.css";
 import { FaArrowLeft } from "react-icons/fa";
+import {useNavigate} from "react-router-dom";
 
 const Diagnostico = () => {
+    const navigate = useNavigate();
+
+    const [preguntas, setPreguntas] = useState([]);
+    const [respuestas, setRespuestas] = useState({});
+    const [titulo, setTitulo] = useState("Diagnóstico");
+    const [respuestasEvaluadas, setRespuestasEvaluadas] = useState([]);
+    const [evaluado, setEvaluado] = useState(false);
+
+    useEffect(() => {
+        const fetchDiagnostico = async () => {
+            const token = localStorage.getItem("token");
+
+            try {
+                const res = await fetch("http://127.0.0.1:8000/api/diagnostico/", {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setTitulo(data.titulo || "Diagnóstico");
+                    setPreguntas(data.preguntas);
+                } else {
+                    const error = await res.json();
+                    alert("Error al obtener el diagnóstico: " + (error.error || "desconocido"));
+                }
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                alert("No se pudo conectar con el servidor.");
+            }
+        };
+
+        fetchDiagnostico();
+    }, []);
+
+    const handleChange = (id_pregunta, id_opcion) => {
+        setRespuestas({ ...respuestas, [id_pregunta]: id_opcion });
+    };
+
+    const handleSubmit = async () => {
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/respuestas/", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    respuestas: respuestas
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(`Tu calificación diagnóstica es: ${result.calificacion}`);
+                setRespuestasEvaluadas(result.detalle);
+                setEvaluado(true);
+            } else {
+                const errorData = await response.json();
+                alert("Error al calificar: " + (errorData.error || "desconocido"));
+            }
+        } catch (error) {
+            console.error("Error al calificar:", error);
+            alert("No se pudo enviar tu diagnóstico.");
+        }
+    };
+
     return (
         <div className="diagnostico-container">
             <Header />
 
             <div className="diagnostico-content">
-                <div className="back-button">
+                <div className="back-button"  onClick={() => navigate(-1)}>
                     <FaArrowLeft /> <span>Atrás</span>
                 </div>
 
@@ -21,33 +94,40 @@ const Diagnostico = () => {
                 </p>
 
                 <div className="diagnostico-card">
-                    <h3>Diagnóstico</h3>
+                    <h3>{titulo}</h3>
+                    {preguntas.map((pregunta, index) => (
+                        <div className="question" key={pregunta.id_pregunta}>
+                            <p><strong>{index + 1}. {pregunta.textopregunta}</strong></p>
 
-                    <div className="question">
-                        <p><strong>1. ¿Qué es un apuntador en programación?</strong></p>
-                        <label><input type="radio" name="q1" /> Una variable que almacena datos.</label>
-                        <label><input type="radio" name="q1" /> Una variable que almacena la dirección de memoria de otro dato.</label>
-                        <label><input type="radio" name="q1" /> Una función que organiza los datos en memoria.</label>
-                        <label><input type="radio" name="q1" /> Un tipo de bucle que controla el flujo del programa.</label>
-                    </div>
+                            {Array.isArray(pregunta.opciones) && pregunta.opciones.map((opcion) => {
+                                const evaluacion = respuestasEvaluadas.find(r => r.id_pregunta === pregunta.id_pregunta);
+                                const esSeleccionada = respuestas[pregunta.id_pregunta] === opcion.id_opciones;
+                                const esCorrecta = evaluacion && opcion.id_opciones === evaluacion.id_correcta;
+                                const esIncorrecta = evaluacion && esSeleccionada && !esCorrecta;
 
-                    <div className="question">
-                        <p><strong>2. ¿Cuál de las siguientes declaraciones define correctamente un apuntador en C?</strong></p>
-                        <label><input type="radio" name="q2" /> int ptr*;</label>
-                        <label><input type="radio" name="q2" /> int ptr();</label>
-                        <label><input type="radio" name="q2" /> int &ptr;</label>
-                        <label><input type="radio" name="q2" /> int *ptr;</label>
-                    </div>
+                                let clase = "";
+                                if (evaluado) {
+                                    if (esCorrecta) clase = "opcion-correcta";
+                                    else if (esIncorrecta) clase = "opcion-incorrecta";
+                                }
 
-                    <div className="question">
-                        <p><strong>3. ¿Qué significa int *ptr = NULL; en C?</strong></p>
-                        <label><input type="radio" name="q3" /> ptr es un apuntador que apunta al valor 0.</label>
-                        <label><input type="radio" name="q3" /> ptr es un apuntador que no apunta a ninguna dirección válida.</label>
-                        <label><input type="radio" name="q3" /> ptr es una variable entera inicializada en 0.</label>
-                        <label><input type="radio" name="q3" /> ptr es un tipo de función.</label>
-                    </div>
+                                return (
+                                    <label key={opcion.id_opciones} className={clase}>
+                                        <input
+                                            type="radio"
+                                            name={`q${pregunta.id_pregunta}`}
+                                            checked={esSeleccionada}
+                                            disabled={evaluado}
+                                            onChange={() => handleChange(pregunta.id_pregunta, opcion.id_opciones)}
+                                        />
+                                        {opcion.textoopcion}
+                                    </label>
+                                );
+                            })}
+                        </div>
+                    ))}
 
-                    <button className="submit-btn">Enviar</button>
+                    <button className="submit-btn" onClick={handleSubmit}>Enviar</button>
                 </div>
             </div>
 
