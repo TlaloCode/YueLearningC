@@ -25,7 +25,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones, Problema
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -939,6 +939,24 @@ def calificar_respuestas(request):
         "calificacion": calificacion,
         "detalle": detalle_respuestas
     })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_problemas_por_curso(request, id_curso):
+    problemas = Problema.objects.filter(id_curso=id_curso).order_by('id_problema')
+
+    data = [
+        {
+            "id_problema": p.id_problema,
+            "tituloproblema": p.tituloproblema,
+            "descripcion": p.descripcion,
+            "solucion": p.solucion,
+        }
+        for p in problemas
+    ]
+
+    return Response(data)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

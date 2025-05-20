@@ -13,13 +13,15 @@ const Compilador = () => {
     const navigate = useNavigate();
     const [entrada, setEntrada] = useState("");
     const [codigo, setCodigo] = useState(`#include <stdio.h>
-
-
+    
 int main() {
     printf("Hola mundo desde C!");
     return 0;
 }`);
     const [salida, setSalida] = useState("Presiona 'Ejecutar' para ver el resultado...");
+    const [problemas, setProblemas] = useState([]);
+    const [indiceActual, setIndiceActual] = useState(0);
+    const [soluciones, setSoluciones] = useState({});
 
     const ejecutarCodigo = async () => {
         try {
@@ -49,6 +51,42 @@ int main() {
         }
     };
 
+    useEffect(() => {
+        const fetchProblemas = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await fetch(`http://127.0.0.1:8000/api/problemas/${courseId}/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setProblemas(data);
+                    if (data.length > 0) {
+                        setCodigo(data[0].solucion || "");
+                    }
+                } else {
+                    console.error("Error al obtener problemas.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+
+        fetchProblemas();
+    }, [courseId]);
+
+    const cambiarProblema = (nuevoIndice) => {
+        // Guarda la solución actual antes de cambiar
+        setSoluciones(prev => ({ ...prev, [indiceActual]: codigo }));
+
+        setIndiceActual(nuevoIndice);
+        setCodigo(soluciones[nuevoIndice] || problemas[nuevoIndice].solucion || "");
+    };
+
+
     return (
         <div className="compilador-container">
             <Header/>
@@ -59,11 +97,17 @@ int main() {
                         <FaArrowLeft/> <span>Atrás</span>
                     </div>
 
-                    <h1 className="title">Practica lo que sabes</h1>
-
-                    <p className="descripcion">
-                        1.- Escribe un programa en C que realice las siguientes operaciones usando apuntadores:
-                    </p>
+                    <h1 className="title">Práctica lo que sabes</h1>
+                    {problemas.length > 0 && (
+                        <>
+                            <p className="titulo">
+                                {indiceActual + 1}. {problemas[indiceActual].tituloproblema}
+                            </p>
+                            <p className="descripcion">
+                                {problemas[indiceActual].descripcion}
+                            </p>
+                        </>
+                    )}
 
                     <ul className="lista-instrucciones">
                         <li> Crea un arreglo dinámico de enteros de tamaño n, donde n es ingresado por el usuario.</li>
@@ -105,6 +149,21 @@ int main() {
                     <button className="btn-ejecutar" onClick={ejecutarCodigo}>
                         Ejecutar
                     </button>
+                    <div className="botones-navegacion">
+                        <button
+                            onClick={() => cambiarProblema(indiceActual - 1)}
+                            disabled={indiceActual === 0}
+                        >
+                            Anterior
+                        </button>
+                        <button
+                            onClick={() => cambiarProblema(indiceActual + 1)}
+                            disabled={indiceActual === problemas.length - 1}
+                        >
+                            Siguiente
+                        </button>
+                    </div>
+
 
                 </div>
             </div>
