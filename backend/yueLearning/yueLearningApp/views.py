@@ -25,7 +25,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones, Problema
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -60,6 +60,7 @@ def validar_contrasena(password):
 @api_view(['POST'])
 def registrar_usuario(request):
     data = request.data
+    print(data)
     rol = data.get("rol")  # Puede ser 'estudiante' o 'docente'
 
     if rol not in ["estudiante", "docente"]:
@@ -69,7 +70,7 @@ def registrar_usuario(request):
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not data.get("contrasena") == data.get("confirmPassword"):
+    if not data.get("contrasena") == data.get("confirm_password") :
         print("Hola")
         return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -939,6 +940,24 @@ def calificar_respuestas(request):
         "calificacion": calificacion,
         "detalle": detalle_respuestas
     })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_problemas_por_curso(request, id_curso):
+    problemas = Problema.objects.filter(id_curso=id_curso).order_by('id_problema')
+
+    data = [
+        {
+            "id_problema": p.id_problema,
+            "tituloproblema": p.tituloproblema,
+            "descripcion": p.descripcion,
+            "solucion": p.solucion,
+        }
+        for p in problemas
+    ]
+
+    return Response(data)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

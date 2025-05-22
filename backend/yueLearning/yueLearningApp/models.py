@@ -162,6 +162,17 @@ class Opcion(models.Model):
         managed = True
         db_table = 'opciones'
 
+class Problema(models.Model):
+    id_problema = models.AutoField(db_column='ID_Problema', primary_key=True)
+    id_curso = models.ForeignKey('Curso', models.DO_NOTHING, db_column='ID_Curso', blank=True, null=True)
+    tituloproblema = models.CharField(db_column='TituloProblema', max_length=100, blank=True, null=True)
+    descripcion = models.TextField(db_column='Descripcion', blank=True, null=True)
+    solucion = models.TextField(db_column='Solucion', blank=True, null=True)
+
+    class Meta:
+        db_table = 'problema'
+
+
 class CalificacionCurso(models.Model):
     id = models.AutoField(primary_key=True)
     id_curso = models.ForeignKey("Curso", on_delete=models.CASCADE, db_column="ID_Curso")
