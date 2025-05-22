@@ -62,7 +62,7 @@ const RegisterTeacher = () => {
                     apellidomaterno: "",
                     email: "",
                     password: "",
-                    confirmPassword: "",
+                    confirm_password: "",
                     termsAccepted: false,
                 });
                 navigate("/login");

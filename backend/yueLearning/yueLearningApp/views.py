@@ -60,6 +60,7 @@ def validar_contrasena(password):
 @api_view(['POST'])
 def registrar_usuario(request):
     data = request.data
+    print(data)
     rol = data.get("rol")  # Puede ser 'estudiante' o 'docente'
 
     if rol not in ["estudiante", "docente"]:
@@ -69,7 +70,7 @@ def registrar_usuario(request):
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not data.get("contrasena") == data.get("confirmPassword"):
+    if not data.get("contrasena") == data.get("confirm_password") :
         print("Hola")
         return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
 
