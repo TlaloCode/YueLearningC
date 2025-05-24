@@ -113,7 +113,7 @@ const Header = () => {
             fetchProfileImage();
         }
 
-    }, []);
+    }, [API_URL]);
 
     const handleMisCursos = () => {
         if (usuario?.rol === "estudiante") {
