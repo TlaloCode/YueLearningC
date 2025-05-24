@@ -162,7 +162,7 @@ const TeacherCourseDetail = () => {
         };
         fetchTeacherDetails()
         fetchCourseDetails();
-    }, [courseId]);
+    }, [courseId,API_URL]);
 
     if (!course) {
         return <div>Cargando...</div>;

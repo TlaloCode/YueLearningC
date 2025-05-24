@@ -39,7 +39,7 @@ const InscribirCurso = () => {
 
 
         fetchCourseDetails();
-    }, [courseId]);
+    }, [courseId,API_URL]);
 
     const handleInscribir = async () => {
         const token = localStorage.getItem("token");

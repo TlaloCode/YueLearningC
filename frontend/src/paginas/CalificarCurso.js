@@ -44,7 +44,7 @@ const CalificarCurso = () => {
         };
 
         fetchCurso();
-    }, [courseId]);
+    }, [courseId,API_URL]);
 
     const getImagenCurso = (idImagen) => {
         if (!idImagen) return genericCourse;

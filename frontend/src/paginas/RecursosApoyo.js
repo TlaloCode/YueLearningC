@@ -42,7 +42,7 @@ const RecursosApoyo = () => {
         if (courseId) {  // Solo intenta si idCurso es válido
             fetchRecursos();
         }
-    }, [courseId]);
+    }, [courseId,API_URL]);
 
 
     return (

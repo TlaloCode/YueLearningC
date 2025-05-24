@@ -7,6 +7,7 @@ import menuHamburguesa from "../assets/menuHamburguesa.png"; // Asegúrate que e
 import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 const Header = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [usuario, setUsuario] = useState(null); // Estado para almacenar datos del usuario
     const [menuLateralAbierto, setMenuLateralAbierto] = useState(false);
@@ -74,7 +75,7 @@ const Header = () => {
         // Si no está en caché, descargarla
         const fetchProfileImage = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/profile-photo/", {
+                const response = await fetch(`${API_URL}/profile-photo/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

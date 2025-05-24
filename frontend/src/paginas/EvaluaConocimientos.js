@@ -50,7 +50,7 @@ const EvaluaConocimientos = () => {
         };
 
         fetchPreguntas();
-    }, [courseId]);
+    }, [courseId,API_URL]);
 
     const handleChange = (id_pregunta, id_opcion) => {
         setRespuestas({ ...respuestas, [id_pregunta]: id_opcion });

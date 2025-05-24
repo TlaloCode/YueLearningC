@@ -124,7 +124,7 @@ const StudentProfile = () => {
         };
         fetchProfileData();
         fetchProfileImage();
-    }, []);
+    }, [API_URL]);
 
     const handleChange = (e) => {
         setProfile({ ...profile, [e.target.name]: e.target.value });

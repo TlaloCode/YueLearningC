@@ -43,7 +43,7 @@ const Podio = () => {
         };
 
         fetchPodio();
-    }, []);
+    }, [API_URL]);
 
     const top3 = usuarios.slice(0, 3);
     const posicionesRestantes = usuarios.slice(3, 10);
