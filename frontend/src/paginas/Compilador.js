@@ -9,6 +9,7 @@ import SideBarMenu from "../components/SiderBarMenu";
 import Editor from "@monaco-editor/react";
 
 const Compilador = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const { courseId } = useParams();  // Obtener el courseId de la URL
     const navigate = useNavigate();
     const [entrada, setEntrada] = useState("");
@@ -55,7 +56,7 @@ int main() {
         const fetchProblemas = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await fetch(`http://127.0.0.1:8000/api/problemas/${courseId}/`, {
+                const response = await fetch(`${API_URL}/problemas/${courseId}/`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

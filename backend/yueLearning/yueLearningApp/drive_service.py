@@ -1,19 +1,29 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-import io
 from googleapiclient.http import MediaIoBaseUpload
 import os
-
-
-# Construye la ruta absoluta al archivo JSON
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'Credentials', 'service_account.json')
+import io
+import json
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
-# 🔹 Crear una instancia del servicio de Google Drive
+
 def build_service():
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    credentials = None
+
+    # Si existe la variable de entorno, estamos en producción (Railway)
+    if os.getenv('GOOGLE_CREDENTIALS_JSON'):
+        credentials_info = json.loads(os.getenv('GOOGLE_CREDENTIALS_JSON'))
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_info, scopes=SCOPES
+        )
+    else:
+        # Ruta al archivo local
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'Credentials', 'service_account.json')
+        credentials = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES
+        )
+
     service = build('drive', 'v3', credentials=credentials)
     return service
 
@@ -25,14 +35,22 @@ def upload_file_to_drive(file_obj, filename, folder_id=None):
     if folder_id:
         file_metadata['parents'] = [folder_id]
 
-    media = MediaIoBaseUpload(file_obj, mimetype='image/jpeg')  # O image/png
+    # Detectar el tipo MIME del archivo desde el objeto recibido (Django lo proporciona)
+    mimetype = getattr(file_obj, 'content_type', 'application/octet-stream')
+
+    media = MediaIoBaseUpload(
+        file_obj,
+        mimetype=mimetype,
+        chunksize=1024*1024,  # 1MB
+        resumable=True
+    )
+
     uploaded_file = service.files().create(
         body=file_metadata,
         media_body=media,
         fields='id'
     ).execute()
 
-    # 🔹 Obtener el enlace público
     file_id = uploaded_file.get('id')
 
     # Hacer el archivo público
@@ -41,5 +59,4 @@ def upload_file_to_drive(file_obj, filename, folder_id=None):
         body={'role': 'reader', 'type': 'anyone'}
     ).execute()
 
-    # Retornar el link público
     return file_id

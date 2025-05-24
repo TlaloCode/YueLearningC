@@ -8,6 +8,7 @@ import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 
 const CreateCourse = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
@@ -52,7 +53,7 @@ const CreateCourse = () => {
         }
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/create-course/", {
+            const response = await fetch(`${API_URL}/create-course/`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,

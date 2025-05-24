@@ -4,6 +4,7 @@ import {useParams} from "react-router-dom";
 import PantallaCarga from "../components/PantallaCarga";
 
 const AgregarRecurso = ({ onClose }) => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const { courseId } = useParams();
     const [titulo, setTitulo] = useState('');
     const [descripcion, setDescripcion] = useState('');
@@ -32,7 +33,7 @@ const AgregarRecurso = ({ onClose }) => {
         const token = localStorage.getItem("token");
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/subir-recurso/${courseId}/`, {
+            const response = await fetch(`${API_URL}/subir-recurso/${courseId}/`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`

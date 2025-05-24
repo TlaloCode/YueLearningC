@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
 const VideoDetalle = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const { idVideo } = useParams();
     const [videoData, setVideoData] = useState(null);
@@ -16,7 +17,7 @@ const VideoDetalle = () => {
         const fetchVideoData = async () => {
             try {
                 console.log(idVideo);
-                const response = await fetch(`http://127.0.0.1:8000/api/get-video-detail/${idVideo}/`);
+                const response = await fetch(`${API_URL}/get-video-detail/${idVideo}/`);
                 const data = await response.json();
                 if (response.ok) {
                     setVideoData(data);

@@ -631,51 +631,11 @@ def subir_video(request, id_curso):
     if archivo.size > 524288000:  # 500MB
         return Response({"error": "El archivo es demasiado grande."}, status=400)
 
-    print("Tipo de archivo:", type(archivo))
-    print("Es archivo temporal:", hasattr(archivo, 'temporary_file_path'))
-
     try:
-        # Conexión con Google Drive
-        SCOPES = ['https://www.googleapis.com/auth/drive']
-        SERVICE_ACCOUNT_FILE = 'credentials/service_account.json'  # Actualiza la ruta si es diferente
-        http = httplib2.Http(timeout=300)  # 300 segundos (5 minutos)
-        credentials = service_account.Credentials.from_service_account_file(
-            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        # Subida a Google Drive con servicio ya configurado
+        file_id = upload_file_to_drive(archivo, archivo.name)
 
-        service = build('drive', 'v3', credentials=credentials, static_discovery=False)
-
-
-        if not hasattr(archivo, 'temporary_file_path'):
-            return Response({"error": "El archivo no puede ser procesado como archivo físico"}, status=400)
-
-        file_content = archivo.read()
-        media = MediaIoBaseUpload(
-            BytesIO(file_content),
-            mimetype=archivo.content_type,
-            chunksize=1024*1024,
-            resumable=True
-        )
-
-        # Subir archivo a Drive
-        file_metadata = {'name': archivo.name}
-        #file_content = archivo.read()
-        #media = MediaIoBaseUpload(BytesIO(file_content), mimetype=archivo.content_type)
-
-        uploaded_file = service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id'
-        ).execute()
-
-        file_id = uploaded_file.get('id')
-
-        # Hacerlo público
-        service.permissions().create(
-            fileId=file_id,
-            body={'type': 'anyone', 'role': 'reader'}
-        ).execute()
-
-        # Guardar en la base de datos
+        # Guardar en base de datos
         curso = Curso.objects.get(id_curso=id_curso)
         Video.objects.create(
             id_curso=curso,
@@ -741,33 +701,11 @@ def subir_recurso(request, id_curso):
 
         if not archivo:
             return Response({"error": "No se seleccionó ningún archivo."}, status=400)
+        if archivo.size > 524288000:  # Límite de 500MB
+            return Response({"error": "El archivo es demasiado grande."}, status=400)
 
-        # Conexión a Google Drive
-        SCOPES = ['https://www.googleapis.com/auth/drive']
-        SERVICE_ACCOUNT_FILE = 'credentials/service_account.json'  # Asegúrate que apunta bien
-
-        credentials = service_account.Credentials.from_service_account_file(
-            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-        service = build('drive', 'v3', credentials=credentials)
-
-        # Subir el archivo
-        file_metadata = {'name': archivo.name}
-        file_path = archivo.temporary_file_path()  # Usa archivo temporal
-        media = MediaFileUpload(file_path, mimetype=archivo.content_type)
-
-        uploaded_file = service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id'
-        ).execute()
-
-        file_id = uploaded_file.get('id')
-
-        # Hacer el recurso público
-        service.permissions().create(
-            fileId=file_id,
-            body={'type': 'anyone', 'role': 'reader'}
-        ).execute()
+        # Subir el archivo a Google Drive (automáticamente detecta tipo MIME)
+        file_id = upload_file_to_drive(archivo, archivo.name)
 
         # Guardar en base de datos
         curso = Curso.objects.get(id_curso=id_curso)

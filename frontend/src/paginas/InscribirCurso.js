@@ -9,6 +9,7 @@ import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 
 const InscribirCurso = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const { courseId } = useParams();
     const [course, setCourse] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
@@ -19,7 +20,7 @@ const InscribirCurso = () => {
             const token = localStorage.getItem("token");
             if (!token) return;
 
-            const response = await fetch(`http://127.0.0.1:8000/api/get-course-details/${courseId}/`, {
+            const response = await fetch(`${API_URL}/get-course-details/${courseId}/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -44,7 +45,7 @@ const InscribirCurso = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await fetch(`http://127.0.0.1:8000/api/inscribir-curso/`, {
+        const response = await fetch(`${API_URL}/inscribir-curso/`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${token}`,

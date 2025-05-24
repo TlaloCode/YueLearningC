@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import userPlaceholder from "../assets/default-user.jpg";
 
 const Podio = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [usuarios, setUsuarios] = useState([]);
     const [miLugar, setMiLugar] = useState(null);
@@ -21,7 +22,7 @@ const Podio = () => {
             const token = localStorage.getItem("token");
 
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/podio/", {
+                const response = await fetch(`${API_URL}/podio/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json"

@@ -13,6 +13,7 @@ import {FaStar,FaEdit, FaChevronLeft, FaPlusCircle, FaTrash } from "react-icons/
 
 
 const TeacherCourseDetail = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const { courseId } = useParams();
     const [course, setCourse] = useState(null);
     const [teacher, setTeacher] = useState(null);
@@ -53,7 +54,7 @@ const TeacherCourseDetail = () => {
         try {
             const token = localStorage.getItem("token");
 
-            const response = await fetch(`http://127.0.0.1:8000/api/delete-video/${videoToDelete.id_video}/`, {
+            const response = await fetch(`${API_URL}/delete-video/${videoToDelete.id_video}/`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -84,7 +85,7 @@ const TeacherCourseDetail = () => {
         try {
             const token = localStorage.getItem("token");
 
-            const response = await fetch(`http://127.0.0.1:8000/api/delete-recurso/${resourceToDelete.id_recurso}/`, {
+            const response = await fetch(`${API_URL}/delete-recurso/${resourceToDelete.id_recurso}/`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -116,7 +117,7 @@ const TeacherCourseDetail = () => {
             const token = localStorage.getItem("token");
             if (!token) return;
 
-            const response = await fetch(`http://127.0.0.1:8000/api/get-course-details/${courseId}/`, {
+            const response = await fetch(`${API_URL}/get-course-details/${courseId}/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -144,7 +145,7 @@ const TeacherCourseDetail = () => {
                 setfotoPerfil(cachedImage);
             }
 
-            const response = await fetch("http://127.0.0.1:8000/api/get-user-profile/", {
+            const response = await fetch(`${API_URL}/get-user-profile/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",

@@ -7,6 +7,7 @@ import ErrorModal from "../components/ErrorModal";
 import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 const RecoverPassword = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [correo, setCorreo] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -17,7 +18,7 @@ const RecoverPassword = () => {
         setErrorMessage("");
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/recuperar-contrasena/", {
+            const response = await fetch(`${API_URL}/recuperar-contrasena/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

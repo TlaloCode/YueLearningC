@@ -10,6 +10,7 @@ import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 
 const Login = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const [formData, setFormData] = useState({ correoelectronico: "", contrasena: "" });
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
@@ -21,7 +22,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const response = await fetch("http://127.0.0.1:8000/api/login/", {
+        const response = await fetch(`${API_URL}/login/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
