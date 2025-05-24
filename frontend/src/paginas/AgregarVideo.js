@@ -5,6 +5,7 @@ import {useParams} from "react-router-dom";
 import PantallaCarga from "../components/PantallaCarga";
 
 const AgregarVideo = ({ onClose }) => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const { courseId } = useParams();
     const [videoTitle, setVideoTitle] = useState("");
     const [videoFile, setVideoFile] = useState(null);
@@ -27,7 +28,7 @@ const AgregarVideo = ({ onClose }) => {
         const token = localStorage.getItem("token");
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/subir-video/${courseId}/`, {
+            const response = await fetch(`${API_URL}/subir-video/${courseId}/`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`

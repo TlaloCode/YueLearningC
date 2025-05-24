@@ -10,6 +10,7 @@ import Footer from "../components/footer";
 import Header from "../components/Header";
 
 const StudentProfile = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [editFields, setEditFields] = useState({});
     const [profile, setProfile] = useState({
@@ -43,7 +44,7 @@ const StudentProfile = () => {
 
 
         const fetchProfileData = async () => {
-            const response = await fetch("http://127.0.0.1:8000/api/get-user-profile/", {
+            const response = await fetch(`${API_URL}/get-user-profile/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -89,7 +90,7 @@ const StudentProfile = () => {
             }
 
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/profile-photo/", {
+                const response = await fetch(`${API_URL}/profile-photo/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -142,7 +143,7 @@ const StudentProfile = () => {
             formData.append("file", file);
 
             try {
-                const respuesta = await fetch("http://127.0.0.1:8000/api/upload-profile-photo/", {
+                const respuesta = await fetch(`${API_URL}/upload-profile-photo/`, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -175,7 +176,7 @@ const StudentProfile = () => {
         const token = localStorage.getItem("token");
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/eliminar-cuenta/", {
+            const response = await fetch(`${API_URL}/eliminar-cuenta/`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -201,7 +202,7 @@ const StudentProfile = () => {
     const handleSave = async () => {
         const token = localStorage.getItem("token");
 
-        const response = await fetch("http://127.0.0.1:8000/api/update-user-profile/", {
+        const response = await fetch(`${API_URL}/update-user-profile/`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

@@ -8,6 +8,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import {useParams} from "react-router-dom";
 
 const RecursosApoyo = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const { courseId } = useParams(); // id del curso desde la URL
     const [recursos, setRecursos] = useState([]);
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ const RecursosApoyo = () => {
             }
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/get-course-resource/${courseId}/`, {
+                const response = await fetch(`${API_URL}/get-course-resource/${courseId}/`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

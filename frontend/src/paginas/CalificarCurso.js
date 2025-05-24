@@ -7,6 +7,7 @@ import "../css/CalificarCurso.css";
 import { FaStar, FaArrowLeft } from "react-icons/fa";
 
 const CalificarCurso = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const { courseId } = useParams();
     const navigate = useNavigate();
     const [rating, setRating] = useState(3);
@@ -23,7 +24,7 @@ const CalificarCurso = () => {
 
         const fetchCurso = async () => {
             try {
-                const res = await fetch(`http://127.0.0.1:8000/api/get-course-details/${courseId}/`, {
+                const res = await fetch(`${API_URL}/get-course-details/${courseId}/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json"
@@ -54,7 +55,7 @@ const CalificarCurso = () => {
         const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://127.0.0.1:8000/api/calificar-curso/", {
+            const res = await fetch(`${API_URL}/calificar-curso/`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,

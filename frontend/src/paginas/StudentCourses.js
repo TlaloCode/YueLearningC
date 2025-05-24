@@ -9,6 +9,7 @@ import userPlaceholder from "../assets/default-user.jpg";
 
 
 const StudentCourses = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [student, setStudent] = useState({});
     const [courses, setCourses] = useState([]);
@@ -35,28 +36,28 @@ const StudentCourses = () => {
         const fetchData = async () => {
             try {
                 // 1. Perfil del estudiante
-                const resProfile = await fetch("http://127.0.0.1:8000/api/get-user-profile/", {
+                const resProfile = await fetch(`${API_URL}/get-user-profile/`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const studentData = await resProfile.json();
                 setStudent(studentData);
 
                 // 2. Cursos inscritos
-                const resCourses = await fetch("http://127.0.0.1:8000/api/get-enrolled-courses/", {
+                const resCourses = await fetch(`${API_URL}/get-enrolled-courses/`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const enrolledCourses = await resCourses.json();
                 setCourses(enrolledCourses);
 
                 // 3. Todos los cursos
-                const resAllCourses = await fetch("http://127.0.0.1:8000/api/get-all-courses/", {
+                const resAllCourses = await fetch(`${API_URL}/get-all-courses/`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const allCoursesData = await resAllCourses.json();
                 setAllCourses(allCoursesData);
 
                 // 4. Docentes con al menos un curso
-                const resTeachers = await fetch("http://127.0.0.1:8000/api/get-teachers-with-courses/", {
+                const resTeachers = await fetch(`${API_URL}/get-teachers-with-courses/`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const teachersData = await resTeachers.json();

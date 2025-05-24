@@ -9,6 +9,7 @@ import { FaStar, FaArrowLeft } from "react-icons/fa";
 import SideBarMenu from "../components/SiderBarMenu";
 
 const ListaVideos = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const { courseId } = useParams();  // Obtener el courseId de la URL
     const [videos, setVideos] = useState([]);
     const [courseName, setCourseName] = useState(""); // ✅ Nombre del curso
@@ -21,7 +22,7 @@ const ListaVideos = () => {
             const token = localStorage.getItem("token");
             if (!token) return;
 
-            const response = await fetch(`http://127.0.0.1:8000/api/get-videos/${courseId}/`, {
+            const response = await fetch(`${API_URL}/get-videos/${courseId}/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -39,7 +40,7 @@ const ListaVideos = () => {
 
         const fetchCourseName = async () => {
             const token = localStorage.getItem("token");
-            const response = await fetch(`http://127.0.0.1:8000/api/get-course-details/${courseId}/`, {
+            const response = await fetch(`${API_URL}/get-course-details/${courseId}/`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,

@@ -6,6 +6,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import {useNavigate} from "react-router-dom";
 
 const Diagnostico = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
 
     const [preguntas, setPreguntas] = useState([]);
@@ -19,7 +20,7 @@ const Diagnostico = () => {
             const token = localStorage.getItem("token");
 
             try {
-                const res = await fetch("http://127.0.0.1:8000/api/diagnostico/", {
+                const res = await fetch(`${API_URL}/diagnostico/`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -52,7 +53,7 @@ const Diagnostico = () => {
         const token = localStorage.getItem("token");
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/respuestas/", {
+            const response = await fetch(`${API_URL}/respuestas/`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,

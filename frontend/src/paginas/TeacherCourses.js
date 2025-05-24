@@ -8,6 +8,7 @@ import genericCourse from "../assets/c-course.jpg";
 import defaultLogo from "../Img/default-profile.png";
 
 const TeacherCourses = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [profile, setProfile] = useState({
         name: "",
@@ -34,7 +35,7 @@ const TeacherCourses = () => {
         const fetchProfileAndCourses = async () => {
             try {
                 // 1. Obtener datos del perfil
-                const profileRes = await fetch("http://127.0.0.1:8000/api/get-user-profile/", {
+                const profileRes = await fetch(`${API_URL}/get-user-profile/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
@@ -55,7 +56,7 @@ const TeacherCourses = () => {
                 }
 
                 // 2. Obtener cursos del docente
-                const coursesRes = await fetch("http://127.0.0.1:8000/api/get-teacher-courses/", {
+                const coursesRes = await fetch(`${API_URL}/get-teacher-courses/`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",

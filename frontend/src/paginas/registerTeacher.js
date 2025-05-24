@@ -9,6 +9,7 @@ import {useNavigate} from "react-router-dom";
 
 
 const RegisterTeacher = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: "",
@@ -16,7 +17,7 @@ const RegisterTeacher = () => {
         middleName: "",
         email: "",
         password: "",
-        confirmPassword: "",
+        confirm_password: "",
         termsAccepted: false,
     });
     const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
@@ -34,7 +35,7 @@ const RegisterTeacher = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/register-user/", {
+            const response = await fetch(`${API_URL}/register-user/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -46,7 +47,7 @@ const RegisterTeacher = () => {
                     apellidomaterno: formData.middleName,
                     correoelectronico: formData.email,
                     contrasena: formData.password,
-                    confirmPassword: formData.confirmPassword,
+                    confirm_password: formData.confirm_password,
                     estatuscorreo: "No verificado",
                 }),
             });
@@ -277,8 +278,8 @@ const RegisterTeacher = () => {
                         <div style={{ position: "relative" }}>
                             <input
                                 type="password"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
+                                name="confirm_password"
+                                value={formData.confirm_password}
                                 onChange={handleChange}
                                 style={{
                                     width: "100%",

@@ -8,13 +8,14 @@ import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 
 const RegisterStudent = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
     // Definimos el estado para los datos del formulario
     const [formData, setFormData] = useState({
         nickname: "",
         email: "",
         password: "",
-        confirmPassword: "",
+        confirm_password: "",
         termsAccepted: false,
     });
 
@@ -33,7 +34,7 @@ const RegisterStudent = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/register-user/", {
+            const response = await fetch(`${API_URL}/register-user/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -43,7 +44,7 @@ const RegisterStudent = () => {
                     nickname: formData.nickname,
                     correoelectronico: formData.email,
                     contrasena: formData.password,
-                    confirm_password: formData.confirmPassword,
+                    confirm_password: formData.confirm_password,
                     estatuscorreo: "No verificado",
 
                 }),
@@ -58,7 +59,7 @@ const RegisterStudent = () => {
                     nickname: "",
                     email: "",
                     password: "",
-                    confirmPassword: "",
+                    confirm_password: "",
                     termsAccepted: false,
                 });
                 navigate("/login");
@@ -210,8 +211,8 @@ const RegisterStudent = () => {
                             <div style={{position: "relative"}}>
                                 <input
                                     type="password"
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
+                                    name="confirm_password"
+                                    value={formData.confirm_password}
                                     onChange={handleChange}
                                     style={{
                                         width: "100%",
