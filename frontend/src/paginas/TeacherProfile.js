@@ -223,7 +223,7 @@ const TeacherProfile = () => {
 
         fetchProfileData();
         fetchProfileImage();
-    }, [] );
+    }, [API_URL] );
 
     const handleChange = (e) => {
         const { name, value } = e.target;

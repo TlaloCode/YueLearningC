@@ -60,7 +60,7 @@ const ListaVideos = () => {
 
         fetchVideos();
         fetchCourseName();
-    }, [courseId]);
+    }, [courseId,API_URL]);
 
     return (
         <div className="lista-videos-container">

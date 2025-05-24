@@ -30,7 +30,7 @@ const VideoDetalle = () => {
         };
 
         fetchVideoData();
-    }, [idVideo]);
+    }, [idVideo,API_URL]);
 
     if (!videoData) {
         return <p>Cargando video...</p>;  // ⬅️ Mientras no hay datos, muestra loading

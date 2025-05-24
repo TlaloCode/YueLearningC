@@ -77,7 +77,7 @@ int main() {
         };
 
         fetchProblemas();
-    }, [courseId]);
+    }, [courseId,API_URL]);
 
     const cambiarProblema = (nuevoIndice) => {
         // Guarda la solución actual antes de cambiar

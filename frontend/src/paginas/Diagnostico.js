@@ -43,7 +43,7 @@ const Diagnostico = () => {
         };
 
         fetchDiagnostico();
-    }, []);
+    }, [API_URL]);
 
     const handleChange = (id_pregunta, id_opcion) => {
         setRespuestas({ ...respuestas, [id_pregunta]: id_opcion });

@@ -74,7 +74,7 @@ const TeacherCourses = () => {
         };
 
         fetchProfileAndCourses();
-    }, []);
+    }, [API_URL]);
 
 
     const [courses, setCourses] = useState([]);
