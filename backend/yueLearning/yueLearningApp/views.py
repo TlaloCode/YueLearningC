@@ -8,7 +8,6 @@ import requests
 import httplib2
 from math import ceil
 from io import BytesIO
-from celery import shared_task
 from django.db.models import Q
 from django.conf import settings
 from django.db.models import Avg
