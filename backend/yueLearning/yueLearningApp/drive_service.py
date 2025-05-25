@@ -14,11 +14,13 @@ def build_service():
     try:
         # Intenta obtener la variable de entorno para producción
         raw_creds = config('GOOGLE_CREDENTIALS_JSON', default=None)
+        print(raw_creds)
         if raw_creds:
             credentials_info = json.loads(raw_creds)
             credentials = service_account.Credentials.from_service_account_info(
                 credentials_info, scopes=SCOPES
             )
+            print(credentials)
         else:
             # Si no existe, usar archivo local (desarrollo)
             BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
