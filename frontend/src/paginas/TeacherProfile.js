@@ -301,6 +301,13 @@ const TeacherProfile = () => {
                                 onChange={handleFileChange}
                                 style={{display: "none"}}
                             />
+                            {selectedFile && (
+                                <img
+                                    src={URL.createObjectURL(selectedFile)}
+                                    alt="Preview"
+                                    style={{ width: 100, height: 100, borderRadius: "50%", marginTop: 10 }}
+                                />
+                            )}
                             <div className="edit-icon"><FaEdit /></div>
                         </div>
                         <h3>Todos mis cursos</h3>
