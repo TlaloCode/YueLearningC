@@ -23,6 +23,7 @@ def build_service():
             print(credentials)
         else:
             # Si no existe, usar archivo local (desarrollo)
+            print("No encontró nada")
             BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'Credentials', 'service_account.json')
             credentials = service_account.Credentials.from_service_account_file(
