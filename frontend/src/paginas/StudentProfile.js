@@ -133,7 +133,6 @@ const StudentProfile = () => {
     const handleFileChange = async (e) => {
         const file = e.target.files[0];
         setSelectedFile(file);
-
         if (file) {
             const previewURL = URL.createObjectURL(file);
             setProfile(prev => ({ ...prev, preview: previewURL }));

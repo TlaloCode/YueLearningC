@@ -304,22 +304,19 @@ def upload_profile_photo(request):
     if not file:
         return Response({"error": "No se seleccionó ninguna imagen."}, status=status.HTTP_400_BAD_REQUEST)
     elif not file.content_type.startswith("image/"):
-        return Response({"error": "Solo se permiten archivos de imagen."}, status=400)
+        return Response({"error": "Solo se permiten archivos de imagen."}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
-        # Convertir el archivo a stream para pasarlo a Google Drive
-        file_stream = io.BytesIO(file.read())
-
-        # Usar el servicio modularizado
-
-        # Guardar el link en el modelo
-        file_id = upload_file_to_drive(file_stream, file.name)
+        # Subir directamente el archivo
+        file_id = upload_file_to_drive(file, file.name)
         usuario.fotoperfil = file_id
         usuario.save()
 
         return Response({"fotoPerfil": file_id}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"error": f"❌ Error al subir imagen: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
