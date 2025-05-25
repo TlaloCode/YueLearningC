@@ -45,7 +45,7 @@ const Login = () => {
         localStorage.setItem("rol", data.rol);
         localStorage.setItem("correo", data.correo);
         localStorage.setItem("id", data.id);
-        navigate("/home");; // Redirigir a la página principal
+        navigate("/home"); // Redirigir a la página principal
         localStorage.setItem("token", data.token);
         localStorage.setItem("refresh",data.refresh_token);
         localStorage.setItem("rol",data.rol);
