@@ -6,6 +6,9 @@ import uuid
 import tempfile
 import requests
 import httplib2
+import json
+from decouple import config
+from django.http import JsonResponse
 from math import ceil
 from io import BytesIO
 from django.db.models import Q
@@ -624,8 +627,9 @@ def subir_video(request, id_curso):
     titulo = request.data.get("titulo")
     descripcion = request.data.get("descripcion")
     archivo = request.FILES.get("video")
-
-
+    creds_json = json.loads(config('GOOGLE_CREDENTIALS_JSON'))
+    if not creds_json:
+        return Response({"error": "❌ No se encontró la variable de entorno 'GOOGLE_CREDENT
     if not archivo:
         return Response({"error": "No se seleccionó ningún archivo."}, status=400)
     if archivo.size > 524288000:  # 500MB

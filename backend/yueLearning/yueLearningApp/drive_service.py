@@ -1,6 +1,7 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
+from decouple import config
 import os
 import io
 import json
@@ -12,7 +13,7 @@ def build_service():
 
     # Si existe la variable de entorno, estamos en producción (Railway)
     if os.getenv('GOOGLE_CREDENTIALS_JSON'):
-        credentials_info = json.loads(os.getenv('GOOGLE_CREDENTIALS_JSON'))
+        credentials_info = json.loads(config('GOOGLE_CREDENTIALS_JSON'))
         credentials = service_account.Credentials.from_service_account_info(
             credentials_info, scopes=SCOPES
         )
