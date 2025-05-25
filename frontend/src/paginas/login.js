@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/HeaderLogin";
 import Footer from "../components/footer";
 import escom from "../Img/ESCOM.jpeg";
@@ -10,6 +11,7 @@ import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 
 const Login = () => {
+    const navigate = useNavigate();
     const API_URL = process.env.REACT_APP_API_URL;
     const [formData, setFormData] = useState({ correoelectronico: "", contrasena: "" });
     const [errorMessage, setErrorMessage] = useState("");
@@ -43,7 +45,7 @@ const Login = () => {
         localStorage.setItem("rol", data.rol);
         localStorage.setItem("correo", data.correo);
         localStorage.setItem("id", data.id);
-        window.location.href = "/home"; // Redirigir a la página principal
+        navigate("/home");; // Redirigir a la página principal
         localStorage.setItem("token", data.token);
         localStorage.setItem("refresh",data.refresh_token);
         localStorage.setItem("rol",data.rol);
