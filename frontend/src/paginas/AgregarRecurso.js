@@ -135,7 +135,7 @@ const AgregarRecurso = ({ onClose }) => {
                     </div>
                 </form>
             </div>
-            {isLoading && <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..." />}
+            {isLoading && <PantallaCarga mensaje="Subiendo recurso. Esto puede tardar unos minutos..." />}
         </div>
     );
 };
