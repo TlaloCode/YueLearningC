@@ -100,7 +100,7 @@ def registrar_usuario(request):
 
     token = uuid.uuid4()
     EmailVerificationToken.objects.create(usuario_id=usuario, token=token, fecha_expiracion=now() + timedelta(hours=24))
-    verification_link = f"http://127.0.0.1:8000/api/verify-email/?token={token}"
+    verification_link = f"https://yuelearningc-production.up.railway.app/api/verify-email/?token={token}"
     send_mail(
         subject="Verifica tu correo electrónico",
         message=f"Hola, verifica tu correo aquí: {verification_link}",
@@ -647,7 +647,6 @@ def subir_video(request, id_curso):
             descripcion=descripcion,
             video=file_id
         )
-
         return Response({"message": "Video subido y registrado correctamente", "file_id": file_id})
     except Exception as e:
         return Response({"error": str(e)}, status=500)
