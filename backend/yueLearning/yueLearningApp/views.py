@@ -647,7 +647,6 @@ def subir_video(request, id_curso):
             descripcion=descripcion,
             video=file_id
         )
-
         return Response({"message": "Video subido y registrado correctamente", "file_id": file_id})
     except Exception as e:
         return Response({"error": str(e)}, status=500)
