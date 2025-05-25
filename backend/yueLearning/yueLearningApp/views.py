@@ -629,7 +629,7 @@ def subir_video(request, id_curso):
     archivo = request.FILES.get("video")
     creds_json = json.loads(config('GOOGLE_CREDENTIALS_JSON'))
     if not creds_json:
-        return Response({"error": "❌ No se encontró la variable de entorno 'GOOGLE_CREDENT
+          return Response({"error": "❌ No se encontró la variable de entorno 'GOOGLE_CREDENTIALS_JSON'"}, status=500)
     if not archivo:
         return Response({"error": "No se seleccionó ningún archivo."}, status=400)
     if archivo.size > 524288000:  # 500MB
