@@ -26,7 +26,7 @@ const TeacherProfile = () => {
         fotoPerfil: "",
     });
 
-    const [setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
     const [editFields, setEditFields] = useState({});
