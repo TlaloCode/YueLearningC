@@ -20,7 +20,7 @@ const StudentProfile = () => {
         fotoPerfil: "",
         preview: null
     });
-    const [setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
     const [confirmationMessage, setConfirmationMessage] = useState("");
@@ -262,6 +262,13 @@ const StudentProfile = () => {
                                     onChange={handleFileChange}
                                     style={{display: "none"}}
                                 />
+                                {selectedFile && (
+                                    <img
+                                        src={URL.createObjectURL(selectedFile)}
+                                        alt="Preview"
+                                        style={{ width: 100, height: 100, borderRadius: "50%", marginTop: 10 }}
+                                    />
+                                )}
 
                             </div>
                             <div className="profile-courses" onClick={handleRedirect}>
