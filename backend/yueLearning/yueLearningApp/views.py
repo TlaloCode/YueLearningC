@@ -27,7 +27,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones, Problema,CalificacionCurso
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones, Problema, CalificacionCurso
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
