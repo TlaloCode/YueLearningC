@@ -14,13 +14,16 @@ def build_service():
     try:
         # Intenta obtener la variable de entorno para producción
         raw_creds = config('GOOGLE_CREDENTIALS_JSON', default=None)
+        print(raw_creds)
         if raw_creds:
             credentials_info = json.loads(raw_creds)
             credentials = service_account.Credentials.from_service_account_info(
                 credentials_info, scopes=SCOPES
             )
+            print(credentials)
         else:
             # Si no existe, usar archivo local (desarrollo)
+            print("No encontró nada")
             BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'Credentials', 'service_account.json')
             credentials = service_account.Credentials.from_service_account_file(
@@ -31,7 +34,6 @@ def build_service():
 
     service = build('drive', 'v3', credentials=credentials)
     return service
-
 # 🔹 Subir archivo a Google Drive
 def upload_file_to_drive(file_obj, filename, folder_id=None):
     try:
