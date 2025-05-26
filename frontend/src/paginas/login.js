@@ -222,12 +222,15 @@ const Login = () => {
                     }}
                 >
                     <label>
-                        <input type="checkbox" style={{ marginRight: "5px" }} />
+                        <input type="checkbox" style={{marginRight: "5px"}}/>
                         Recordarme
                     </label>
-                    <a href="/forgot-password" style={{ color: "#003366" }}>
-                        Recuperar contraseña
-                    </a>
+                    <span
+                        onClick={() => navigate("/forgot-password")}
+                        style={{color: "#003366", cursor: "pointer", textDecoration: "underline"}}
+                    >
+                      Recuperar contraseña
+                    </span>
                 </div>
             </div>
         </div>

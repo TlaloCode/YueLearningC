@@ -38,7 +38,7 @@ from googleapiclient.http import MediaFileUpload
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .drive_service import upload_file_to_drive
+from .drive_service import upload_file_to_drive, build_service
 
 
 refresh = None
@@ -305,6 +305,8 @@ def upload_profile_photo(request):
         return Response({"error": "No se seleccionó ninguna imagen."}, status=status.HTTP_400_BAD_REQUEST)
     elif not file.content_type.startswith("image/"):
         return Response({"error": "Solo se permiten archivos de imagen."}, status=status.HTTP_400_BAD_REQUEST)
+    elif file.size > 1 * 1024 * 1024:  # 1 MB en bytes
+        return Response({"error": "La imagen es muy grande."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         # Subir directamente el archivo
@@ -316,7 +318,6 @@ def upload_profile_photo(request):
 
     except Exception as e:
         return Response({"error": f"❌ Error al subir imagen: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -624,17 +625,41 @@ def subir_video(request, id_curso):
     titulo = request.data.get("titulo")
     descripcion = request.data.get("descripcion")
     archivo = request.FILES.get("video")
-    creds_json = json.loads(config('GOOGLE_CREDENTIALS_JSON'))
-    if not creds_json:
-          return Response({"error": "❌ No se encontró la variable de entorno 'GOOGLE_CREDENTIALS_JSON'"}, status=500)
+
     if not archivo:
         return Response({"error": "No se seleccionó ningún archivo."}, status=400)
     if archivo.size > 524288000:  # 500MB
         return Response({"error": "El archivo es demasiado grande."}, status=400)
 
     try:
-        # Subida a Google Drive con servicio ya configurado
-        file_id = upload_file_to_drive(archivo, archivo.name)
+        # Convertir archivo de Django a stream
+        file_stream = io.BytesIO(archivo.read())
+
+        # Configurar credenciales
+        service = build_service()  # Usa tu función que construye el servicio con las credenciales
+
+        file_metadata = {
+            'name': archivo.name,
+        }
+
+        media = MediaIoBaseUpload(
+            file_stream,
+            mimetype=archivo.content_type,
+            chunksize=256 * 1024,  # 256 KB
+            resumable=True
+        )
+
+        request_drive = service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
+        )
+
+        response = None
+        while response is None:
+            status, response = request_drive.next_chunk()
+
+        file_id = response.get("id")
 
         # Guardar en base de datos
         curso = Curso.objects.get(id_curso=id_curso)
@@ -644,7 +669,9 @@ def subir_video(request, id_curso):
             descripcion=descripcion,
             video=file_id
         )
+
         return Response({"message": "Video subido y registrado correctamente", "file_id": file_id})
+
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 

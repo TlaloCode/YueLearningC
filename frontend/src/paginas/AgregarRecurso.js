@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import "../css/AgregarRecurso.css";
 import {useParams} from "react-router-dom";
 import PantallaCarga from "../components/PantallaCarga";
+import InformationModal from "../components/InformationModal";
+import ErrorModal from "../components/ErrorModal";
 
 const AgregarRecurso = ({ onClose }) => {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -10,6 +12,8 @@ const AgregarRecurso = ({ onClose }) => {
     const [descripcion, setDescripcion] = useState('');
     const [archivo, setArchivo] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [infoMessage, setInfoMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
 
     const handleFileChange = (e) => {
@@ -45,19 +49,25 @@ const AgregarRecurso = ({ onClose }) => {
             setIsLoading(false);  // Ocultar carga
 
             if (response.ok) {
-                alert("✅ Recurso agregado correctamente");
+                setInfoMessage("Recurso agregado correctamente");
                 onClose();  // Cerrar modal
             } else {
-                alert("❌ Error al subir recurso: " + (data.error || "desconocido"));
+                setErrorMessage("Error al subir recurso: " + (data.error || "desconocido"));
             }
         } catch (error) {
-            console.error("Error al subir recurso:", error);
+            setErrorMessage("Error al subir recurso");
             setIsLoading(false);
         }
     };
 
     return (
         <div className="modal-overlay">
+            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")}/>
+            <InformationModal message={infoMessage} onClose={() => {
+                setInfoMessage("");
+                window.location.reload();
+            }}/>
+            />
             <div className="modal-container">
                 <h2 className="modal-title">Agregar Recurso</h2>
 
@@ -106,7 +116,7 @@ const AgregarRecurso = ({ onClose }) => {
                             <input
                                 type="file"
                                 onChange={handleFileChange}
-                                style={{ display: 'none' }}
+                                style={{display: 'none'}}
                                 id="recurso-file"
                             />
                             <label htmlFor="recurso-file" className="upload-icon">
@@ -119,23 +129,25 @@ const AgregarRecurso = ({ onClose }) => {
                         <button className="btn btn-success" type="submit"
                                 onChange={handleSubmit}
                                 style={
-                            {
-                                backgroundColor: "#0077DD",
-                                border: "2px solid #0077DD",
-                            }
-                        }
-                        >Agregar</button>
+                                    {
+                                        backgroundColor: "#0077DD",
+                                        border: "2px solid #0077DD",
+                                    }
+                                }
+                        >Agregar
+                        </button>
                         <button className="btn btn-danger" type="button" onClick={onClose}
                                 style={
                                     {
                                         backgroundColor: "#6c6c6c",
                                         border: "2px solid #6c6c6c",
                                     }
-                                }>Cancelar</button>
+                                }>Cancelar
+                        </button>
                     </div>
                 </form>
             </div>
-            {isLoading && <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..." />}
+            {isLoading && <PantallaCarga mensaje="Subiendo recurso. Esto puede tardar unos minutos..."/>}
         </div>
     );
 };

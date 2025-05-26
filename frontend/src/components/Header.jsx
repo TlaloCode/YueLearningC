@@ -105,6 +105,7 @@ const Header = () => {
                     }
                 }
             } catch (error) {
+                setLoading(false);
                 console.error("Error al descargar imagen de perfil:", error);
             }
         };

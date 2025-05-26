@@ -9,7 +9,8 @@ import Footer from "../components/footer"; // Importa el footer
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 import ConfirmationModal from "../components/ConfirmationModal";
-
+import PantallaCarga from "../components/PantallaCarga";
+import userPlaceholder from "../assets/default-user.jpg";
 const TeacherProfile = () => {
     const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
@@ -32,6 +33,7 @@ const TeacherProfile = () => {
     const [editFields, setEditFields] = useState({});
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [setPendingDelete] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const enableEdit = (fieldName) => {
         setEditFields({ ...editFields, [fieldName]: true });
@@ -60,7 +62,7 @@ const TeacherProfile = () => {
             const data = await response.json();
 
             if (response.ok) {
-                alert(data.message || "Cuenta eliminada correctamente.");
+                setInformationMessage(data.message || "Cuenta eliminada correctamente.");
                 localStorage.clear();
                 sessionStorage.clear();
                 navigate("/login");
@@ -84,6 +86,7 @@ const TeacherProfile = () => {
         formData.append("file", file);
 
         try {
+            setIsLoading(true);
             const respuesta = await fetch(`${API_URL}/upload-profile-photo/`, {
                 method: "POST",
                 headers: {
@@ -95,13 +98,14 @@ const TeacherProfile = () => {
             const data = await respuesta.json();
 
             if (respuesta.ok) {
+                setIsLoading(false);
                 setProfile((prev) => ({
                     ...prev,
                     fotoPerfil: data.fotoPerfil
                 }));
 
                 sessionStorage.setItem("cachedProfileImage", data.fotoPerfil);
-                alert("Imagen actualizada correctamente");
+                setInformationMessage("Imagen subida correctamente");
                 const fetchProfileImage = async () => {
                     const response = await fetch(`${API_URL}/profile-photo/`, {
                         headers: {
@@ -128,11 +132,12 @@ const TeacherProfile = () => {
 
                 await fetchProfileImage();
             } else {
-                alert(data.error || "Error al subir la imagen");
+                setIsLoading(false);
+                setErrorMessage(data.error || "Error al subir la imagen");
             }
         } catch (error) {
-            console.error("Error al subir la imagen:", error);
-            alert("Error en la carga de imagen");
+            setIsLoading(false);
+            setErrorMessage("Error en la carga de imagen");
         }
     };
 
@@ -141,7 +146,7 @@ const TeacherProfile = () => {
         const token = localStorage.getItem("token");
 
         if (!token || token.trim() === "") {
-            alert("No tienes un token de autenticación. Inicia sesión.");
+            setErrorMessage("No tienes un token de autenticación. Inicia sesión.");
             return;
         }
         const fetchProfileData = async () => {
@@ -171,11 +176,11 @@ const TeacherProfile = () => {
                     });
                 } else {
                     console.error("Error en la respuesta:", response.status, response.statusText);
-                    alert("Error al cargar el perfil. Intenta nuevamente.");
+                    setErrorMessage("Error al cargar el perfil. Intenta nuevamente.");
                 }
             } catch (error) {
                 console.error("Error en la solicitud:", error);
-                alert("Error de conexión. Intenta nuevamente.");
+                setErrorMessage("Error de conexión. Intenta nuevamente.");
             }
         };
 
@@ -266,8 +271,14 @@ const TeacherProfile = () => {
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
-            <ConfirmationModal
+            <InformationModal
+                message={InformationMessage}
+                onClose={() => {
+                    setInformationMessage("");
+                    sessionStorage.removeItem("cachedProfileImage");
+                    window.location.reload(); // Siempre recarga al cerrar
+                }}
+            /><ConfirmationModal
                 message={confirmationMessage}
                 onClose={() => {
                     setConfirmationMessage("");
@@ -289,7 +300,7 @@ const TeacherProfile = () => {
                     <div className="profile-sidebar">
                         <div className="profile-picture">
                             <img
-                                src={profile.fotoPerfil || userImagePlaceholder}
+                                src={sessionStorage.getItem("cachedProfileImage") || userPlaceholder}
                                 alt="Foto de perfil"
                                 className="clickable-profile-image"
                                 onClick={() => document.getElementById("teacherFileInput").click()}
@@ -403,6 +414,7 @@ const TeacherProfile = () => {
 
             <Footer/> {/* Footer fijo */}
         </div>
+            {isLoading && <PantallaCarga mensaje="Subiendo imagen..." />}
         </div>
     );
 };
