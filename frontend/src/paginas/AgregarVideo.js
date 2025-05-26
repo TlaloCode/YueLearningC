@@ -3,8 +3,6 @@ import "../css/AgregarVideo.css";
 import { FaUpload } from "react-icons/fa";
 import {useParams} from "react-router-dom";
 import PantallaCarga from "../components/PantallaCarga";
-import InformationModal from "../components/InformationModal";
-import ErrorModal from "../components/ErrorModal";
 
 const AgregarVideo = ({ onClose }) => {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -13,11 +11,6 @@ const AgregarVideo = ({ onClose }) => {
     const [videoFile, setVideoFile] = useState(null);
     const [videoDescription, setVideoDescription] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [infoMessage, setInfoMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
-    const [progreso, setProgreso] = useState(0);
-
-
 
     const handleFileChange = (e) => {
         setVideoFile(e.target.files[0]);
@@ -33,18 +26,7 @@ const AgregarVideo = ({ onClose }) => {
         formData.append("video", videoFile);
 
         const token = localStorage.getItem("token");
-        setProgreso(0);
 
-        // Simulación: cada 200ms aumenta hasta 90%
-        const simInterval = setInterval(() => {
-            setProgreso((prev) => {
-                if (prev >= 90) {
-                    clearInterval(simInterval);
-                    return prev;
-                }
-                return prev + 5;
-            });
-        }, 2000);
         try {
             const response = await fetch(`${API_URL}/subir-video/${courseId}/`, {
                 method: "POST",
@@ -58,15 +40,13 @@ const AgregarVideo = ({ onClose }) => {
             setIsLoading(false);  // Ocultar carga
 
             if (response.ok) {
-                clearInterval(simInterval);
-                setProgreso(100);
-                setInfoMessage("Video agregado correctamente");
+                alert("✅ Video agregado correctamente");
                 onClose();
             } else {
-                setErrorMessage("Error al subir video: " + (data.error || "desconocido"));
+                alert("❌ Error al subir video: " + (data.error || "desconocido"));
             }
         } catch (error) {
-            setErrorMessage("❌ Error en la conexión");
+            alert("❌ Error en la conexión");
             setIsLoading(false);
         }
     };
@@ -74,9 +54,6 @@ const AgregarVideo = ({ onClose }) => {
 
     return (
         <div className="modal-overlay">
-            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={infoMessage} onClose={() => {setInfoMessage("");window.location.reload();}} />
-            />
             <div className="modal-container">
                 <h2 className="modal-title">Agregar Video</h2>
                 <form onSubmit={handleSubmit} className="video-form">
@@ -151,7 +128,7 @@ const AgregarVideo = ({ onClose }) => {
                     </div>
                 </form>
             </div>
-            {isLoading && <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..."  porcentaje={progreso}/>}
+            {isLoading && <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..." />}
 
 
         </div>
