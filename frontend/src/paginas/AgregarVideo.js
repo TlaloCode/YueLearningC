@@ -44,7 +44,7 @@ const AgregarVideo = ({ onClose }) => {
                 }
                 return prev + 5;
             });
-        }, 200);
+        }, 2000);
         try {
             const response = await fetch(`${API_URL}/subir-video/${courseId}/`, {
                 method: "POST",
