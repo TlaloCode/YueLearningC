@@ -62,6 +62,18 @@ const AgregarVideo = ({ onClose }) => {
                 setProgreso(100);
                 setInfoMessage("Video agregado correctamente");
                 onClose();
+                await fetch(`${API_URL}/notificar-estudiantes/${courseId}/`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        mensaje: `Se ha subido un nuevo video: "${videoTitle}". ¡Ve a revisarlo!`
+                    })
+                });
+
+
             } else {
                 setErrorMessage("Error al subir video: " + (data.error || "desconocido"));
             }
