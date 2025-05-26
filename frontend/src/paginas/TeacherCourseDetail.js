@@ -22,6 +22,8 @@ const TeacherCourseDetail = () => {
     const [showConfirmationModalResource, setShowConfirmationModalResource] = useState(false);
     const [videoToDelete, setVideoToDelete] = useState(null);
     const [resourceToDelete, setResourceToDelete] = useState(null);
+    const [inscritos, setInscritos] = useState([]);
+
 
 
     const [videos, setVideos] = useState([]);
@@ -135,6 +137,28 @@ const TeacherCourseDetail = () => {
             }
         };
 
+        const fetchInscritos = async () => {
+            const token = localStorage.getItem("token");
+
+            try {
+                const response = await fetch(`${API_URL}/inscritos-curso/${courseId}/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setInscritos(data);
+                } else {
+                    console.error("Error al obtener inscritos.");
+                }
+            } catch (err) {
+                console.error("Error:", err);
+            }
+        };
+
         const fetchTeacherDetails = async () => {
             const token = localStorage.getItem("token");
             const cachedImage = sessionStorage.getItem("cachedProfileImage");
@@ -162,6 +186,7 @@ const TeacherCourseDetail = () => {
         };
         fetchTeacherDetails()
         fetchCourseDetails();
+        fetchInscritos();
     }, [courseId,API_URL]);
 
     if (!course) {
@@ -220,7 +245,7 @@ const TeacherCourseDetail = () => {
                                     />
                                     <p className="video-title">{video.titulovideo}</p>
                                     <div className="video-actions">
-                                        <FaEdit title="Editar" className="edit-icon-react" />
+                                        <FaEdit title="Editar" className="edit-icon-react"/>
                                         <FaTrash className="delete-icon" title="Eliminar"
                                                  onClick={() => handleDeleteClick(video)}/>
                                     </div>
@@ -248,8 +273,9 @@ const TeacherCourseDetail = () => {
                                         <img src={pdf} alt="PDF" className="pdf-icon"/>
                                     </a>
                                     <p className="resource-title">{resource.titulorecurso}</p>
-                                    <FaEdit className="edit-icon-react" />
-                                    <FaTrash className="delete-icon" onClick={() => handleDeleteRecursoClick(resource)}/>
+                                    <FaEdit className="edit-icon-react"/>
+                                    <FaTrash className="delete-icon"
+                                             onClick={() => handleDeleteRecursoClick(resource)}/>
                                 </div>
                             ))
                         ) : (
@@ -257,6 +283,19 @@ const TeacherCourseDetail = () => {
                         )}
                     </div>
                 </div>
+                <div className="course-section">
+                    <h3>Estudiantes inscritos</h3>
+                    {inscritos.length > 0 ? (
+                        <ul className="student-list">
+                            {inscritos.map((est, idx) => (
+                                <li key={idx}>{est.nickname}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="empty-message">Aún no hay estudiantes inscritos en este curso.</p>
+                    )}
+                </div>
+
             </div>
 
             <Footer/>
