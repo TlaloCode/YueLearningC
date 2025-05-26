@@ -184,3 +184,13 @@
 .edit-icon-react:hover {
     transform: scale(1.2);
 }
+
+.student-list {
+    padding-left: 20px;
+    font-size: 16px;
+    color: #003366;
+}
+
+.student-list li {
+    margin-bottom: 5px;
+}
