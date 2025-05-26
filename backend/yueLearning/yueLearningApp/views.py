@@ -27,7 +27,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones, Problema, CalificacionCurso
+from .models import Usuario, Estudiantes, Docente, EmailVerificationToken, Curso, Inscripciones, Video, RecursoApoyo, Calificaciones, Problema,CalificacionCurso
+from .models import Cuestionario, Pregunta, Opcion
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -779,7 +780,18 @@ def delete_recurso(request, id_recurso):
         return Response({"error": str(e)}, status=500)
 
 
-from .models import Cuestionario, Pregunta, Opcion
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def inscritos_por_curso(request, id_curso):
+    inscritos = (
+        Inscripciones.objects
+        .filter(id_curso=id_curso)
+        .select_related('id_usuario')
+    )
+    data = [{"nickname": insc.id_usuario.nickname} for insc in inscritos]
+
+    return Response(data)
+
 
 @api_view(['GET'])
 def obtener_preguntas_por_curso(request, courseId):
