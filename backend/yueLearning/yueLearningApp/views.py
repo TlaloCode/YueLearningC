@@ -792,6 +792,47 @@ def inscritos_por_curso(request, id_curso):
 
     return Response(data)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def notificar_actualizacion(request, id_curso):
+    mensaje_docente = request.data.get("mensaje")
+
+    if not mensaje_docente:
+        return Response({"error": "Debes proporcionar un mensaje."}, status=400)
+
+    try:
+        curso = Curso.objects.get(id_curso=id_curso)
+
+        if curso.id_docente != request.user:
+            return Response({"error": "No tienes permiso para notificar este curso."}, status=403)
+
+        inscripciones = Inscripciones.objects.filter(id_curso=curso).select_related("id_usuario")
+        correos = [i.id_usuario.correoelectronico for i in inscripciones if i.id_usuario.correoelectronico]
+
+        if not correos:
+            return Response({"message": "No hay estudiantes inscritos en este curso."})
+
+        asunto = f"📘 Actualización en el curso: {curso.nombrecurso}"
+        mensaje = (
+            f"Hola estudiante,\n\n"
+            f"Hay una nueva actualización en el curso \"{curso.nombrecurso}\".\n\n"
+            f"Mensaje del docente:\n{mensaje_docente}\n\n"
+            f"Por favor, revisa la plataforma para más detalles.\n\n"
+            f"Atentamente,\nYUE-Learning C"
+        )
+
+        send_mail(
+            subject=asunto,
+            message=mensaje,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=correos,
+            fail_silently=False,
+        )
+
+        return Response({"message": "Notificación enviada por correo a los estudiantes inscritos."})
+
+    except Curso.DoesNotExist:
+        return Response({"error": "Curso no encontrado."}, status=404)
 
 @api_view(['GET'])
 def obtener_preguntas_por_curso(request, courseId):

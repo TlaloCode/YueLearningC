@@ -51,6 +51,17 @@ const AgregarRecurso = ({ onClose }) => {
             if (response.ok) {
                 setInfoMessage("Recurso agregado correctamente");
                 onClose();  // Cerrar modal
+                await fetch(`${API_URL}/notificar-estudiantes/${courseId}/`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        mensaje: `Se ha subido un nuevo recurso: "${titulo}". ¡Ve a revisarlo!`
+                    })
+                });
+
             } else {
                 setErrorMessage("Error al subir recurso: " + (data.error || "desconocido"));
             }

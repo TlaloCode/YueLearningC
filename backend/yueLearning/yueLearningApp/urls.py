@@ -6,7 +6,7 @@ from .views import get_enrolled_courses, get_all_courses, get_teachers_with_cour
 from .views import get_course_videos, get_profile_photo, get_teacher_photo, subir_video, get_video_detail
 from .views import subir_recurso, get_course_resource, delete_video, delete_recurso, calificar_respuestas
 from .views import obtener_preguntas_por_curso, get_diagnostico, get_podio, eliminar_cuenta, recuperar_contrasena
-from .views import calificar_curso, buscar_cursos, get_problemas_por_curso, inscritos_por_curso
+from .views import calificar_curso, buscar_cursos, get_problemas_por_curso, inscritos_por_curso, notificar_actualizacion
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -32,6 +32,7 @@ urlpatterns = [
     path('teacher-photo/<str:file_id>/', get_teacher_photo, name='get_teacher_photo'),
     path('subir-video/<int:id_curso>/', subir_video, name='subir_video'),
     path('delete-video/<int:id_video>/', delete_video, name='delete_video'),
+    path("notificar-estudiantes/<int:id_curso>/", notificar_actualizacion),
     path('get-video-detail/<int:id_video>/', get_video_detail, name='get_video_detail'),
     path('subir-recurso/<int:id_curso>/', subir_recurso, name='subir_recurso'),
     path('delete-recurso/<int:id_recurso>/', delete_recurso, name='delete_recurso'),
