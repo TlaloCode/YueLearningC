@@ -71,8 +71,6 @@ const CalificarCurso = () => {
                 })
             });
 
-            const data = await res.json();
-
             if (res.ok) {
                 setErrorMessage("Gracias por tu calificación");
                 navigate(-1);
