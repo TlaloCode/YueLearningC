@@ -797,8 +797,13 @@ def inscritos_por_curso(request, id_curso):
         .filter(id_curso=id_curso)
         .select_related('id_usuario')
     )
-    data = [{"nickname": insc.id_usuario.nickname} for insc in inscritos]
-
+    data = []
+    for insc in inscritos:
+        try:
+            estudiante = Estudiantes.objects.get(usuario=insc.id_usuario)
+            data.append({"nickname": estudiante.nickname})
+        except Estudiantes.DoesNotExist:
+            continue
     return Response(data)
 
 @api_view(['POST'])

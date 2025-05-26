@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/InscribirCurso.css";
@@ -14,6 +14,8 @@ const InscribirCurso = () => {
     const [course, setCourse] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchCourseDetails = async () => {
@@ -55,12 +57,16 @@ const InscribirCurso = () => {
 
         if (response.ok) {
             setInformationMessage("Inscripción exitosa");
+
         } else {
            setInformationMessage("Error al inscribirse");
         }
     };
 
-
+    const construirURLDrive = (idImagen) => {
+        if (!idImagen) return genericCourse;
+        return `https://drive.google.com/thumbnail?id=${idImagen}&sz=w500`;
+    };
 
     if (!course) {
         return <div>Cargando...</div>;
@@ -69,8 +75,18 @@ const InscribirCurso = () => {
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
-        <div className="course-detail-container">
+            <InformationModal
+                message={InformationMessage}
+                onClose={() => {
+                    setInformationMessage("");
+                    if (InformationMessage === "Inscripción exitosa") {
+                        navigate(`/lista-videos/${courseId}`);
+                    } else {
+                        navigate("/mis-cursos-estudiante");
+                    }
+                }}
+            />
+            <div className="course-detail-container">
             <Header />
 
             <div className="course-content">
@@ -98,7 +114,7 @@ const InscribirCurso = () => {
 
 
                 <img
-                    src={course.image || genericCourse}
+                    src={construirURLDrive(course.image)}
                     alt="Código ejemplo"
                     className="course-image"
                 />
