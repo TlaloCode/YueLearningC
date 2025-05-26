@@ -186,13 +186,15 @@ const TeacherCourseDetail = () => {
             <div className="course-info">
                 <h2 className="course-title">{course.title}</h2>
                 <div className="course-rating">
-                    <FaStar className="star" />
-                    <FaStar className="star" />
-                    <FaStar className="star" />
-                    <FaStar className="star" />
-                    <FaStar className="star gray" />
-                    <strong>4.0</strong>
+                    {[...Array(5)].map((_, i) => (
+                        <FaStar
+                            key={i}
+                            className={`star ${i < (course.calificacion || 5) ? "" : "gray"}`}
+                        />
+                    ))}
+                    <strong>{course.calificacion || 5}.0</strong>
                 </div>
+
             </div>
 
             <div className="course-content">
