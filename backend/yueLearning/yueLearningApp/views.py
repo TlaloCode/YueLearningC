@@ -661,6 +661,15 @@ def subir_video(request, id_curso):
             status, response = request_drive.next_chunk()
 
         file_id = response.get("id")
+        # Hacer público el video en Drive
+        service.permissions().create(
+            fileId=file_id,
+            body={
+                "role": "reader",
+                "type": "anyone"
+            },
+            fields="id"
+        ).execute()
 
         # Guardar en base de datos
         curso = Curso.objects.get(id_curso=id_curso)

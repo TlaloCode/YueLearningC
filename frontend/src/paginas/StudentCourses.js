@@ -82,7 +82,10 @@ const StudentCourses = () => {
     const getTeacherPhotoURL = (fileId) =>
         fileId ? `http://127.0.0.1:8000/api/teacher-photo/${fileId}/` : teacherImage;
 
-
+    const construirURLDrive = (idImagen) => {
+        if (!idImagen) return genericCourse;
+        return `https://drive.google.com/thumbnail?id=${idImagen}&sz=w500`;
+    };
 
     return (
         <div className="app-container">
@@ -137,7 +140,7 @@ const StudentCourses = () => {
                 <div className="courses-grid">
                     {courses.map((course) => (
                         <div key={course.id} className="course-card" onClick={() => handleCourseSignedClick(course.id)}>
-                            <img src={course.image || genericCourse} alt={course.title} className="course-image" />
+                            <img src={construirURLDrive(course.image)} alt={course.title} className="course-image" />
                             <h3>{course.title}</h3>
                             <span className="course-author">Creado por {course.author}</span>
                         </div>
@@ -169,7 +172,7 @@ const StudentCourses = () => {
                 <div className="courses-grid">
                     {allCourses.map((course) => (
                         <div key={course.id} className="course-card" onClick={() => handleCourseClick(course.id)}>
-                            <img src={course.image || genericCourse} alt={course.title} className="course-image"/>
+                            <img src={construirURLDrive(course.image)} alt={course.title} className="course-image"/>
                             <h3>{course.title}</h3>
                             <span className="course-author">Creado por {course.author}</span>
                         </div>
