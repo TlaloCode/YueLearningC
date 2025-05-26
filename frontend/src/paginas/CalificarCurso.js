@@ -5,6 +5,8 @@ import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/CalificarCurso.css";
 import { FaStar, FaArrowLeft } from "react-icons/fa";
+import InformationModal from "../components/InformationModal";
+import ErrorModal from "../components/ErrorModal";
 
 const CalificarCurso = () => {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -12,6 +14,8 @@ const CalificarCurso = () => {
     const navigate = useNavigate();
     const [rating, setRating] = useState(3);
     const [curso, setCurso] = useState(null);
+    const [infoMessage, setInfoMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleRate = (value) => {
         setRating(value);
@@ -67,17 +71,14 @@ const CalificarCurso = () => {
                 })
             });
 
-            const data = await res.json();
-
             if (res.ok) {
-                alert("✅ Gracias por tu calificación.");
+                setErrorMessage("Gracias por tu calificación");
                 navigate(-1);
             } else {
-                alert(data.error || "❌ No se pudo enviar la calificación.");
+                setErrorMessage("No se pudo enviar tu calificación");
             }
         } catch (error) {
-            console.error("Error al calificar:", error);
-            alert("Error de red.");
+            setErrorMessage("Error de red");
         }
     };
 
@@ -85,6 +86,9 @@ const CalificarCurso = () => {
 
     return (
         <div className="calificar-container">
+            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
+            <InformationModal message={infoMessage} onClose={() => setInfoMessage("")} />
+
             <Header />
 
             <div className="calificar-content">
