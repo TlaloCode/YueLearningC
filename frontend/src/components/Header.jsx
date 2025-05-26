@@ -105,6 +105,7 @@ const Header = () => {
                     }
                 }
             } catch (error) {
+                setLoading(false);
                 console.error("Error al descargar imagen de perfil:", error);
             }
         };
@@ -176,19 +177,31 @@ const Header = () => {
                         }}>
                             <button
                                 style={menuBtnStyle}
-                                onClick={() => navigate("/diagnostico")}
+                                onClick={() => {
+                                    if (!usuario) return;
+                                    navigate("/diagnostico");
+                                }}
+
                             >
                                 Evaluación diagnóstica
                             </button>
                             <button
                                 style={menuBtnStyle}
-                                onClick={handleMisCursos}
+                                onClick={() => {
+                                    if (!usuario) return;
+                                    handleMisCursos();
+                                }}
+
                             >
                                 Mis cursos
                             </button>
                             <button
                                 style={menuBtnStyle}
-                                onClick={() => navigate("/podio")}
+                                onClick={() => {
+                                    if (!usuario) return;
+                                    navigate("/podio");
+                                }}
+
                             >
                                 Podio
                             </button>

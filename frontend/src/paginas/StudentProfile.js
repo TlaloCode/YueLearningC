@@ -6,6 +6,7 @@ import userPlaceholder from "../assets/default-user.jpg";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 import ConfirmationModal from "../components/ConfirmationModal";
+import PantallaCarga from "../components/PantallaCarga";
 import Footer from "../components/footer";
 import Header from "../components/Header";
 
@@ -25,6 +26,8 @@ const StudentProfile = () => {
     const [InformationMessage, setInformationMessage] = useState("");
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [setPendingDelete] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleRedirect = () => {
         navigate('/mis-cursos-estudiante');
     };
@@ -36,6 +39,9 @@ const StudentProfile = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
+        if (selectedFile) {
+            console.log("Archivo seleccionado:", selectedFile.name);
+        }
 
         if (!token || token.trim() === "") {
             alert("No tienes un token de autenticación. Inicia sesión.");
@@ -124,7 +130,7 @@ const StudentProfile = () => {
         };
         fetchProfileData();
         fetchProfileImage();
-    }, [API_URL]);
+    }, [API_URL,selectedFile]);
 
     const handleChange = (e) => {
         setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -142,6 +148,7 @@ const StudentProfile = () => {
             formData.append("file", file);
 
             try {
+                setIsLoading(true);
                 const respuesta = await fetch(`${API_URL}/upload-profile-photo/`, {
                     method: "POST",
                     headers: {
@@ -160,15 +167,18 @@ const StudentProfile = () => {
                     }));
 
                     sessionStorage.setItem("cachedProfileImage", data.fotoPerfil);
-                    alert("Imagen subida correctamente");
+                    setIsLoading(false);
+                    setInformationMessage("Imagen subida correctamente");
                 } else {
-                    alert(data.error || "Error al subir la imagen");
+                    setIsLoading(false);
+                    setErrorMessage(data.error || "Error al subir la imagen");
                 }
             } catch (error) {
-                console.error("Error al subir la imagen:", error);
-                alert("Error en la carga de imagen");
+                setIsLoading(false);
+                setErrorMessage("Error al subir la imagen:");
             }
         }
+
     };
 
     const handleDeleteAccount = async () => {
@@ -225,11 +235,17 @@ const StudentProfile = () => {
         }
     };
 
-
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")}/>
-            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")}/>
+            <InformationModal
+                message={InformationMessage}
+                onClose={() => {
+                    setInformationMessage("");
+                    sessionStorage.removeItem("cachedProfileImage");
+                    window.location.reload(); // Siempre recarga al cerrar
+                }}
+            />
             <ConfirmationModal
                 message={confirmationMessage}
                 onClose={() => {
@@ -249,8 +265,7 @@ const StudentProfile = () => {
                     <div className="profile-content">
                         <div className="profile-left">
                             <div className="profile-image">
-                                <img
-                                    src={profile.fotoPerfil || userPlaceholder}
+                                <img src={sessionStorage.getItem("cachedProfileImage") || userPlaceholder}
                                     alt="Foto de perfil"
                                     className="clickable-profile-image"
                                     onClick={() => document.getElementById("fileInput").click()}
@@ -262,13 +277,6 @@ const StudentProfile = () => {
                                     onChange={handleFileChange}
                                     style={{display: "none"}}
                                 />
-                                {selectedFile && (
-                                    <img
-                                        src={URL.createObjectURL(selectedFile)}
-                                        alt="Preview"
-                                        style={{ width: 100, height: 100, borderRadius: "50%", marginTop: 10 }}
-                                    />
-                                )}
 
                             </div>
                             <div className="profile-courses" onClick={handleRedirect}>
@@ -363,6 +371,8 @@ const StudentProfile = () => {
                 </div>
                 <Footer/>
             </div>
+            {isLoading && <PantallaCarga mensaje="Subiendo imagen..." />}
+
         </div>
     );
 };

@@ -19,7 +19,13 @@ const StudentCourses = () => {
     const teacherImage = "";
 
     const handleCourseClick = (courseId) => {
-        navigate(`/inscribir-curso/${courseId}`);
+        const yaInscrito = courses.some((curso) => curso.id === courseId);
+
+        if (yaInscrito) {
+            navigate(`/lista-videos/${courseId}`);
+        } else {
+            navigate(`/inscribir-curso/${courseId}`);
+        }
     };
 
     const handleCourseSignedClick = (courseId) => {

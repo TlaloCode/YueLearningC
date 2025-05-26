@@ -30,7 +30,6 @@ const InscribirCurso = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("Curso obtenido:", data);  // Verifica que los datos lleguen correctamente
                 setCourse(data);
             } else {
                 console.error("Error al obtener el curso:", response.status, response.statusText);
@@ -55,9 +54,9 @@ const InscribirCurso = () => {
         });
 
         if (response.ok) {
-            alert("Inscripción exitosa");
+            setInformationMessage("Inscripción exitosa");
         } else {
-            alert("Error al inscribirse");
+           setInformationMessage("Error al inscribirse");
         }
     };
 
