@@ -4,6 +4,8 @@ import Footer from "../components/footer";
 import "../css/Diagnostico.css";
 import { FaArrowLeft } from "react-icons/fa";
 import {useNavigate} from "react-router-dom";
+import ErrorModal from "../components/ErrorModal";
+import InformationModal  from "../components/InformationModal";
 
 const Diagnostico = () => {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -14,6 +16,9 @@ const Diagnostico = () => {
     const [titulo, setTitulo] = useState("Diagnóstico");
     const [respuestasEvaluadas, setRespuestasEvaluadas] = useState([]);
     const [evaluado, setEvaluado] = useState(false);
+    const [infoMessage, setInfoMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+
 
     useEffect(() => {
         const fetchDiagnostico = async () => {
@@ -66,13 +71,14 @@ const Diagnostico = () => {
 
             if (response.ok) {
                 const result = await response.json();
-                alert(`Tu calificación diagnóstica es: ${result.calificacion}`);
+                setInfoMessage(`✅ Tu calificación es: ${result.calificacion}\nNivel: ${result.nivel}`);
                 setRespuestasEvaluadas(result.detalle);
                 setEvaluado(true);
             } else {
                 const errorData = await response.json();
-                alert("Error al calificar: " + (errorData.error || "desconocido"));
+                setErrorMessage("❌ Error al calificar: " + (errorData.error || "desconocido"));
             }
+
         } catch (error) {
             console.error("Error al calificar:", error);
             alert("No se pudo enviar tu diagnóstico.");
@@ -81,6 +87,16 @@ const Diagnostico = () => {
 
     return (
         <div className="diagnostico-container">
+            <InformationModal
+                message={infoMessage}
+                onClose={() => setInfoMessage("")}
+            />
+
+            <ErrorModal
+                message={errorMessage}
+                onClose={() => setErrorMessage("")}
+            />
+
             <Header />
 
             <div className="diagnostico-content">

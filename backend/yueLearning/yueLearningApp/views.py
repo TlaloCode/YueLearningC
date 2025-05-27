@@ -715,6 +715,37 @@ def delete_video(request, id_video):
         print("❌ Error al eliminar video:", str(e))
         return Response({"error": str(e)}, status=500)
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def editar_video(request, id_video):
+    try:
+        video = Video.objects.get(id_video=id_video)
+        if video.id_curso.id_docente != request.user:
+            return Response({"error": "No tienes permiso para editar este video."}, status=403)
+
+        titulo = request.data.get("titulo")
+        descripcion = request.data.get("descripcion")
+        nuevo_video = request.FILES.get("video")
+
+        if titulo:
+            video.titulovideo = titulo
+        if descripcion:
+            video.descripcion = descripcion
+
+        if nuevo_video:
+            from .drive_service import upload_file_to_drive
+            file_id = upload_file_to_drive(nuevo_video, nuevo_video.name)
+
+            # Opcional: eliminar el anterior de Drive si deseas
+            video.video = file_id
+
+        video.save()
+        return Response({"message": "Video actualizado correctamente."})
+    except Video.DoesNotExist:
+        return Response({"error": "Video no encontrado."}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
 @api_view(['GET'])
 def get_video_detail(request, id_video):
     try:
@@ -788,6 +819,35 @@ def delete_recurso(request, id_recurso):
         print("❌ Error al eliminar recurso:", str(e))
         return Response({"error": str(e)}, status=500)
 
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def editar_recurso(request, id_recurso):
+    try:
+        recurso = RecursoApoyo.objects.get(id_recurso=id_recurso)
+        if recurso.id_curso.id_docente != request.user:
+            return Response({"error": "No tienes permiso para editar este recurso."}, status=403)
+
+        titulo = request.data.get("titulo")
+        descripcion = request.data.get("descripcion")
+        nuevo_archivo = request.FILES.get("archivo")
+
+        if titulo:
+            recurso.titulorecurso = titulo
+        if descripcion:
+            recurso.descripcion = descripcion
+
+        if nuevo_archivo:
+            from .drive_service import upload_file_to_drive
+            file_id = upload_file_to_drive(nuevo_archivo, nuevo_archivo.name)
+            recurso.recurso = file_id
+
+        recurso.save()
+        return Response({"message": "Recurso actualizado correctamente."})
+    except RecursoApoyo.DoesNotExist:
+        return Response({"error": "Recurso no encontrado."}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -937,10 +997,25 @@ def calificar_respuestas(request):
 
     # 🔁 Si es diagnóstico
     if curso_id is None:
-        # Se puede usar ID_Curso = NULL o 0 para guardar en la tabla
+        # Diagnóstico: asignar nivel al estudiante
+        try:
+            estudiante = Estudiantes.objects.get(usuario=usuario)
+        except Estudiantes.DoesNotExist:
+            return Response({"error": "Usuario no registrado como estudiante."}, status=404)
+
+        if calificacion >= 8:
+            nivel = "Avanzado"
+        elif calificacion >= 6:
+            nivel = "Intermedio"
+        else:
+            nivel = "Básico"
+
+        estudiante.nivelconocimiento = nivel
+        estudiante.save()
+
         Calificaciones.objects.update_or_create(
             id_usuario=usuario,
-            id_curso=None,  # o puedes usar un curso diagnóstico fijo
+            id_curso=None,
             defaults={"calificacion": calificacion}
         )
     else:
