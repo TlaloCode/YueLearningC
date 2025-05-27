@@ -221,10 +221,6 @@ const Login = () => {
                         color: "#555",
                     }}
                 >
-                    <label>
-                        <input type="checkbox" style={{marginRight: "5px"}}/>
-                        Recordarme
-                    </label>
                     <span
                         onClick={() => navigate("/forgot-password")}
                         style={{color: "#003366", cursor: "pointer", textDecoration: "underline"}}

@@ -10,6 +10,8 @@ import pdf from "../assets/pdf.png";
 import AgregarVideo from "../paginas/AgregarVideo";
 import AgregarRecurso from "../paginas/AgregarRecurso";
 import {FaStar,FaEdit, FaChevronLeft, FaPlusCircle, FaTrash } from "react-icons/fa";
+import ErrorModal from "../components/ErrorModal"
+import InformationModal from "../components/InformationModal";
 
 
 const TeacherCourseDetail = () => {
@@ -23,6 +25,13 @@ const TeacherCourseDetail = () => {
     const [videoToDelete, setVideoToDelete] = useState(null);
     const [resourceToDelete, setResourceToDelete] = useState(null);
     const [inscritos, setInscritos] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editItem, setEditItem] = useState(null);
+    const [editTitle, setEditTitle] = useState("");
+    const [editDescription, setEditDescription] = useState("");
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [infoMessage, setInfoMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
 
 
@@ -50,6 +59,15 @@ const TeacherCourseDetail = () => {
         setShowConfirmationModalResource(true);
     };
 
+    const handleEdit = (item, isVideo = true) => {
+        setIsEditing(true);
+        setEditItem({ ...item, isVideo });
+        setEditTitle(isVideo ? item.titulovideo : item.titulorecurso);
+        setEditDescription(item.descripcion);
+        setSelectedFile(null); // en blanco por si no desea cambiar archivo
+    };
+
+
     const confirmDeleteVideo = async () => {
         if (!videoToDelete) return;
 
@@ -64,17 +82,16 @@ const TeacherCourseDetail = () => {
             });
 
             if (response.ok) {
-                alert("Video eliminado exitosamente");
+                setInfoMessage("Video eliminado correctamente");
 
                 // Opcional: recargar videos después de eliminar
                 setVideos(videos.filter(v => v.id_video !== videoToDelete.id_video));
             } else {
                 const data = await response.json();
-                alert("Error al eliminar el video: " + (data.error || "desconocido"));
+                setErrorMessage("Error al eliminar el video"|| data);
             }
         } catch (error) {
-            console.error("Error al eliminar video:", error);
-            alert("Error de conexión al eliminar");
+            setErrorMessage("Error de conexion al eliminar");
         }
 
         setShowConfirmationModalVideo(false);
@@ -95,22 +112,62 @@ const TeacherCourseDetail = () => {
             });
 
             if (response.ok) {
-                alert("Recurso eliminado exitosamente");
+                setInfoMessage("✅ Recurso eliminado correctamente");
 
                 // Actualizar recursos localmente
                 setResources(resources.filter(r => r.id_recurso !== resourceToDelete.id_recurso));
             } else {
                 const data = await response.json();
-                alert("Error al eliminar recurso: " + (data.error || "desconocido"));
+                setErrorMessage("Error al eliminar recurso" || data);
             }
-        } catch (error) {
-            console.error("Error al eliminar recurso:", error);
-            alert("Error de conexión al eliminar recurso");
+        } catch (err) {
+            setErrorMessage("Error de conexión al eliminar");
         }
+
 
         setShowConfirmationModalResource(false);
         setResourceToDelete(null);
+    }
+
+    const confirmEdit = async () => {
+        const token = localStorage.getItem("token");
+        const formData = new FormData();
+        formData.append("titulo", editTitle);
+        formData.append("descripcion", editDescription);
+        if (selectedFile) {
+            formData.append(editItem.isVideo ? "video" : "archivo", selectedFile);
+        }
+
+        const endpoint = editItem.isVideo
+            ? `${API_URL}/editar-video/${editItem.id_video}/`
+            : `${API_URL}/editar-recurso/${editItem.id_recurso}/`;
+
+        try {
+            const response = await fetch(endpoint, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                setInfoMessage("✅ Contenido actualizado correctamente");
+            } else {
+                const error = await response.json();
+                setErrorMessage("❌ Error al actualizar: " + (error?.error || "desconocido"));
+            }
+
+        } catch (err) {
+            setErrorMessage("❌ Error de conexión al actualizar");
+        }
+
+
+
+        setIsEditing(false);
+        setEditItem(null);
     };
+
 
 
 
@@ -195,6 +252,18 @@ const TeacherCourseDetail = () => {
 
     return (
         <div className="app-container">
+            <InformationModal
+                message={infoMessage}
+                onClose={() => {
+                    setInfoMessage("");
+                    window.location.reload();
+                }}
+            />
+
+            <ErrorModal
+                message={errorMessage}
+                onClose={() => setErrorMessage("")}
+            />
             <Header />
 
             <div className="profile-section">
@@ -245,7 +314,8 @@ const TeacherCourseDetail = () => {
                                     />
                                     <p className="video-title">{video.titulovideo}</p>
                                     <div className="video-actions">
-                                        <FaEdit title="Editar" className="edit-icon-react"/>
+                                        <FaEdit title="Editar" className="edit-icon-react"
+                                                onClick={() => handleEdit(video, true)} />
                                         <FaTrash className="delete-icon" title="Eliminar"
                                                  onClick={() => handleDeleteClick(video)}/>
                                     </div>
@@ -273,7 +343,8 @@ const TeacherCourseDetail = () => {
                                         <img src={pdf} alt="PDF" className="pdf-icon"/>
                                     </a>
                                     <p className="resource-title">{resource.titulorecurso}</p>
-                                    <FaEdit className="edit-icon-react"/>
+                                    <FaEdit className="edit-icon-react" title="EditarRes"
+                                            onClick={() => handleEdit(resource, false)} />
                                     <FaTrash className="delete-icon"
                                              onClick={() => handleDeleteRecursoClick(resource)}/>
                                 </div>
@@ -314,6 +385,27 @@ const TeacherCourseDetail = () => {
                     onConfirm={confirmDeleteRecurso}
                 />
             )}
+
+            {isEditing && (
+                <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
+                    <div  className="modal-container" style={{ background: 'white', borderRadius: '10px', padding: '20px', width: '400px', fontFamily: 'Roboto, sans-serif', fontSize: '14px' }}>
+                        <h3 className="modal-title" style={{ marginBottom: '20px', fontSize: '20px', fontWeight: 'bold' }}>Editar {editItem?.isVideo ? "video" : "recurso"}</h3>
+                        <div className="input-group" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <label>Título</label>
+                            <input className="video-input" type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+                            <label>Descripción</label>
+                            <input  className="video-input" type="text" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+                            <label>{editItem?.isVideo ? "Actualizar imagen del video" : "Actualizar archivo del recurso (opcional)"}</label>
+                            <input className="video-input" type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
+                        </div>
+                        <div className="button-group" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', gap: '10px' }}>
+                            <button className="btn btn-danger" onClick={() => setIsEditing(false)} style={{ padding: '8px 16px' }}>Cancelar</button>
+                            <button className="btn btn-success" onClick={confirmEdit} style={{ padding: '8px 16px', background: '#007bff', color: 'white' }}>Guardar cambios</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
 
         </div>
     );

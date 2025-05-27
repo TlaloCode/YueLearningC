@@ -11,12 +11,18 @@ const SideBarMenu = () => {
             <NavLink to={`/lista-videos/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
                 Lista de videos
             </NavLink>
-            <NavLink to={`/evalua-conocimientos/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
-                Cuestionarios
-            </NavLink>
-            <NavLink to={`/compilador/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
-                Practicar
-            </NavLink>
+
+            {[3, 4, 5].includes(Number(courseId)) && (
+                <>
+                    <NavLink to={`/evalua-conocimientos/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
+                        Cuestionarios
+                    </NavLink>
+                    <NavLink to={`/compilador/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
+                        Practicar
+                    </NavLink>
+                </>
+            )}
+
             <NavLink to={`/recursos-apoyo/${courseId}`} className={({isActive}) => isActive ? "active" : ""}>
                 Recursos
             </NavLink>
@@ -25,6 +31,7 @@ const SideBarMenu = () => {
             </NavLink>
         </div>
     );
+
 };
 
 export default SideBarMenu;
