@@ -245,7 +245,7 @@ const Header = () => {
                         }
 
                         try {
-                            const res = await fetch(`http://127.0.0.1:8000/api/buscar-cursos/?q=${encodeURIComponent(query)}`);
+                            const res = await fetch(`${API_URL}/buscar-cursos/?q=${encodeURIComponent(query)}`);
                             if (res.ok) {
                                 const data = await res.json();
                                 setResultados(data);
