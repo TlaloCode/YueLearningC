@@ -37,9 +37,7 @@ int main() {
                     files: [{ content: codigo }],
                     stdin: entrada
                 })
-
             });
-
             const result = await response.json();
             if (result.run) {
                 setSalida(result.run.output || "Sin salida");

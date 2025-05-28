@@ -82,7 +82,12 @@ const EvaluaConocimientos = () => {
             if (response.ok) {
                 const result = await response.json();
                 setInfoMessage(`✅ Tu calificación es: ${result.calificacion}`);
-                setRespuestasCorrectas(result.correctas);
+                const correctasMap = {};
+                result.detalle.forEach(item => {
+                    correctasMap[item.id_pregunta] = item.id_correcta;
+                });
+                setRespuestasCorrectas(correctasMap);
+
                 setMostrarResultados(true);
             } else {
                 const errorData = await response.json();
