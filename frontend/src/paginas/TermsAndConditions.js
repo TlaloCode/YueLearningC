@@ -44,7 +44,7 @@ const TermsAndConditions = () => {
                     programación C. Al utilizar nuestra página web, aceptas cumplir con los términos y condiciones aquí
                     descritos.
                 </p>
-                <h3>Registro y Uso de la aplicación web</h3>
+                <h3>Registro y uso de la aplicación web</h3>
                 <p>
                     Para registrarse en la aplicación web, debe de proporcionar información real, como su correo
                     electrónico institucional y nombre de usuario.<br/>
@@ -55,7 +55,7 @@ const TermsAndConditions = () => {
                 </p>
                 <h3>Uso del contenido</h3>
                 <p>
-                    El contenido proporcionado (videos, cuestionarios, ejercicios prácticos, y más) es para uso
+                El contenido proporcionado (videos, cuestionarios, ejercicios prácticos, y más) es para uso
                     exclusivo en la enseñanza de programación.<br/>
                     Está prohibido copiar, distribuir o comercializar los materiales sin autorización.
                 </p>

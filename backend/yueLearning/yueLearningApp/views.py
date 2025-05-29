@@ -9,6 +9,7 @@ import httplib2
 import json
 from decouple import config
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from math import ceil
 from io import BytesIO
 from django.db.models import Q
@@ -194,17 +195,17 @@ def verificar_correo(request):
     try:
         token_obj = EmailVerificationToken.objects.get(token=token)
     except EmailVerificationToken.DoesNotExist:
-        return redirect('/correo-no-verificado')  # puedes crear esta ruta para errores
+        return redirect('https://yuelearningc-production.up.railway.app/correo-no-verificado')  # puedes crear esta ruta para errores
 
     if now() > token_obj.fecha_expiracion:
-        return redirect('/correo-expirado')  # opcional
+        return redirect('https://yuelearningc-production.up.railway.app/correo-expirado')  # opcional
 
     usuario = token_obj.usuario_id
     usuario.estatuscorreo = "Verificado"
     usuario.save()
     token_obj.delete()
 
-    return redirect('/correoVerificado')  # 🔁 esta es tu ruta React
+    return redirect('https://yuelearningc-production.up.railway.app/correoVerificado')  # 🔁 esta es tu ruta React
 
 @api_view(['GET'])
 def buscar_cursos(request):
