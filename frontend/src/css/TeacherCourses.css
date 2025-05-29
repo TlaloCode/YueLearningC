@@ -86,7 +86,7 @@
     background: white;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 500px; /* Aumentar el tamaño del cuadro */
     height: 380px; /* Aumentar la altura */
     text-align: center;
@@ -95,7 +95,7 @@
 
 .course-card:hover {
     transform: scale(1.05); /* Efecto de zoom al pasar el mouse */
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .course-image {
@@ -127,4 +127,139 @@ h3 {
 
 .btn-arrow:hover {
     background: #ddd;
+}
+
+.delete-icon {
+    color: red;
+    cursor: pointer;
+    font-size: 18px; /* ✅ Aumenta el tamaño del ícono */
+    transition: transform 0.2s ease-in-out;
+}
+
+.delete-icon:hover {
+    transform: scale(1.2); /* ✅ Efecto al pasar el mouse */
+}
+
+.edit-icon-react {
+    color: #0066cc;
+    cursor: pointer;
+    font-size: 18px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4); /* gris oscuro translúcido */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+
+.modal-container {
+    background-color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    width: 80%;
+    max-width: 450px;
+    text-align: center;
+    font-size: 14px;
+    z-index: 10000;
+}
+
+
+.modal-container input[type="text"],
+.modal-container input[type="file"] {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
+    align-content: center;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-actions button:first-child {
+    background-color: #ccc;
+    color: black;
+}
+
+.modal-actions button:last-child {
+    background-color: #0077DD;
+    color: white;
+}
+
+.modal-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-actions button:first-child {
+    background-color: #ccc;
+    color: black;
+}
+
+.modal-actions button:last-child {
+    background-color: #0077DD;
+    color: white;
+}
+
+/* Animación */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.course-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.course-actions .icon {
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.course-actions .icon:hover {
+    transform: scale(1.2);
+}
+
+.course-actions .edit {
+    color: #007bff;
+}
+
+.course-actions .delete {
+    color: #dc3545;
 }

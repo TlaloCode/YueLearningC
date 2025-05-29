@@ -90,7 +90,7 @@ const InscribirCurso = () => {
             <Header />
 
             <div className="course-content">
-                <div className="back-button">
+                <div className="back-button"  onClick={() => navigate(-1)}>
                     <FaArrowLeft /> <span>Atrás</span>
                 </div>
 

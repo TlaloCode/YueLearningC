@@ -7,7 +7,7 @@ from .views import get_course_videos, get_profile_photo, get_teacher_photo, subi
 from .views import subir_recurso, get_course_resource, delete_video, delete_recurso, calificar_respuestas
 from .views import obtener_preguntas_por_curso, get_diagnostico, get_podio, eliminar_cuenta, recuperar_contrasena
 from .views import calificar_curso, buscar_cursos, get_problemas_por_curso, inscritos_por_curso, notificar_actualizacion
-from .views import editar_video, editar_recurso
+from .views import editar_video, editar_recurso, eliminar_curso, editar_curso
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -48,7 +48,8 @@ urlpatterns = [
     path('podio/', get_podio, name='get_podio'),
     path("calificar-curso/", calificar_curso),
     path("eliminar-cuenta/", eliminar_cuenta),
-
+    path('editar-curso/<int:id>/', editar_curso),
+    path('eliminar-curso/<int:id>/', eliminar_curso),
 
 
 ]

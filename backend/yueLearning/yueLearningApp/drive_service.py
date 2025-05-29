@@ -46,17 +46,19 @@ def upload_file_to_drive(file_obj, filename, folder_id=None):
         if folder_id:
             file_metadata['parents'] = [folder_id]
 
-        # Detectar el tipo MIME del archivo desde el objeto recibido (Django lo proporciona)
         mimetype = getattr(file_obj, 'content_type', 'application/octet-stream')
 
+        # 🔁 Convertir a stream
+        file_stream = io.BytesIO(file_obj.read())
+        file_stream.seek(0)
+
         media = MediaIoBaseUpload(
-            file_obj,
+            file_stream,
             mimetype=mimetype,
-            chunksize=1024 * 1024,  # 1MB
+            chunksize=1024 * 1024,
             resumable=True
         )
 
-        # Subir el archivo
         uploaded_file = service.files().create(
             body=file_metadata,
             media_body=media,
@@ -65,7 +67,6 @@ def upload_file_to_drive(file_obj, filename, folder_id=None):
 
         file_id = uploaded_file.get('id')
 
-        # Hacer el archivo público
         service.permissions().create(
             fileId=file_id,
             body={'role': 'reader', 'type': 'anyone'}

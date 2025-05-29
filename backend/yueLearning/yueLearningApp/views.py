@@ -32,6 +32,7 @@ from .models import Cuestionario, Pregunta, Opcion
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+from .gmail_api import send_email_gmail  # ajusta el path si lo pones en otra carpeta
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
@@ -109,6 +110,7 @@ def registrar_usuario(request):
         recipient_list=[data.get("correoelectronico")],
         fail_silently=False,
     )
+
 
     return Response({"message": "Usuario registrado con éxito. Verifica tu correo."}, status=status.HTTP_201_CREATED)
 
@@ -192,16 +194,17 @@ def verificar_correo(request):
     try:
         token_obj = EmailVerificationToken.objects.get(token=token)
     except EmailVerificationToken.DoesNotExist:
-        return Response({"error": "Token inválido o ya utilizado."}, status=status.HTTP_400_BAD_REQUEST)
+        return redirect('/correo-no-verificado')  # puedes crear esta ruta para errores
 
     if now() > token_obj.fecha_expiracion:
-        return Response({"error": "El enlace de verificación ha expirado."}, status=status.HTTP_400_BAD_REQUEST)
+        return redirect('/correo-expirado')  # opcional
 
     usuario = token_obj.usuario_id
     usuario.estatuscorreo = "Verificado"
     usuario.save()
     token_obj.delete()
-    return Response({"message": "Correo verificado con éxito. Ya puedes iniciar sesión."}, status=status.HTTP_200_OK)
+
+    return redirect('/correoVerificado')  # 🔁 esta es tu ruta React
 
 @api_view(['GET'])
 def buscar_cursos(request):
@@ -910,12 +913,15 @@ def notificar_actualizacion(request, id_curso):
 
 @api_view(['GET'])
 def obtener_preguntas_por_curso(request, courseId):
+    #Obtener las preguntas que estas relacionadas al curso
     cuestionarios = Cuestionario.objects.filter(id_curso=courseId)
 
     data = []
+    #Buscar entre las preguntas las asociadas al cuestionario
     for cuestionario in cuestionarios:
         preguntas = Pregunta.objects.filter(id_cuestionario=cuestionario)
         preguntas_data = []
+        #Construir la respuesta con las preguntas y sus opciones
         for pregunta in preguntas:
             opciones = Opcion.objects.filter(id_pregunta=pregunta)
             preguntas_data.append({
@@ -974,13 +980,13 @@ def get_diagnostico(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def calificar_respuestas(request):
+    #Obtener las preguntas contestadas junto con su respuesta
     respuestas = request.data.get("respuestas", {})  # { ID_Pregunta: ID_OpcionSeleccionada }
     curso_id = request.data.get("curso", None)
     usuario = request.user
-
     correctas = 0
     total = 0
-
+    #Verificar en la base de datos cuales preguntas son correctas y contarlas para la puntuación
     for id_pregunta, id_opcion in respuestas.items():
         try:
             opcion = Opcion.objects.get(id_opciones=id_opcion, id_pregunta=id_pregunta)
@@ -989,10 +995,9 @@ def calificar_respuestas(request):
             total += 1
         except Opcion.DoesNotExist:
             continue
-
+    #Excepcion por si se envió el cuestionario sin resolver
     if total == 0:
         return Response({"error": "No se enviaron respuestas válidas."}, status=400)
-
     calificacion = round((correctas / total) * 10, 1)
 
     # 🔁 Si es diagnóstico
@@ -1105,6 +1110,46 @@ def get_podio(request):
         "top": lista_podio[:10],
         "mi_posicion": mi_posicion
     })
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def editar_curso(request, id):
+    try:
+        curso = Curso.objects.get(id_curso=id, id_docente=request.user)
+    except Curso.DoesNotExist:
+        return Response({"error": "Curso no encontrado o no autorizado."}, status=404)
+
+    nombre = request.data.get("nombrecurso", curso.nombrecurso)
+    imagen = request.FILES.get("imagen", None)
+
+    curso.nombrecurso = nombre
+
+    if imagen:
+        try:
+            file_id = upload_file_to_drive(imagen, imagen.name)
+            curso.imagen_url = file_id
+        except Exception as e:
+            return Response({"error": f"No se pudo subir la imagen: {str(e)}"}, status=500)
+
+    curso.save()
+    return Response({"message": "Curso actualizado con éxito."})
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_curso(request, id):
+    try:
+        curso = Curso.objects.get(id_curso=id, id_docente=request.user)
+    except Curso.DoesNotExist:
+        return Response({"error": "Curso no encontrado o no autorizado."}, status=404)
+
+    # Elimina videos y recursos del curso
+    Video.objects.filter(id_curso=curso).delete()
+    RecursoApoyo.objects.filter(id_curso=curso).delete()
+    Inscripciones.objects.filter(id_curso=curso).delete()
+    Calificaciones.objects.filter(id_curso=curso).delete()
+
+    curso.delete()
+    return Response({"message": "Curso eliminado correctamente."})
 
 
 @api_view(['DELETE'])
