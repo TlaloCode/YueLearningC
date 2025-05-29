@@ -32,6 +32,7 @@ from .models import Cuestionario, Pregunta, Opcion
 from .serializers import UsuarioSerializer, EstudianteSerializer, DocenteSerializer
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+from .gmail_api import send_email_gmail  # ajusta el path si lo pones en otra carpeta
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
@@ -109,6 +110,7 @@ def registrar_usuario(request):
         recipient_list=[data.get("correoelectronico")],
         fail_silently=False,
     )
+
 
     return Response({"message": "Usuario registrado con éxito. Verifica tu correo."}, status=status.HTTP_201_CREATED)
 
@@ -192,16 +194,17 @@ def verificar_correo(request):
     try:
         token_obj = EmailVerificationToken.objects.get(token=token)
     except EmailVerificationToken.DoesNotExist:
-        return Response({"error": "Token inválido o ya utilizado."}, status=status.HTTP_400_BAD_REQUEST)
+        return redirect('/correo-no-verificado')  # puedes crear esta ruta para errores
 
     if now() > token_obj.fecha_expiracion:
-        return Response({"error": "El enlace de verificación ha expirado."}, status=status.HTTP_400_BAD_REQUEST)
+        return redirect('/correo-expirado')  # opcional
 
     usuario = token_obj.usuario_id
     usuario.estatuscorreo = "Verificado"
     usuario.save()
     token_obj.delete()
-    return Response({"message": "Correo verificado con éxito. Ya puedes iniciar sesión."}, status=status.HTTP_200_OK)
+
+    return redirect('/correoVerificado')  # 🔁 esta es tu ruta React
 
 @api_view(['GET'])
 def buscar_cursos(request):

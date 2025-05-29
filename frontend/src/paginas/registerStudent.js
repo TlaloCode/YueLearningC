@@ -62,7 +62,6 @@ const RegisterStudent = () => {
                     confirm_password: "",
                     termsAccepted: false,
                 });
-                navigate("/login");
             } else {
                 setErrorMessage(data.error || "Ocurrió un error en el registro");
 
@@ -77,7 +76,14 @@ const RegisterStudent = () => {
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
+            <InformationModal message={InformationMessage} onClose={() => {
+                setInformationMessage("");
+                if (InformationMessage === "Usuario registrado con éxito. Verifica tu correo.") {
+                    navigate(`/login`);
+                }else {
+                    navigate(`/home`);
+                }
+            }} />
             <Header/>
             <div
                 style={{

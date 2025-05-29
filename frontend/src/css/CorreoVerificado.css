@@ -1,0 +1,74 @@
+.verificacion-wrapper {
+    min-height: 100vh;
+    background-image: url("../Img/ESCOM.jpeg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+
+.verificacion-content {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    padding: 40px;
+    max-width: 800px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+
+.verificacion-texto {
+    flex: 1;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.verificacion-texto h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1c1c4c;
+    margin-bottom: 20px;
+}
+
+.verificacion-texto p {
+    font-size: 15px;
+    color: #444;
+    margin-bottom: 30px;
+}
+
+.btn-listo {
+    display: inline-block;
+    background-color: #0077DD;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-listo:hover {
+    background-color: #0066cc;
+}
+
+.verificacion-imagen {
+    flex: 1;
+    background: #fffbe6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+}
+
+.verificacion-imagen img {
+    max-width: 100%;
+    height: auto;
+}

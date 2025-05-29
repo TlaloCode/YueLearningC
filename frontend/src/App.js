@@ -22,6 +22,7 @@ import Diagnostico from "./paginas/Diagnostico";
 import Compilador from "./paginas/Compilador";
 import Podio from "./paginas/Podio";
 import VistaVideo from "./paginas/VistaVideo";
+import CorreoVerificado from "./paginas/CorreoVerificado";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -36,6 +37,7 @@ const App = () => {
               <Route path="/login" element={<Login/>} />
               <Route path="/registerStudent" element={<RegisterStudent/>}/>
               <Route path="/registerTeacher" element={<RegisterTeacher/>}/>
+              <Route path="/correoVerificado" element={<CorreoVerificado/>}/>
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />

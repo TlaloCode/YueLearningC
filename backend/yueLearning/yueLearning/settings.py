@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'yueLearning.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django', #'django.db.backends.mysql' 'mysql.connector.django'
+        'ENGINE': 'django.db.backends.mysql', #'django.db.backends.mysql' 'mysql.connector.django'
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
