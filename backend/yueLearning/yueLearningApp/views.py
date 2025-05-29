@@ -195,17 +195,17 @@ def verificar_correo(request):
     try:
         token_obj = EmailVerificationToken.objects.get(token=token)
     except EmailVerificationToken.DoesNotExist:
-        return redirect('https://yuelearningc-production.up.railway.app/correo-no-verificado')  # puedes crear esta ruta para errores
+        return redirect('https://yue-learningc.netlify.app/correo-no-verificado')  # puedes crear esta ruta para errores
 
     if now() > token_obj.fecha_expiracion:
-        return redirect('https://yuelearningc-production.up.railway.app/correo-expirado')  # opcional
+        return redirect('https://yue-learningc.netlify.app/correo-expirado')  # opcional
 
     usuario = token_obj.usuario_id
     usuario.estatuscorreo = "Verificado"
     usuario.save()
     token_obj.delete()
 
-    return redirect('https://yuelearningc-production.up.railway.app/correoVerificado')  # 🔁 esta es tu ruta React
+    return redirect('https://yue-learningc.netlify.app/correoVerificado')  # 🔁 esta es tu ruta React
 
 @api_view(['GET'])
 def buscar_cursos(request):
