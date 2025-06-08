@@ -100,7 +100,7 @@ def registrar_usuario(request):
     send_mail(
         subject="Verifica tu correo electrónico",
         message=f"Hola, verifica tu correo aquí: {verification_link}",
-        from_email="ulises21.uligom@gmail.com",
+        from_email="yuelearning2025a011@gmail.com",
         recipient_list=[data.get("correoelectronico")],
         fail_silently=False,
     )
