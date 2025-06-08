@@ -58,35 +58,29 @@ def validar_contrasena(password):
         return "La contraseña debe incluir al menos una letra minúscula."
     if not re.search(r"\d", password):
         return "La contraseña debe incluir al menos un número."
-    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+    if not re.search(r"[!+-@_#$%^&*(),.?\":{}|<>]", password):
         return "La contraseña debe incluir al menos un carácter especial."
     return None
 
 @api_view(['POST'])
 def registrar_usuario(request):
     data = request.data
-    print(data)
     rol = data.get("rol")  # Puede ser 'estudiante' o 'docente'
-
     if rol not in ["estudiante", "docente"]:
         return Response({"error": "Rol no válido."}, status=status.HTTP_400_BAD_REQUEST)
-
+    if not data.get("nickname") or not data.get("nombre"):
+            return Response({"error": "Por favor, ingrese un nombre de usuario"}, status=status.HTTP_400_BAD_REQUEST)
     error_contrasena = validar_contrasena(data.get('contrasena'))
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
-
     if not data.get("contrasena") == data.get("confirm_password") :
-        print("Hola")
         return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
-
     if Usuario.objects.filter(correoelectronico=data.get('correoelectronico')).exists():
         return Response({"error": "El correo electrónico ya está registrado."}, status=status.HTTP_400_BAD_REQUEST)
-
     usuario = Usuario.objects.create_user(
         correoelectronico=data.get("correoelectronico"),
         password=data.get("contrasena")
     )
-
     if rol == "estudiante":
         Estudiantes.objects.create(usuario=usuario, nickname=data.get("nickname"),contrasena=data.get("contrasena"))
     else:
@@ -100,19 +94,16 @@ def registrar_usuario(request):
             descripcionperfil=data.get("descripcionperfil"),
             contrasena=data.get("contrasena")
         )
-
     token = uuid.uuid4()
     EmailVerificationToken.objects.create(usuario_id=usuario, token=token, fecha_expiracion=now() + timedelta(hours=24))
     verification_link = f"https://yuelearningc-production.up.railway.app/api/verify-email/?token={token}"
     send_mail(
         subject="Verifica tu correo electrónico",
         message=f"Hola, verifica tu correo aquí: {verification_link}",
-        from_email="yuelearning2025a011@gmail.com",
+        from_email="ulises21.uligom@gmail.com",
         recipient_list=[data.get("correoelectronico")],
         fail_silently=False,
     )
-
-
     return Response({"message": "Usuario registrado con éxito. Verifica tu correo."}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
@@ -120,7 +111,6 @@ def login_usuario(request):
     data = request.data
     correo = data.get("correoelectronico")
     password = data.get("contrasena")
-    print(data)
     usuario = Usuario.objects.filter(correoelectronico=correo).first()
     if not usuario:
         return Response({"error": "Correo o contraseña incorrectos."},
@@ -137,7 +127,6 @@ def login_usuario(request):
 
     # Determinar el rol del usuario
     rol = "estudiante" if Estudiantes.objects.filter(usuario=usuario).exists() else "docente" if Docente.objects.filter(usuario=usuario).exists() else "usuario"
-    print(rol)
     return Response({
         "message": "Inicio de sesión exitoso.",
         "token": str(refresh.access_token),
@@ -205,7 +194,7 @@ def verificar_correo(request):
     usuario.save()
     token_obj.delete()
 
-    return redirect('https://yuelearningc-production.up.railway.app/correoVerificado')  # 🔁 esta es tu ruta React
+    return redirect('https://yue-learningc.netlify.app/correoVerificado')  # 🔁 esta es tu ruta React
 
 @api_view(['GET'])
 def buscar_cursos(request):
@@ -281,7 +270,6 @@ def update_user_profile(request):
         try:
             docente = Docente.objects.get(usuario=usuario)
             docente.nombre = data.get("nombre", docente.nombre)
-            print(data.get('password'))
             error_contrasena = validar_contrasena(data.get('password'))
             if error_contrasena:
                 return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
@@ -493,20 +481,19 @@ def get_course_details(request, course_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def inscribir_curso(request):
-    estudiante = request.user
-    curso_id = request.data.get("curso_id")
-
+    estudiante = request.user #Obtener usuario estudiante
+    curso_id = request.data.get("curso_id") #Obtener el identificador del curso
     try:
-        curso = Curso.objects.get(id_curso=curso_id)
-    except Curso.DoesNotExist:
+        curso = Curso.objects.get(id_curso=curso_id) #Buscar el curso en la base de datos con su Identificador
+    except Curso.DoesNotExist:                       #Si el curso no se encuentra, se envia un error 404
         return Response({"error": "Curso no encontrado"}, status=404)
 
     # Verificar si ya está inscrito
-    if Inscripciones.objects.filter(id_usuario=estudiante, id_curso=curso).exists():
+    if Inscripciones.objects.filter(id_usuario=estudiante, id_curso=curso).exists():   #Registro en la base de datos
         return Response({"error": "Ya estás inscrito en este curso"}, status=400)
 
     # Crear inscripción
-    Inscripciones.objects.create(id_usuario=estudiante, id_curso=curso)
+    Inscripciones.objects.create(id_usuario=estudiante, id_curso=curso)                #Crear el registro en la base de datos
     return Response({"message": "Inscripción exitosa"})
 
 @api_view(['POST'])
@@ -579,9 +566,7 @@ def get_course_videos(request, course_id):
                 "description": video.descripcion,
                 "video": video.video,  # Aquí va la URL o el enlace del video
             })
-
         return Response(videos_data)
-
     except Curso.DoesNotExist:
         return Response({"error": "Curso no encontrado"}, status=404)
 
@@ -611,7 +596,6 @@ def get_course_resource(request, course_id):
 @api_view(['GET'])
 def get_teacher_photo(request, file_id):
     try:
-        print(file_id)
         drive_url = f"https://drive.google.com/uc?export=download&id={file_id}"
         response = requests.get(drive_url)
 
@@ -706,7 +690,7 @@ def delete_video(request, id_video):
             # Aquí 'video.video' es el file_id
             service.files().delete(fileId=video.video).execute()
         except Exception as drive_error:
-            print(f"⚠️ No se pudo eliminar el archivo de Drive: {drive_error}")
+            return Response({"error": str(drive_error)}, status=500)
 
         # Ahora eliminar de la base de datos
         video.delete()
@@ -716,7 +700,6 @@ def delete_video(request, id_video):
     except Video.DoesNotExist:
         return Response({"error": "Video no encontrado."}, status=404)
     except Exception as e:
-        print("❌ Error al eliminar video:", str(e))
         return Response({"error": str(e)}, status=500)
 
 @api_view(['PUT'])
@@ -790,7 +773,6 @@ def subir_recurso(request, id_curso):
         return Response({"message": "Recurso subido y registrado correctamente.", "file_id": file_id})
 
     except Exception as e:
-        print("Error en subir_recurso:", e)
         return Response({"error": str(e)}, status=500)
 
 
@@ -810,7 +792,7 @@ def delete_recurso(request, id_recurso):
 
             service.files().delete(fileId=recurso.urlrecurso).execute()
         except Exception as drive_error:
-            print(f"⚠️ No se pudo eliminar el archivo de Drive: {drive_error}")
+            return Response({"error": str(drive_error)}, status=500)
 
         # Ahora eliminar de la base de datos
         recurso.delete()
@@ -820,7 +802,6 @@ def delete_recurso(request, id_recurso):
     except RecursoApoyo.DoesNotExist:
         return Response({"error": "Recurso no encontrado."}, status=404)
     except Exception as e:
-        print("❌ Error al eliminar recurso:", str(e))
         return Response({"error": str(e)}, status=500)
 
 

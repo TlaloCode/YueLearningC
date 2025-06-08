@@ -80,7 +80,7 @@ const StudentCourses = () => {
     }, [API_URL]);
 
     const getTeacherPhotoURL = (fileId) =>
-        fileId ? `http://127.0.0.1:8000/api/teacher-photo/${fileId}/` : teacherImage;
+        fileId ? `${API_URL}/teacher-photo/${fileId}/` : teacherImage;
 
     const construirURLDrive = (idImagen) => {
         if (!idImagen) return genericCourse;

@@ -4,12 +4,15 @@ import "@fontsource/roboto"
 import Header from "../components/HeaderLogin";
 import Footer from "../components/footer"
 import escom from "../Img/ESCOM.jpeg";
+import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import ErrorModal from "../components/ErrorModal"
 import InformationModal from "../components/InformationModal";
 
 const RegisterStudent = () => {
     const API_URL = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     // Definimos el estado para los datos del formulario
     const [formData, setFormData] = useState({
         nickname: "",
@@ -74,7 +77,24 @@ const RegisterStudent = () => {
 
 
     return (
+
         <div>
+                <style>
+                    {`
+      input[type="password"]::-ms-reveal,
+      input[type="password"]::-ms-clear,
+      input[type="password"]::-webkit-credentials-auto-fill-button,
+      input[type="password"]::-webkit-input-decoration-container,
+      input[type="password"]::-webkit-inner-spin-button,
+      input[type="password"]::-webkit-clear-button {
+        display: none !important;
+      }
+
+      input[type="password"]::-webkit-textfield-decoration-container {
+        display: none !important;
+      }
+    `}
+                </style>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
             <InformationModal message={InformationMessage} onClose={() => {
                 setInformationMessage("");
@@ -182,21 +202,24 @@ const RegisterStudent = () => {
                         {/* Campo Contraseña */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
                             <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Contraseña</label>
-                            <div style={{position: "relative"}}>
+                            <div style={{position: "relative", width: "100%", marginBottom: "20px"}}>
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
+                                    placeholder="Contraseña"
                                     style={{
                                         width: "100%",
-                                        padding: "10px 10px 10px 40px",
+                                        padding: "10px 40px 10px 40px",
                                         borderRadius: "20px",
                                         border: "1px solid #ccc",
                                         outline: "none",
                                         fontFamily: "Roboto, sans-serif",
                                     }}
                                 />
+
+                                {/* Ícono de candado a la izquierda */}
                                 <span
                                     style={{
                                         position: "absolute",
@@ -206,29 +229,47 @@ const RegisterStudent = () => {
                                         color: "#aaa",
                                     }}
                                 >
-                <i className="fa fa-lock"></i>
-              </span>
+                                <FaLock/>
+                              </span>
+
+                                {/* Ícono para mostrar u ocultar contraseña a la derecha */}
+                                <span
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        right: "10px",
+                                        transform: "translateY(-50%)",
+                                        cursor: "pointer",
+                                        color: "#aaa",
+                                    }}
+                                >
+                                {showPassword ? <FaEyeSlash/> : <FaEye/>}
+                              </span>
                             </div>
                         </div>
 
                         {/* Campo Confirmar Contraseña */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
                             <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Confirmar contraseña</label>
-                            <div style={{position: "relative"}}>
+                            <div style={{position: "relative", width: "100%", marginBottom: "20px"}}>
                                 <input
-                                    type="password"
+                                    type={showConfirmPassword ? "text" : "password"}
                                     name="confirm_password"
                                     value={formData.confirm_password}
                                     onChange={handleChange}
+                                    placeholder="Confirmar contraseña"
                                     style={{
                                         width: "100%",
-                                        padding: "10px 10px 10px 40px",
+                                        padding: "10px 40px 10px 40px",
                                         borderRadius: "20px",
                                         border: "1px solid #ccc",
                                         outline: "none",
                                         fontFamily: "Roboto, sans-serif",
                                     }}
                                 />
+
+                                {/* Candado */}
                                 <span
                                     style={{
                                         position: "absolute",
@@ -238,9 +279,25 @@ const RegisterStudent = () => {
                                         color: "#aaa",
                                     }}
                                 >
-                <i className="fa fa-lock"></i>
-              </span>
+                                <FaLock/>
+                              </span>
+
+                                {/* Ojito */}
+                                <span
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    style={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        right: "10px",
+                                        transform: "translateY(-50%)",
+                                        cursor: "pointer",
+                                        color: "#aaa",
+                                    }}
+                                >
+                            {showConfirmPassword ? <FaEyeSlash/> : <FaEye/>}
+                          </span>
                             </div>
+
                         </div>
 
                         {/* Checkbox de términos */}

@@ -178,8 +178,11 @@ const Header = () => {
                             <button
                                 style={menuBtnStyle}
                                 onClick={() => {
-                                    if (!usuario) return;
-                                    navigate("/diagnostico");
+                                    if (!usuario) {
+                                        navigate("/login");
+                                    } else {
+                                        navigate("/diagnostico");
+                                    }
                                 }}
 
                             >
@@ -188,8 +191,10 @@ const Header = () => {
                             <button
                                 style={menuBtnStyle}
                                 onClick={() => {
-                                    if (!usuario) return;
-                                    handleMisCursos();
+                                    if (!usuario) {
+                                        navigate("/login");
+                                    }else{
+                                    handleMisCursos();}
                                 }}
 
                             >
@@ -198,8 +203,10 @@ const Header = () => {
                             <button
                                 style={menuBtnStyle}
                                 onClick={() => {
-                                    if (!usuario) return;
-                                    navigate("/podio");
+                                    if (!usuario){
+                                        navigate("/login");}
+                                    else
+                                    {navigate("/podio");}
                                 }}
 
                             >
@@ -236,13 +243,7 @@ const Header = () => {
                             return;
                         }
 
-                        const token = localStorage.getItem("token");
-                        const rol = localStorage.getItem("rol");
 
-                        if (!token || rol !== "estudiante") {
-                            setResultados([]);
-                            return;
-                        }
 
                         try {
                             const res = await fetch(`${API_URL}/buscar-cursos/?q=${encodeURIComponent(query)}`);
@@ -284,10 +285,15 @@ const Header = () => {
                             <div
                                 key={curso.id}
                                 onClick={() => {
-                                    navigate(`/inscribir-curso/${curso.id}`);
+                                    if (!usuario) {
+                                        navigate("/login");
+                                    } else {
+                                        navigate(`/inscribir-curso/${curso.id}`);
+                                    }
                                     setResultados([]);
                                     setBusqueda("");
                                 }}
+
                                 style={{
                                     padding: "10px",
                                     cursor: "pointer",

@@ -32,20 +32,20 @@ int main() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    language: "c",
-                    version: "10.2.0",
-                    files: [{ content: codigo }],
+                    language: "c",                //Lenguaje de programación C
+                    version: "10.2.0",            //Versión del GCC
+                    files: [{ content: codigo }], //Enviar el código
                     stdin: entrada
                 })
             });
-            const result = await response.json();
+            const result = await response.json(); //Resultado
             if (result.run) {
                 setSalida(result.run.output || "Sin salida");
             } else {
                 setSalida("Error al ejecutar.");
             }
         } catch (error) {
-            console.error("Error al ejecutar:", error);
+            console.error("Error al ejecutar:", error); //
             setSalida("Error de conexión.");
         }
     };

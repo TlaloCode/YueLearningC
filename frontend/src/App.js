@@ -11,6 +11,8 @@ import TeacherProfile from "./paginas/TeacherProfile";
 import StudentProfile from "./paginas/StudentProfile";
 import TeacherCourses from "./paginas/TeacherCourses";
 import CreateCourse from "./paginas/CreateCourse";
+import AgregarVideo from "./paginas/AgregarVideo";
+import AgregarRecurso from "./paginas/AgregarRecurso";
 import StudentCourses from "./paginas/StudentCourses";
 import TeacherCourseDetail from "./paginas/TeacherCourseDetail";
 import InscribirCurso from "./paginas/InscribirCurso";
@@ -46,6 +48,8 @@ const App = () => {
               <Route path="/perfil-estudiante" element={<StudentProfile />} />
               <Route path="/mis-cursos" element={<TeacherCourses />} />
               <Route path="/crear-curso" element={<CreateCourse />} />
+              <Route path="/agregar-video/:courseId" element={<AgregarVideo />} />
+              <Route path="/agregar-recurso/:courseId" element={<AgregarRecurso />} />
               <Route path="/mis-cursos-estudiante" element={<StudentCourses />} />
               <Route path="/curso-detalle" element={<TeacherCourseDetail />} />
               <Route path="/teacher-course-detail/:courseId" element={<TeacherCourseDetail />} />

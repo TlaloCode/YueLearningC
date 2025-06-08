@@ -34,31 +34,28 @@ def build_service():
 
     service = build('drive', 'v3', credentials=credentials)
     return service
+
 # 🔹 Subir archivo a Google Drive
 def upload_file_to_drive(file_obj, filename, folder_id=None):
     try:
         service = build_service()
     except Exception as e:
         raise Exception(f"❌ No se pudo construir el servicio de Google Drive: {str(e)}")
-
     try:
         file_metadata = {'name': filename}
         if folder_id:
             file_metadata['parents'] = [folder_id]
 
         mimetype = getattr(file_obj, 'content_type', 'application/octet-stream')
-
         # 🔁 Convertir a stream
         file_stream = io.BytesIO(file_obj.read())
         file_stream.seek(0)
-
         media = MediaIoBaseUpload(
             file_stream,
             mimetype=mimetype,
             chunksize=1024 * 1024,
             resumable=True
         )
-
         uploaded_file = service.files().create(
             body=file_metadata,
             media_body=media,

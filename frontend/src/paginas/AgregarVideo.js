@@ -6,9 +6,10 @@ import PantallaCarga from "../components/PantallaCarga";
 import InformationModal from "../components/InformationModal";
 import ErrorModal from "../components/ErrorModal";
 
-const AgregarVideo = ({ onClose }) => {
+const AgregarVideo = ({ onClose, modoLocal = false, onSave, courseIdProp }) => {
     const API_URL = process.env.REACT_APP_API_URL;
-    const { courseId } = useParams();
+    const { courseId: courseIdURL } = useParams();
+    const courseId = courseIdProp || courseIdURL;
     const [videoTitle, setVideoTitle] = useState("");
     const [videoFile, setVideoFile] = useState(null);
     const [videoDescription, setVideoDescription] = useState("");
@@ -45,6 +46,18 @@ const AgregarVideo = ({ onClose }) => {
                 return prev + 5;
             });
         }, 2000);
+        if (modoLocal) {
+            alert("📦 Video guardado localmente");
+            onSave({
+                titulo: videoTitle,
+                descripcion: videoDescription,
+                archivo: videoFile
+            });
+            setIsLoading(false);
+            onClose();
+            return;
+        }
+
         try {
             const response = await fetch(`${API_URL}/subir-video/${courseId}/`, {
                 method: "POST",
@@ -85,9 +98,27 @@ const AgregarVideo = ({ onClose }) => {
 
 
     return (
-        <div className="modal-overlay">
+
+        <div className="modal-overlay"
+             style={{
+                 position: "fixed",
+                 top: 0,
+                 left: 0,
+                 width: "100vw",
+                 height: "100vh",
+                 backgroundColor: "rgba(0, 0, 0, 0.5)",
+                 display: "flex",
+                 justifyContent: "center",
+                 alignItems: "center",
+                 zIndex: 9999,
+             }}>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={infoMessage} onClose={() => {setInfoMessage("");window.location.reload();}} />
+            <InformationModal
+                message={infoMessage}
+                onClose={() => {
+                    setInfoMessage("");
+                    window.location.reload();
+                }}
             />
             <div className="modal-container">
                 <h2 className="modal-title">Agregar Video</h2>
@@ -114,7 +145,7 @@ const AgregarVideo = ({ onClose }) => {
 
                     <div className="upload-container">
                         <label htmlFor="video-upload" className="upload-area">
-                            <FaUpload className="upload-icon" />
+                            <FaUpload className="upload-video-icon" />
                             <input
                                 type="file"
                                 id="video-upload"
@@ -164,8 +195,6 @@ const AgregarVideo = ({ onClose }) => {
                 </form>
             </div>
             {isLoading && <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..."  porcentaje={progreso}/>}
-
-
         </div>
     );
 };
