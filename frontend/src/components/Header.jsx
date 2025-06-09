@@ -87,33 +87,6 @@ const Header = () => {
         else if (usuario?.rol === "docente") navigate("/mis-cursos");
     };
 
-    const handleInputChange = async (e) => {
-        const query = e.target.value;
-        setBusqueda(query);
-        if (query.trim() === "") return setResultados([]);
-
-        const token = localStorage.getItem("token");
-        const rol = localStorage.getItem("rol");
-        if (!token || rol !== "estudiante") return setResultados([]);
-
-        try {
-            const res = await fetch(`${API_URL}/buscar-cursos/?q=${encodeURIComponent(query)}`);
-            if (res.ok) {
-                const data = await res.json();
-                setResultados(data);
-            } else setResultados([]);
-        } catch (err) {
-            console.error("Error al buscar cursos:", err);
-            setResultados([]);
-        }
-    };
-
-    const handleCursoClick = (id) => {
-        navigate(`/inscribir-curso/${id}`);
-        setResultados([]);
-        setBusqueda("");
-    };
-
     return (
         <header
             className="navbar navbar-expand-lg"
