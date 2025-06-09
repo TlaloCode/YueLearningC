@@ -63,8 +63,8 @@ const CoursePreview = () => {
                             alt={course.title}
                             style={{
                                 width: "100%",
-                                height: "120px",
-                                objectFit: "cover",
+                                height: "100px",
+                                objectFit: "contain",
                             }}
                         />
                         <div style={{ padding: "20px" }}>

@@ -86,7 +86,6 @@ def registrar_usuario(request):
         correoelectronico=data.get("correoelectronico"),
         password=data.get("contrasena")
     )
-
     if rol == "estudiante":
         Estudiantes.objects.create(usuario=usuario, nickname=data.get("nickname"),contrasena=data.get("contrasena"))
     else:
@@ -103,7 +102,7 @@ def registrar_usuario(request):
 
     token = uuid.uuid4()
     EmailVerificationToken.objects.create(usuario_id=usuario, token=token, fecha_expiracion=now() + timedelta(hours=24))
-    verification_link = f"https://yuelearningc-production.up.railway.app/api/verify-email/?token={token}"
+    verification_link = f"http://127.0.0.1:8000/api/verify-email/?token={token}"
     send_mail(
         subject="Verifica tu correo electrónico",
         message=f"Hola, verifica tu correo aquí: {verification_link}",
@@ -439,6 +438,8 @@ def get_enrolled_courses(request):
 @api_view(['GET'])
 def get_all_courses(request):
     cursos = Curso.objects.select_related('id_docente').all()
+    paginator = LimitOffsetPagination()
+    cursos = paginator.paginate_queryset(cursos, request)
     data = []
 
     for curso in cursos:
@@ -457,7 +458,8 @@ def get_all_courses(request):
             "author": docente_info
         })
 
-    return Response(data)
+    return paginator.get_paginated_response(data)
+
 
 @api_view(['GET'])
 def get_course_details(request, course_id):

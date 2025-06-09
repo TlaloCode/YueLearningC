@@ -184,6 +184,42 @@ h3 {
     font-size: 15px; /* Ajusta el tamaño del texto */
     transform: rotate(360deg); /* Rotación del texto para que quede vertical */
 }
+.scroll-container-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.scroll-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 1rem;
+    padding: 1rem 3rem;
+}
+
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background-color: white;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+.scroll-button.left {
+    left: 0;
+}
+
+.scroll-button.right {
+    right: 0;
+}
+
 
 
 

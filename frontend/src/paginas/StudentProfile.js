@@ -261,14 +261,14 @@ const StudentProfile = () => {
             <Header/>
             <div className="app-container" style={{backgroundColor: "rgba(0,51,102,0.3)"}}>
                 <div className="profile-container">
-                    <h2 className="profile-title">Mi Perfil</h2>
+                    <h2 className="profile-title">Mi perfil</h2>
                     <div className="profile-content">
                         <div className="profile-left">
                             <div className="profile-image">
                                 <img src={sessionStorage.getItem("cachedProfileImage") || userPlaceholder}
-                                    alt="Foto de perfil"
-                                    className="clickable-profile-image"
-                                    onClick={() => document.getElementById("fileInput").click()}
+                                     alt="Foto de perfil"
+                                     className="clickable-profile-image"
+                                     onClick={() => document.getElementById("fileInput").click()}
                                 />
                                 <input
                                     type="file"
@@ -285,7 +285,7 @@ const StudentProfile = () => {
                             </div>
                         </div>
                         <div className="profile-right" style={{fontFamily: "Roboto, sans-serif"}}>
-                            <h3>Datos Personales</h3>
+                            <h3>Datos personales</h3>
                             <br/>
                             <div className="input-group"
                                  style={{
@@ -323,7 +323,8 @@ const StudentProfile = () => {
                                  }}>
                                 <label style={{width: '100%'}}>Correo electrónico institucional</label>
                                 <input type="email" name="institutionalEmail"
-                                       placeholder="Tu correo electrónico institucional" value={profile.institutionalEmail}
+                                       placeholder="Tu correo electrónico institucional"
+                                       value={profile.institutionalEmail}
                                        onChange={handleChange} disabled
                                        style={{
                                            width: "80%",
@@ -363,9 +364,10 @@ const StudentProfile = () => {
                                         setConfirmationMessage("¿Estás seguro de que deseas eliminar tu cuenta?");
                                         setPendingDelete(true);
                                     }}
-                            style={{
-                                marginTop: "80px",
-                            }}>🗑️ Eliminar perfil</button>
+                                    style={{
+                                        marginTop: "80px",
+                                    }}>🗑️ Eliminar perfil
+                            </button>
                         </div>
                     </div>
                 </div>
