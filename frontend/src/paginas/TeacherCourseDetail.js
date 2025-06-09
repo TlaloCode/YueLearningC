@@ -33,8 +33,6 @@ const TeacherCourseDetail = () => {
     const [infoMessage, setInfoMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
-
-
     const [videos, setVideos] = useState([]);
     const [resources, setResources] = useState([]);
 
