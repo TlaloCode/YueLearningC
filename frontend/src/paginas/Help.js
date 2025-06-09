@@ -42,7 +42,7 @@ const Help = () => {
                     Atrás
                 </button>
 
-                <h2><em>Ayuda</em></h2>
+                <h2>Ayuda</h2>
 
                 <h3>Preguntas Frecuentes (FAQ)</h3>
 

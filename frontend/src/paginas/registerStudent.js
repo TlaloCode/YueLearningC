@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "@fontsource/roboto"
+import "@fontsource/roboto";
 import Header from "../components/HeaderLogin";
-import Footer from "../components/footer"
+import Footer from "../components/footer";
 import escom from "../Img/ESCOM.jpeg";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import ErrorModal from "../components/ErrorModal"
@@ -22,19 +22,59 @@ const RegisterStudent = () => {
         termsAccepted: false,
     });
 
-    const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
+    const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [confirmError, setConfirmError] = useState("");
+
+    const validatePassword = (value) => {
+        const requisitosCumplidos =
+            value.length >= 8 &&
+            /[A-Z]/.test(value) &&
+            /[a-z]/.test(value) &&
+            /[0-9]/.test(value) &&
+            /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/.test(value);
+
+        if (!requisitosCumplidos) {
+            return "La contraseña debe tener al menos 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo especial.";
+        }
+        return "";
+    };
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData({
+
+        const updatedForm = {
             ...formData,
             [name]: type === "checkbox" ? checked : value,
-        });
+        };
+        setFormData(updatedForm);
+
+        if (name === "password") {
+            setPasswordError(validatePassword(value));
+            setConfirmError(
+                updatedForm.confirm_password && updatedForm.confirm_password !== value
+                    ? "Ambas contraseñas deben ser iguales"
+                    : ""
+            );
+        }
+
+        if (name === "confirm_password") {
+            setConfirmError(
+                updatedForm.password && updatedForm.password !== value
+                    ? "Ambas contraseñas deben ser iguales"
+                    : ""
+            );
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (passwordError || confirmError) {
+            setErrorMessage("Corrige los errores antes de enviar el formulario.");
+            return;
+        }
 
         try {
             const response = await fetch(`${API_URL}/register-user/`, {
@@ -49,16 +89,14 @@ const RegisterStudent = () => {
                     contrasena: formData.password,
                     confirm_password: formData.confirm_password,
                     estatuscorreo: "No verificado",
-
                 }),
             });
 
             const data = await response.json();
 
-
             if (response.ok) {
                 setInformationMessage(data.message);
-                setFormData({  // Reiniciar el formulario después del registro
+                setFormData({
                     nickname: "",
                     email: "",
                     password: "",
@@ -67,14 +105,12 @@ const RegisterStudent = () => {
                 });
             } else {
                 setErrorMessage(data.error || "Ocurrió un error en el registro");
-
             }
         } catch (error) {
             setErrorMessage("Hubo un problema con el registro.");
             console.error(error);
         }
     };
-
 
     return (
 
@@ -96,18 +132,24 @@ const RegisterStudent = () => {
     `}
                 </style>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={InformationMessage} onClose={() => {
-                setInformationMessage("");
-                if (InformationMessage === "Usuario registrado con éxito. Verifica tu correo.") {
-                    navigate(`/login`);
-                }else {
-                    navigate(`/home`);
-                }
-            }} />
-            <Header/>
+            <InformationModal
+                message={InformationMessage}
+                onClose={() => {
+                    setInformationMessage("");
+                    if (
+                        InformationMessage ===
+                        "Usuario registrado con éxito. Verifica tu correo."
+                    ) {
+                        navigate(`/login`);
+                    } else {
+                        navigate(`/home`);
+                    }
+                }}
+            />
+            <Header />
             <div
                 style={{
-                    backgroundImage: `url(${escom})`, // Imagen de fondo
+                    backgroundImage: `url(${escom})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     height: "150vh",
@@ -117,7 +159,6 @@ const RegisterStudent = () => {
                     alignItems: "center",
                 }}
             >
-                {/* Contenedor del formulario */}
                 <div
                     style={{
                         backgroundColor: "rgba(255, 255, 255, 0.9)",
@@ -128,14 +169,22 @@ const RegisterStudent = () => {
                         textAlign: "center",
                     }}
                 >
-                    <h2 style={{fontFamily: "Roboto, sans-serif", marginBottom: "20px", fontWeight: "bold"}}>
+                    <h2
+                        style={{
+                            fontFamily: "Roboto, sans-serif",
+                            marginBottom: "20px",
+                            fontWeight: "bold",
+                        }}
+                    >
                         Registro de estudiante
                     </h2>
                     <form onSubmit={handleSubmit}>
-                        {/* Campo Nickname */}
-                        <div style={{marginBottom: "15px", textAlign: "left"}}>
-                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Nombre de usuario</label>
-                            <div style={{position: "relative"}}>
+                        {/* Nickname */}
+                        <div style={{ marginBottom: "15px", textAlign: "left" }}>
+                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
+                                Nombre de usuario
+                            </label>
+                            <div style={{ position: "relative" }}>
                                 <input
                                     type="text"
                                     name="nickname"
@@ -160,16 +209,17 @@ const RegisterStudent = () => {
                                         color: "#aaa",
                                     }}
                                 >
-                <i className="fa fa-user"></i>
-              </span>
+                  <i className="fa fa-user"></i>
+                </span>
                             </div>
                         </div>
 
-                        {/* Campo Email */}
-                        <div style={{marginBottom: "15px", textAlign: "left"}}>
-                            <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Correo Electrónico
-                                Institucional</label>
-                            <div style={{position: "relative"}}>
+                        {/* Email */}
+                        <div style={{ marginBottom: "15px", textAlign: "left" }}>
+                            <label style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
+                                Correo Electrónico Institucional
+                            </label>
+                            <div style={{ position: "relative" }}>
                                 <input
                                     type="email"
                                     name="email"
@@ -194,11 +244,10 @@ const RegisterStudent = () => {
                                         color: "#aaa",
                                     }}
                                 >
-                <i className="fa fa-envelope"></i>
-              </span>
+                  <i className="fa fa-envelope"></i>
+                </span>
                             </div>
                         </div>
-
                         {/* Campo Contraseña */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
                             <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Contraseña</label>
@@ -213,7 +262,11 @@ const RegisterStudent = () => {
                                         width: "100%",
                                         padding: "10px 40px 10px 40px",
                                         borderRadius: "20px",
-                                        border: "1px solid #ccc",
+                                        border: passwordError
+                                            ? "2px solid red"
+                                            : formData.password.length > 0
+                                                ? "2px solid green"
+                                                : "1px solid #ccc",
                                         outline: "none",
                                         fontFamily: "Roboto, sans-serif",
                                     }}
@@ -247,8 +300,18 @@ const RegisterStudent = () => {
                                 {showPassword ? <FaEyeSlash/> : <FaEye/>}
                               </span>
                             </div>
+                            {passwordError && (
+                                <p
+                                    style={{
+                                        color: "#555",
+                                        fontSize: "0.8rem",
+                                        marginTop: "5px",
+                                    }}
+                                >
+                                    {passwordError}
+                                </p>
+                            )}
                         </div>
-
                         {/* Campo Confirmar Contraseña */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
                             <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Confirmar contraseña</label>
@@ -263,7 +326,11 @@ const RegisterStudent = () => {
                                         width: "100%",
                                         padding: "10px 40px 10px 40px",
                                         borderRadius: "20px",
-                                        border: "1px solid #ccc",
+                                        border: confirmError
+                                            ? "2px solid red"
+                                            : formData.confirm_password.length > 0
+                                                ? "2px solid green"
+                                                : "1px solid #ccc",
                                         outline: "none",
                                         fontFamily: "Roboto, sans-serif",
                                     }}
@@ -300,7 +367,7 @@ const RegisterStudent = () => {
 
                         </div>
 
-                        {/* Checkbox de términos */}
+                        {/* Términos */}
                         <div
                             style={{
                                 display: "flex",
@@ -314,17 +381,17 @@ const RegisterStudent = () => {
                                 name="termsAccepted"
                                 checked={formData.termsAccepted}
                                 onChange={handleChange}
-                                style={{marginRight: "10px"}}
+                                style={{ marginRight: "10px" }}
                             />
-                            <span style={{fontSize: "0.9rem"}}>
-              Aceptar{" "}
-                                <a href="/terms-and-conditions" style={{color: "#003366"}}>
-                Términos y condiciones
-              </a>
-            </span>
+                            <span style={{ fontSize: "0.9rem" }}>
+                Aceptar{" "}
+                                <a href="/terms-and-conditions" style={{ color: "#003366" }}>
+                  Términos y condiciones
+                </a>
+              </span>
                         </div>
 
-                        {/* Botón de registro */}
+                        {/* Botón */}
                         <button
                             type="submit"
                             disabled={!formData.termsAccepted}
@@ -345,7 +412,7 @@ const RegisterStudent = () => {
                     </form>
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </div>
     );
 };
