@@ -84,6 +84,8 @@ const AgregarRecurso = ({ onClose, modoLocal = false, onSave, courseIdProp }) =>
     };
 
     return (
+        <div>
+            {isLoading && <PantallaCarga mensaje="Subiendo recurso. Esto puede tardar unos minutos..."/>}
         <div className="modal-overlay"
              style={{
                  position: "fixed",
@@ -95,7 +97,7 @@ const AgregarRecurso = ({ onClose, modoLocal = false, onSave, courseIdProp }) =>
                  display: "flex",
                  justifyContent: "center",
                  alignItems: "center",
-                 zIndex: 9999,
+                 zIndex: 9998,
              }}>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
             <InformationModal
@@ -186,7 +188,7 @@ const AgregarRecurso = ({ onClose, modoLocal = false, onSave, courseIdProp }) =>
                     </div>
                 </form>
             </div>
-            {isLoading && <PantallaCarga mensaje="Subiendo recurso. Esto puede tardar unos minutos..."/>}
+        </div>
         </div>
     );
 };

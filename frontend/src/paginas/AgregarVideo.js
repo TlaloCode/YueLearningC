@@ -43,11 +43,10 @@ const AgregarVideo = ({ onClose, modoLocal = false, onSave, courseIdProp }) => {
                     clearInterval(simInterval);
                     return prev;
                 }
-                return prev + 5;
+                return prev + 1;
             });
-        }, 2000);
+        }, 1500);
         if (modoLocal) {
-            alert("📦 Video guardado localmente");
             onSave({
                 titulo: videoTitle,
                 descripcion: videoDescription,
@@ -98,7 +97,10 @@ const AgregarVideo = ({ onClose, modoLocal = false, onSave, courseIdProp }) => {
 
 
     return (
-
+        <div>
+            {isLoading && (
+                <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..." porcentaje={progreso} />
+            )}
         <div className="modal-overlay"
              style={{
                  position: "fixed",
@@ -110,8 +112,9 @@ const AgregarVideo = ({ onClose, modoLocal = false, onSave, courseIdProp }) => {
                  display: "flex",
                  justifyContent: "center",
                  alignItems: "center",
-                 zIndex: 9999,
+                 zIndex: 9998,
              }}>
+
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
             <InformationModal
                 message={infoMessage}
@@ -194,7 +197,7 @@ const AgregarVideo = ({ onClose, modoLocal = false, onSave, courseIdProp }) => {
                     </div>
                 </form>
             </div>
-            {isLoading && <PantallaCarga mensaje="Subiendo video. Esto puede tardar unos minutos..."  porcentaje={progreso}/>}
+        </div>
         </div>
     );
 };
