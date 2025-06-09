@@ -243,8 +243,6 @@ const Header = () => {
                             return;
                         }
 
-
-
                         try {
                             const res = await fetch(`${API_URL}/buscar-cursos/?q=${encodeURIComponent(query)}`);
                             if (res.ok) {
