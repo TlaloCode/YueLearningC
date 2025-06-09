@@ -68,8 +68,8 @@ def registrar_usuario(request):
     rol = data.get("rol")  # Puede ser 'estudiante' o 'docente'
     if rol not in ["estudiante", "docente"]:
         return Response({"error": "Rol no válido."}, status=status.HTTP_400_BAD_REQUEST)
-    if not data.get("nickname") or not data.get("nombre"):
-            return Response({"error": "Por favor, ingrese un nombre de usuario"}, status=status.HTTP_400_BAD_REQUEST)
+    if not data.get("nickname") and not data.get("nombre"):
+       return Response({"error": "Por favor, ingrese un nombre de usuario."}, status=status.HTTP_400_BAD_REQUEST)
     error_contrasena = validar_contrasena(data.get('contrasena'))
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
