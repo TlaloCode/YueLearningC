@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import AgregarVideo from "./AgregarVideo";
+import AgregarRecurso from "./AgregarRecurso";
+import PantallaCarga from "../components/PantallaCarga";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import "../css/CreateCourse.css";
@@ -12,6 +15,12 @@ const CreateCourse = () => {
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
+    const [mostrarModalVideo, setMostrarModalVideo] = useState(false);
+    const [mostrarModalRecurso, setMostrarModalRecurso] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [videosTemp, setVideosTemp] = useState([]);
+    const [recursosTemp, setRecursosTemp] = useState([]);
+
 
     const [course, setCourse] = useState({
         title: "",
@@ -35,12 +44,15 @@ const CreateCourse = () => {
         }
     };
 
+
     const handleSubmit = async (e) => {
+        setIsLoading(true);
         e.preventDefault();
 
         const token = localStorage.getItem("token");
         if (!token || token.trim() === "") {
-            alert("No tienes un token de autenticación.");
+            setErrorMessage("No tienes token de verificación");
+            setIsLoading(false);
             return;
         }
 
@@ -60,24 +72,65 @@ const CreateCourse = () => {
                 },
                 body: formData,
             });
-
+            console.log(videosTemp);
             const data = await response.json();
             if (response.ok) {
-                alert("Curso creado con éxito.");
+                const nuevoCursoId = data.id; // Backend regresa el ID del nuevo curso
+                for (const video of videosTemp) {
+                    const formDataVideo = new FormData();
+                    formDataVideo.append("titulo", video.titulo);
+                    formDataVideo.append("descripcion", video.descripcion);
+                    formDataVideo.append("video", video.archivo);
+
+                    await fetch(`${API_URL}/subir-video/${nuevoCursoId}/`, {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: formDataVideo,
+                    });
+                }
+
+                // Subir recursos temporales
+                for (const recurso of recursosTemp) {
+                    const formDataRecurso = new FormData();
+                    formDataRecurso.append("titulo", recurso.titulo);
+                    formDataRecurso.append("descripcion", recurso.descripcion);
+                    formDataRecurso.append("archivo", recurso.archivo);
+
+                    await fetch(`${API_URL}/subir-recurso/${nuevoCursoId}/`, {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: formDataRecurso,
+                    });
+                }
+                setInformationMessage("Curso creado con éxito.");
+                setIsLoading(false);
                 navigate("/mis-cursos");
             } else {
-                alert(data.error || "Error al crear el curso.");
+                setErrorMessage(data.error || "Error al crear el curso.");
+                setIsLoading(false);
             }
         } catch (error) {
-            console.error("Error en la solicitud:", error);
-            alert("Error de red.");
+            setIsLoading(false);
+            setErrorMessage("Error de red. Verifica tu conexión.");
         }
     };
     return (
         <div>
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
-            <InformationModal message={InformationMessage} onClose={() => setInformationMessage("")} />
-        <div className="app-container">
+            <InformationModal
+                message={InformationMessage}
+                onClose={() => {
+                    setInformationMessage("");
+                    if (InformationMessage.includes("Curso creado")) {
+                        navigate("/mis-cursos");
+                    }
+                }}
+            />
+            <div className="app-container">
             <Header />
 
             <div className="course-container">
@@ -123,18 +176,20 @@ const CreateCourse = () => {
                         <div className="right-side">
                             <div className="action-container">
                                 <span>Agregar video</span>
-                                <button type="button" className="btn-circle">
+                                <button type="button" className="btn-circle" onClick={() => setMostrarModalVideo(true)}>
                                     <FaPlus/>
                                 </button>
+
                             </div>
                             <div className="action-container">
-                                <span>Agregar recurso de apoyo</span>
-                                <button type="button" className="btn-circle">
+                            <span>Agregar recurso de apoyo</span>
+                                <button type="button" className="btn-circle"
+                                        onClick={() => setMostrarModalRecurso(true)}>
                                     <FaPlus/>
                                 </button>
                             </div>
                             <button type="submit" className="btn-create">
-                                Crear
+                            Crear
                             </button>
                         </div>
             </div>
@@ -143,6 +198,29 @@ const CreateCourse = () => {
 
     <Footer />
         </div>
+            {mostrarModalVideo && (
+                <AgregarVideo
+                    onClose={() => setMostrarModalVideo(false)}
+                    onSave={(video) => {
+                        setVideosTemp([...videosTemp, video]);
+                    }}
+                    modoLocal={true}
+                    setIsLoadingGlobal={setIsLoading}
+                />
+            )}
+
+            {mostrarModalRecurso && (
+                <AgregarRecurso
+                    onClose={() => setMostrarModalRecurso(false)}
+                    onSave={(recurso) => {
+                        setRecursosTemp([...recursosTemp, recurso]);
+                    }}
+                    modoLocal={true}
+                />
+            )}
+            {isLoading && <PantallaCarga mensaje="Creando curso. Por favor, espere..." />}
+
+
         </div>
     );
 };

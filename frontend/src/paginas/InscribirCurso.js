@@ -15,6 +15,8 @@ const InscribirCurso = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [InformationMessage, setInformationMessage] = useState("");
     const navigate = useNavigate();
+    const rol = localStorage.getItem("rol");
+
 
 
     useEffect(() => {
@@ -123,9 +125,20 @@ const InscribirCurso = () => {
                     {course.description}
                 </p>
 
-                <button className="btn-inscribirse" onClick={handleInscribir}>
-                    Inscribir <FaArrowRight />
-                </button>
+                {rol === "estudiante" ? (
+                    <button className="btn-inscribirse" onClick={handleInscribir}>
+                        Inscribir <FaArrowRight />
+                    </button>
+                ) : (
+                    <button
+                        className="btn-inscribirse"
+                        onClick={() => navigate("/mis-cursos")}
+                        style={{ backgroundColor: "#ccc", cursor: "pointer" }}
+                    >
+                        Solo los estudiantes pueden inscribirse a este curso
+                    </button>
+                )}
+
             </div>
 
             <Footer />

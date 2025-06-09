@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.utils.timezone import now
 import uuid
 
-# Manager for Usuario model
+# Manager para modelo Usuario
 class UsuarioManager(BaseUserManager):
     def create_user(self, correoelectronico, password=None, **extra_fields):
         if not correoelectronico:

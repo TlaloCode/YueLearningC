@@ -1,15 +1,3 @@
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .modal-container {
     background: white;
     padding: 20px;
@@ -29,7 +17,8 @@
 .video-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+    align-items: center; /* ✅ Centra todos los hijos */
 }
 
 .input-group {
@@ -62,23 +51,25 @@
 }
 
 .upload-area {
-    width: 100px;
+    width: 150px;
     height: 80px;
-    background: #f5f5f5;
-    border-radius: 8px;
+    background: #d0e6ff;
+    border: 2px dashed #0077dd;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: background 0.2s;
 }
 
-.upload-icon {
-    font-size: 30px;
-    color: #666;
+.upload-video-icon {
+    font-size: 40px;
+    color: #0077dd;
 }
 
 .video-description {
-    width: 50px;
+    width: 90%;
     height: 50%;
     padding: 10px;
     background: white;
