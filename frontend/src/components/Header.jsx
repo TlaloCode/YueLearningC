@@ -193,8 +193,9 @@ const Header = () => {
                                 onClick={() => {
                                     if (!usuario) {
                                         navigate("/login");
-                                    }else{
-                                    handleMisCursos();}
+                                    } else {
+                                        handleMisCursos();
+                                    }
                                 }}
 
                             >
@@ -203,14 +204,28 @@ const Header = () => {
                             <button
                                 style={menuBtnStyle}
                                 onClick={() => {
-                                    if (!usuario){
-                                        navigate("/login");}
-                                    else
-                                    {navigate("/podio");}
+                                    if (!usuario) {
+                                        navigate("/login");
+                                    } else {
+                                        navigate("/podio");
+                                    }
                                 }}
 
                             >
                                 Podio
+                            </button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => {
+                                    if (!usuario) {
+                                        navigate("/help");
+                                    } else {
+                                        navigate("/help");
+                                    }
+                                }}
+
+                            >
+                                Ayuda
                             </button>
                         </div>
                     )}
@@ -224,7 +239,7 @@ const Header = () => {
                 >
                     <img src={logo} alt="Logo" style={{width: 50, height: 50, borderRadius: "50%"}}/>
                 </button>
-                    <h1 className="mx-3 mb-0"
+                <h1 className="mx-3 mb-0"
                         style={{fontSize: "2rem", fontFamily: "Roboto, sans-serif", fontWeight: "bold"}}>
                         YUE-Learning C
                     </h1>
