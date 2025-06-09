@@ -5,9 +5,10 @@ import PantallaCarga from "../components/PantallaCarga";
 import InformationModal from "../components/InformationModal";
 import ErrorModal from "../components/ErrorModal";
 
-const AgregarRecurso = ({ onClose }) => {
+const AgregarRecurso = ({ onClose, modoLocal = false, onSave, courseIdProp }) => {
     const API_URL = process.env.REACT_APP_API_URL;
-    const { courseId } = useParams();
+    const { courseId: courseIdURL } = useParams();
+    const courseId = courseIdProp || courseIdURL;
     const [titulo, setTitulo] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [archivo, setArchivo] = useState(null);
@@ -35,6 +36,17 @@ const AgregarRecurso = ({ onClose }) => {
         formData.append("archivo", archivo);
 
         const token = localStorage.getItem("token");
+        if (modoLocal) {
+            alert("Recurso subido temporalmente");
+            onSave({
+                titulo,
+                descripcion,
+                archivo
+            });
+            setIsLoading(false);
+            onClose();
+            return;
+        }
 
         try {
             const response = await fetch(`${API_URL}/subir-recurso/${courseId}/`, {
@@ -72,12 +84,28 @@ const AgregarRecurso = ({ onClose }) => {
     };
 
     return (
-        <div className="modal-overlay">
-            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")}/>
-            <InformationModal message={infoMessage} onClose={() => {
-                setInfoMessage("");
-                window.location.reload();
-            }}/>
+        <div>
+            {isLoading && <PantallaCarga mensaje="Subiendo recurso. Esto puede tardar unos minutos..."/>}
+        <div className="modal-overlay"
+             style={{
+                 position: "fixed",
+                 top: 0,
+                 left: 0,
+                 width: "100vw",
+                 height: "100vh",
+                 backgroundColor: "rgba(0, 0, 0, 0.5)",
+                 display: "flex",
+                 justifyContent: "center",
+                 alignItems: "center",
+                 zIndex: 9998,
+             }}>
+            <ErrorModal message={errorMessage} onClose={() => setErrorMessage("")} />
+            <InformationModal
+                message={infoMessage}
+                onClose={() => {
+                    setInfoMessage("");
+                    window.location.reload();
+                }}
             />
             <div className="modal-container">
                 <h2 className="modal-title">Agregar Recurso</h2>
@@ -95,6 +123,7 @@ const AgregarRecurso = ({ onClose }) => {
                             style={{
                                 width: "100%",
                                 padding: "10px 10px 10px 40px",
+                                fontSize: "18px",
                                 borderRadius: "20px",
                                 border: "1px solid #ccc",
                                 outline: "none",
@@ -114,6 +143,7 @@ const AgregarRecurso = ({ onClose }) => {
                             style={{
                                 width: "100%",
                                 padding: "10px 10px 10px 40px",
+                                fontSize: "18px",
                                 borderRadius: "20px",
                                 border: "1px solid #ccc",
                                 outline: "none",
@@ -130,7 +160,7 @@ const AgregarRecurso = ({ onClose }) => {
                                 style={{display: 'none'}}
                                 id="recurso-file"
                             />
-                            <label htmlFor="recurso-file" className="upload-icon">
+                            <label htmlFor="recurso-file" className="upload-resource-icon">
                                 📁 Subir archivo
                             </label>
                         </div>
@@ -158,7 +188,7 @@ const AgregarRecurso = ({ onClose }) => {
                     </div>
                 </form>
             </div>
-            {isLoading && <PantallaCarga mensaje="Subiendo recurso. Esto puede tardar unos minutos..."/>}
+        </div>
         </div>
     );
 };

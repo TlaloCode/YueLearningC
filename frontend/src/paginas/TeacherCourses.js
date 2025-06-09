@@ -9,6 +9,7 @@ import genericCourse from "../assets/c-course.jpg";
 import defaultLogo from "../Img/default-profile.png";
 import ErrorModal from "../components/ErrorModal";
 import InformationModal from "../components/InformationModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 const TeacherCourses = () => {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -19,6 +20,9 @@ const TeacherCourses = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [infoMessage, setInfoMessage] = useState("");
+    const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+    const [courseToDelete, setCourseToDelete] = useState(null);
+
 
     const [profile, setProfile] = useState({
         name: "",
@@ -69,10 +73,11 @@ const TeacherCourses = () => {
         }
     };
 
-    const handleDeleteClick = async (courseId) => {
+    const confirmDeleteCourse = async () => {
+        if (!courseToDelete) return;
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`${API_URL}/eliminar-curso/${courseId}/`, {
+            const res = await fetch(`${API_URL}/eliminar-curso/${courseToDelete.id}/`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -81,7 +86,7 @@ const TeacherCourses = () => {
 
             if (res.ok) {
                 setInfoMessage("✅ Curso eliminado");
-                setCourses(courses.filter(c => c.id !== courseId));
+                setCourses(courses.filter(c => c.id !== courseToDelete.id));
             } else {
                 const data = await res.json();
                 setErrorMessage("❌ " + (data.error || "No se pudo eliminar"));
@@ -89,6 +94,8 @@ const TeacherCourses = () => {
         } catch (e) {
             setErrorMessage("❌ Error al eliminar curso");
         }
+        setShowConfirmDelete(false);
+        setCourseToDelete(null);
     };
 
     useEffect(() => {
@@ -207,7 +214,13 @@ const TeacherCourses = () => {
                                     <h3 onClick={() => handleCourseClick(course.id)}>{course.title}</h3>
                                     <div className="course-actions">
                                         <FaEdit onClick={() => handleEditClick(course)} className="icon edit"/>
-                                        <FaTrash onClick={() => handleDeleteClick(course.id)} className="icon delete"/>
+                                        <FaTrash
+                                            onClick={() => {
+                                                setCourseToDelete(course);
+                                                setShowConfirmDelete(true);
+                                            }}
+                                            className="icon delete"
+                                        />
                                     </div>
                                 </div>
 
@@ -253,6 +266,17 @@ const TeacherCourses = () => {
 
 
             <Footer/>
+            {showConfirmDelete && (
+                <ConfirmationModal
+                    message={`¿Está seguro de eliminar el curso "${courseToDelete.title}"? Esta acción no se podrá deshacer.`}
+                    onClose={() => {
+                        setShowConfirmDelete(false);
+                        setCourseToDelete(null);
+                    }}
+                    onConfirm={confirmDeleteCourse}
+                />
+            )}
+
         </div>
     );
 };

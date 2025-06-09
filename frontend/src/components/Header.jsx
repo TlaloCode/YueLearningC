@@ -162,9 +162,58 @@ const Header = () => {
                             width: "170px",
                             fontWeight: "500"
                         }}>
-                            <button style={menuBtnStyle} onClick={() => navigate("/diagnostico")}>Evaluación diagnóstica</button>
-                            <button style={menuBtnStyle} onClick={handleMisCursos}>Mis cursos</button>
-                            <button style={menuBtnStyle} onClick={() => navigate("/podio")}>Podio</button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => {
+                                    if (!usuario) {
+                                        navigate("/login");
+                                    } else {
+                                        navigate("/diagnostico");
+                                    }
+                                }}
+
+                            >
+                                Evaluación diagnóstica
+                            </button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => {
+                                    if (!usuario) {
+                                        navigate("/login");
+                                    } else {
+                                        handleMisCursos();
+                                    }
+                                }}
+
+                            >
+                                Mis cursos
+                            </button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => {
+                                    if (!usuario) {
+                                        navigate("/login");
+                                    } else {
+                                        navigate("/podio");
+                                    }
+                                }}
+
+                            >
+                                Podio
+                            </button>
+                            <button
+                                style={menuBtnStyle}
+                                onClick={() => {
+                                    if (!usuario) {
+                                        navigate("/help");
+                                    } else {
+                                        navigate("/help");
+                                    }
+                                }}
+
+                            >
+                                Ayuda
+                            </button>
                         </div>
                     )}
                 </div>
@@ -172,7 +221,10 @@ const Header = () => {
                 <button onClick={homeNavigation} style={{ background: "transparent", border: "none" }}>
                     <img src={logo} alt="Logo" style={{ width: 40, height: 40, borderRadius: "50%" }} />
                 </button>
-                <h1 className="mx-2 mb-0" style={{ fontSize: "1.5rem", fontWeight: "bold" }}>YUE-Learning C</h1>
+                <h1 className="mx-3 mb-0"
+                        style={{fontSize: "2rem", fontFamily: "Roboto, sans-serif", fontWeight: "bold"}}>
+                        YUE-Learning C
+                    </h1>
             </div>
 
             <div className="ms-auto d-flex align-items-center">
@@ -180,7 +232,28 @@ const Header = () => {
                     type="text"
                     placeholder="Buscar curso o docente"
                     value={busqueda}
-                    onChange={handleInputChange}
+                    onChange={async (e) => {
+                        const query = e.target.value;
+                        setBusqueda(query);
+
+                        if (query.trim() === "") {
+                            setResultados([]);
+                            return;
+                        }
+
+                        try {
+                            const res = await fetch(`${API_URL}/buscar-cursos/?q=${encodeURIComponent(query)}`);
+                            if (res.ok) {
+                                const data = await res.json();
+                                setResultados(data);
+                            } else {
+                                setResultados([]);
+                            }
+                        } catch (err) {
+                            console.error("Error al buscar cursos:", err);
+                            setResultados([]);
+                        }
+                    }}
                     className="form-control"
                     style={{
                         width: "300px",
@@ -207,7 +280,16 @@ const Header = () => {
                         {resultados.map((curso) => (
                             <div
                                 key={curso.id}
-                                onClick={() => handleCursoClick(curso.id)}
+                                onClick={() => {
+                                    if (!usuario) {
+                                        navigate("/login");
+                                    } else {
+                                        navigate(`/inscribir-curso/${curso.id}`);
+                                    }
+                                    setResultados([]);
+                                    setBusqueda("");
+                                }}
+
                                 style={{
                                     padding: "10px",
                                     cursor: "pointer",

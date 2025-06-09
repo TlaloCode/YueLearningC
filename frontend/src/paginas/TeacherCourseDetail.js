@@ -33,8 +33,6 @@ const TeacherCourseDetail = () => {
     const [infoMessage, setInfoMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
-
-
     const [videos, setVideos] = useState([]);
     const [resources, setResources] = useState([]);
 
@@ -301,7 +299,13 @@ const TeacherCourseDetail = () => {
                         <button className="add-button" onClick={handleOpenModal}>
                             Agregar <FaPlusCircle/>
                         </button>
-                        {showModal && <AgregarVideo onClose={handleCloseModal}/>}
+                        {showModal && (
+                            <AgregarVideo
+                                onClose={handleCloseModal}
+                                modoLocal={false} // 👈 se enviará directamente al backend
+                                courseIdProp={courseId} // 👈 usa el ID desde la URL
+                            />
+                        )}
                     </div>
                     <div className="videos-grid">
                         {videos.length > 0 ? (
@@ -333,7 +337,13 @@ const TeacherCourseDetail = () => {
                         <button className="add-button" onClick={handleOpenRecursoModal}>
                             Agregar <FaPlusCircle/>
                         </button>
-                        {showRecursoModal && <AgregarRecurso onClose={handleCloseRecursoModal}/>}
+                        {showRecursoModal && (
+                            <AgregarRecurso
+                                onClose={handleCloseRecursoModal}
+                                modoLocal={false}
+                                courseIdProp={courseId}
+                            />
+                        )}
                     </div>
                     <div className="resources-list">
                         {resources.length > 0 ? (
