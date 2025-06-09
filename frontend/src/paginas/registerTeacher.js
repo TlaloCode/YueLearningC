@@ -228,7 +228,7 @@ const RegisterTeacher = () => {
                         {/* Campo Email */}
                         <div style={{marginBottom: "15px", textAlign: "left"}}>
                             <label style={{fontSize: "0.9rem", fontWeight: "bold"}}>Correo Electrónico
-                                Institucional</label>
+                                </label>
                             <div style={{position: "relative"}}>
                                 <input
                                     type="email"
