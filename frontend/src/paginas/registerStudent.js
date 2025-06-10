@@ -29,14 +29,37 @@ const RegisterStudent = () => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData({
+
+        const updatedForm = {
             ...formData,
             [name]: type === "checkbox" ? checked : value,
-        });
+        };
+        setFormData(updatedForm);
+
+        if (name === "password") {
+            setPasswordError(validatePassword(value));
+            setConfirmError(
+                updatedForm.confirm_password && updatedForm.confirm_password !== value
+                    ? "Ambas contraseñas deben ser iguales"
+                    : ""
+            );
+        }
+
+        if (name === "confirm_password") {
+            setConfirmError(
+                updatedForm.password && updatedForm.password !== value
+                    ? "Ambas contraseñas deben ser iguales"
+                    : ""
+            );
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+            if (passwordError || confirmError) {
+            setErrorMessage("Corrige los errores antes de enviar el formulario.");
+            return;
+        }
 
         try {
             const response = await fetch(`${API_URL}/register-user/`, {
