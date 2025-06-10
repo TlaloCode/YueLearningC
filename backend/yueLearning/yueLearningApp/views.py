@@ -428,8 +428,6 @@ def get_enrolled_courses(request):
 @api_view(['GET'])
 def get_all_courses(request):
     cursos = Curso.objects.select_related('id_docente').all()
-    paginator = LimitOffsetPagination()
-    cursos = paginator.paginate_queryset(cursos, request)
     data = []
 
     for curso in cursos:
@@ -448,8 +446,7 @@ def get_all_courses(request):
             "author": docente_info
         })
 
-    return paginator.get_paginated_response(data)
-
+    return Response(data)
 
 @api_view(['GET'])
 def get_course_details(request, course_id):
