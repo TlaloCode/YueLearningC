@@ -97,7 +97,7 @@ def registrar_usuario(request):
         )
     token = uuid.uuid4()
     EmailVerificationToken.objects.create(usuario_id=usuario, token=token, fecha_expiracion=now() + timedelta(hours=24))
-    verification_link = f"http://127.0.0.1:8000/api/verify-email/?token={token}"
+    verification_link = f"https://yuelearningc-production.up.railway.app/api/verify-email/?token={token}"
     send_mail(
         subject="Verifica tu correo electrónico",
         message=f"Hola, verifica tu correo aquí: {verification_link}",
