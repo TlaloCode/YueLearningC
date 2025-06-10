@@ -65,6 +65,7 @@ def validar_contrasena(password):
 @api_view(['POST'])
 def registrar_usuario(request):
     data = request.data
+    print(data)
     rol = data.get("rol")  # Puede ser 'estudiante' o 'docente'
     if rol not in ["estudiante", "docente"]:
         return Response({"error": "Rol no válido."}, status=status.HTTP_400_BAD_REQUEST)
