@@ -22,59 +22,19 @@ const RegisterStudent = () => {
         termsAccepted: false,
     });
 
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
     const [InformationMessage, setInformationMessage] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [confirmError, setConfirmError] = useState("");
-
-    const validatePassword = (value) => {
-        const requisitosCumplidos =
-            value.length >= 8 &&
-            /[A-Z]/.test(value) &&
-            /[a-z]/.test(value) &&
-            /[0-9]/.test(value) &&
-            /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/.test(value);
-
-        if (!requisitosCumplidos) {
-            return "La contraseña debe tener al menos 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo especial.";
-        }
-        return "";
-    };
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-
-        const updatedForm = {
+        setFormData({
             ...formData,
             [name]: type === "checkbox" ? checked : value,
-        };
-        setFormData(updatedForm);
-
-        if (name === "password") {
-            setPasswordError(validatePassword(value));
-            setConfirmError(
-                updatedForm.confirm_password && updatedForm.confirm_password !== value
-                    ? "Ambas contraseñas deben ser iguales"
-                    : ""
-            );
-        }
-
-        if (name === "confirm_password") {
-            setConfirmError(
-                updatedForm.password && updatedForm.password !== value
-                    ? "Ambas contraseñas deben ser iguales"
-                    : ""
-            );
-        }
+        });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (passwordError || confirmError) {
-            setErrorMessage("Corrige los errores antes de enviar el formulario.");
-            return;
-        }
 
         try {
             const response = await fetch(`${API_URL}/register-user/`, {
@@ -89,14 +49,16 @@ const RegisterStudent = () => {
                     contrasena: formData.password,
                     confirm_password: formData.confirm_password,
                     estatuscorreo: "No verificado",
+
                 }),
             });
 
             const data = await response.json();
 
+
             if (response.ok) {
                 setInformationMessage(data.message);
-                setFormData({
+                setFormData({  // Reiniciar el formulario después del registro
                     nickname: "",
                     email: "",
                     password: "",
@@ -105,6 +67,7 @@ const RegisterStudent = () => {
                 });
             } else {
                 setErrorMessage(data.error || "Ocurrió un error en el registro");
+
             }
         } catch (error) {
             setErrorMessage("Hubo un problema con el registro.");
