@@ -25,9 +25,44 @@ const RegisterTeacher = () => {
     });
     const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
     const [InformationMessage, setInformationMessage] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [passwordMatchError, setPasswordMatchError] = useState("");
+
+    const validatePassword = (value) => {
+        const requisitosCumplidos =
+            value.length >= 8 &&
+            /[A-Z]/.test(value) &&
+            /[a-z]/.test(value) &&
+            /[0-9]/.test(value) &&
+            /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/.test(value);
+
+        if (!requisitosCumplidos) {
+            return "La contraseña debe tener al menos 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo especial.";
+        }
+        return "";
+    };
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+
+        if (name === "password") {
+            const error = validatePassword(value);
+            setPasswordError(error);
+            if (formData.confirm_password && value !== formData.confirm_password) {
+                setPasswordMatchError("Ambas contraseñas deben ser iguales");
+            } else {
+                setPasswordMatchError("");
+            }
+        }
+
+        if (name === "confirm_password") {
+            if (formData.password && formData.password !== value) {
+                setPasswordMatchError("Ambas contraseñas deben ser iguales");
+            } else {
+                setPasswordMatchError("");
+            }
+        }
+
         setFormData({
             ...formData,
             [name]: type === "checkbox" ? checked : value,
@@ -36,6 +71,10 @@ const RegisterTeacher = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (passwordError || passwordMatchError) {
+            setErrorMessage("Corrige los errores en el formulario antes de enviar.");
+            return;
+        }
 
         try {
             const response = await fetch(`${API_URL}/register-user/`, {
@@ -273,7 +312,11 @@ const RegisterTeacher = () => {
                                         width: "100%",
                                         padding: "10px 40px 10px 40px",
                                         borderRadius: "20px",
-                                        border: "1px solid #ccc",
+                                        border: passwordError
+                                            ? "2px solid red"
+                                            : formData.password.length > 0
+                                                ? "2px solid green"
+                                                : "1px solid #ccc",
                                         outline: "none",
                                         fontFamily: "Roboto, sans-serif",
                                     }}
@@ -323,7 +366,11 @@ const RegisterTeacher = () => {
                                         width: "100%",
                                         padding: "10px 40px 10px 40px",
                                         borderRadius: "20px",
-                                        border: "1px solid #ccc",
+                                        border: passwordMatchError
+                                            ? "2px solid red"
+                                            : formData.confirm_password.length > 0
+                                                ? "2px solid green"
+                                                : "1px solid #ccc",
                                         outline: "none",
                                         fontFamily: "Roboto, sans-serif",
                                     }}
