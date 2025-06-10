@@ -27,6 +27,20 @@ const RegisterStudent = () => {
     const [passwordError, setPasswordError] = useState("");
     const [confirmError, setConfirmError] = useState("");
 
+        const validatePassword = (value) => {
+        const requisitosCumplidos =
+            value.length >= 8 &&
+            /[A-Z]/.test(value) &&
+            /[a-z]/.test(value) &&
+            /[0-9]/.test(value) &&
+            /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/.test(value);
+
+        if (!requisitosCumplidos) {
+            return "La contraseña debe tener al menos 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo especial.";
+        }
+        return "";
+    };
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
 
