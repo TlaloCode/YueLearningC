@@ -24,6 +24,8 @@ const RegisterStudent = () => {
 
     const [errorMessage, setErrorMessage] = useState("");  // Estado para el mensaje de error
     const [InformationMessage, setInformationMessage] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [confirmError, setConfirmError] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
