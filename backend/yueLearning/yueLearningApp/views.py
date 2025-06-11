@@ -69,19 +69,26 @@ def registrar_usuario(request):
     rol = data.get("rol")  # Puede ser 'estudiante' o 'docente'
     if rol not in ["estudiante", "docente"]:
         return Response({"error": "Rol no válido."}, status=status.HTTP_400_BAD_REQUEST)
+    # Validación de nombre de usuario obligatorio según el rol
     if not data.get("nickname") and not data.get("nombre"):
        return Response({"error": "Por favor, ingrese un nombre de usuario."}, status=status.HTTP_400_BAD_REQUEST)
     error_contrasena = validar_contrasena(data.get('contrasena'))
+    # Validación de contraseña 
     if error_contrasena:
         return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
+    # Confirmación de contraseñas coincidentes
     if not data.get("contrasena") == data.get("confirm_password") :
         return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
+    # Verifica si el correo ya está registrado
     if Usuario.objects.filter(correoelectronico=data.get('correoelectronico')).exists():
         return Response({"error": "El correo electrónico ya está registrado."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Crea el usuario principal
     usuario = Usuario.objects.create_user(
         correoelectronico=data.get("correoelectronico"),
         password=data.get("contrasena")
     )
+    # Crea el perfil correspondiente según el rol
     if rol == "estudiante":
         Estudiantes.objects.create(usuario=usuario, nickname=data.get("nickname"),contrasena=data.get("contrasena"))
     else:
@@ -95,9 +102,12 @@ def registrar_usuario(request):
             descripcionperfil=data.get("descripcionperfil"),
             contrasena=data.get("contrasena")
         )
+    # Genera token de verificación de correo
     token = uuid.uuid4()
+    # Enlace de verificación
     EmailVerificationToken.objects.create(usuario_id=usuario, token=token, fecha_expiracion=now() + timedelta(hours=24))
     verification_link = f"https://yuelearningc-production.up.railway.app/api/verify-email/?token={token}"
+    # Enviar correo con enlace de verificación
     send_mail(
         subject="Verifica tu correo electrónico",
         message=f"Hola, verifica tu correo aquí: {verification_link}",
@@ -113,17 +123,19 @@ def login_usuario(request):
     correo = data.get("correoelectronico")
     password = data.get("contrasena")
     usuario = Usuario.objects.filter(correoelectronico=correo).first()
+    # Verificar existencia del usuario
     if not usuario:
         return Response({"error": "Correo o contraseña incorrectos."},
         status=status.HTTP_400_BAD_REQUEST)
-
+    # Verificar si el correo fue confirmado previamente
     if usuario.estatuscorreo != "Verificado":
         return Response({"error": "Debes verificar tu correo antes de iniciar sesión."},
         status=status.HTTP_403_FORBIDDEN)
-
+    # Validar contraseña
     if not usuario.check_password(password):
         return Response({"error": "Correo o contraseña incorrectos."},
         status=status.HTTP_400_BAD_REQUEST)
+    # Generar tokens JWT (access y refresh)    
     refresh = RefreshToken.for_user(usuario)
 
     # Determinar el rol del usuario
@@ -181,34 +193,56 @@ def recuperar_contrasena(request):
 
 @api_view(['GET'])
 def verificar_correo(request):
+    # Buscar el token en la base de datos
     token = request.GET.get('token')
     try:
         token_obj = EmailVerificationToken.objects.get(token=token)
     except EmailVerificationToken.DoesNotExist:
-        return redirect('https://yue-learningc.netlify.app/correo-no-verificado')  # puedes crear esta ruta para errores
+        return redirect('https://yue-learningc.netlify.app/correo-no-verificado')  # Ruta por si el correo no tiene un token
 
+    # Verificar si el token ha expirado
     if now() > token_obj.fecha_expiracion:
-        return redirect('https://yue-learningc.netlify.app/correo-expirado')  # opcional
-
+        return redirect('https://yue-learningc.netlify.app/correo-expirado')  # Ruta por si el correo expiró
+    # Marcar el correo como verificado
     usuario = token_obj.usuario_id
     usuario.estatuscorreo = "Verificado"
     usuario.save()
+    # Eliminar el token después de su uso
     token_obj.delete()
 
-    return redirect('https://yue-learningc.netlify.app/correoVerificado')  # 🔁 esta es tu ruta React
+    return redirect('https://yue-learningc.netlify.app/correoVerificado')  # Ruta en React para éxito
 
 @api_view(['GET'])
 def buscar_cursos(request):
+        """
+    Vista para buscar cursos por nombre del curso o por nombre del docente.
+
+    Parámetro de consulta:
+    - q: término de búsqueda (se busca tanto en el nombre del curso como en el nombre del docente)
+
+    Comportamiento:
+    1. Si no se proporciona un término de búsqueda, retorna una lista vacía.
+    2. Realiza una búsqueda insensible a mayúsculas/minúsculas (`icontains`).
+    3. Limita los resultados a un máximo de 10 coincidencias.
+    4. Retorna una lista de diccionarios con:
+        - id del curso
+        - nombre del curso
+        - nombre del docente
+
+    Respuesta:
+    - 200 OK: Lista de cursos encontrados (máximo 10)
+    - []: Si no se envía el parámetro `q` o si está vacío
+    """
     query = request.GET.get("q", "").strip()
 
     if not query:
         return Response([])  # Si no hay búsqueda, devuelve vacío
-
+    # Búsqueda en el nombre del curso o en el nombre del docente
     cursos = Curso.objects.filter(
         Q(nombrecurso__icontains=query) |
-        Q(id_docente__docente__nombre__icontains=query)  # Si el campo en Docente se llama 'nombre'
-    ).select_related("id_docente")[:10]  # Limita a 10 resultados
-
+        Q(id_docente__docente__nombre__icontains=query)  
+    ).select_related("id_docente")[:10]   # Limita a 10 resultados y optimiza la consulta con select_related
+    # Preparar la respuesta
     resultado = [
         {
             "id": curso.id_curso,
@@ -225,6 +259,7 @@ def buscar_cursos(request):
 def get_user_profile(request):
     usuario = request.user
     try:
+        # Intentar obtener perfil de estudiante
         estudiante = Estudiantes.objects.get(usuario=usuario)
         return Response({
             "nickname": estudiante.nickname,
@@ -234,6 +269,7 @@ def get_user_profile(request):
         }, status=status.HTTP_200_OK)
     except Estudiantes.DoesNotExist:
         try:
+            # Si no es estudiante, intentar obtener perfil de docente
             docente = Docente.objects.get(usuario=usuario)
             return Response({
                 "nombre": docente.nombre,
@@ -254,11 +290,12 @@ def get_user_profile(request):
 def update_user_profile(request):
     usuario = request.user
     data = request.data
-
+    # Intentar obtener perfil de estudiante
     try:
         estudiante = Estudiantes.objects.get(usuario=usuario)
         estudiante.nickname = data.get("nickname", estudiante.nickname)
         error_contrasena = validar_contrasena(data.get('contrasena'))
+        # Validación y actualización de contraseña
         if error_contrasena:
             return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -269,14 +306,17 @@ def update_user_profile(request):
             return Response({"message": "Perfil de estudiante actualizado correctamente."}, status=status.HTTP_200_OK)
     except Estudiantes.DoesNotExist:
         try:
+            # Si no es estudiante, intentar obtener perfil de docente
             docente = Docente.objects.get(usuario=usuario)
             docente.nombre = data.get("nombre", docente.nombre)
             error_contrasena = validar_contrasena(data.get('password'))
+            # Validación de contraseña para docente
             if error_contrasena:
                 return Response({"error": error_contrasena}, status=status.HTTP_400_BAD_REQUEST)
             elif not data.get('password') == data.get('confirmPassword'):
                 return Response({"error": "Las contraseñas no coinciden"}, status=status.HTTP_400_BAD_REQUEST)
             else:
+                # Actualización de los demás campos del perfil docente
                 docente.contrasena = data.get("password", docente.contrasena)
                 docente.apellidopaterno = data.get("apellidopaterno", docente.apellidopaterno)
                 docente.apellidomaterno = data.get("apellidomaterno", docente.apellidomaterno)
@@ -294,17 +334,20 @@ def update_user_profile(request):
 def upload_profile_photo(request):
     usuario = request.user
     file = request.FILES.get("file")
-
+    # Validar existencia del archivo
     if not file:
         return Response({"error": "No se seleccionó ninguna imagen."}, status=status.HTTP_400_BAD_REQUEST)
+    # Validar tipo de archivo
     elif not file.content_type.startswith("image/"):
         return Response({"error": "Solo se permiten archivos de imagen."}, status=status.HTTP_400_BAD_REQUEST)
+    # Validar tamaño máximo de 1MB
     elif file.size > 1 * 1024 * 1024:  # 1 MB en bytes
         return Response({"error": "La imagen es muy grande."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        # Subir directamente el archivo
+        # Subir la imagen a Google Drive (Drive_service)
         file_id = upload_file_to_drive(file, file.name)
+        # Asignar el ID del archivo al campo fotoperfil del usuario
         usuario.fotoperfil = file_id
         usuario.save()
 
@@ -320,7 +363,7 @@ def get_profile_photo(request):
         usuario = request.user
         file_id = usuario.fotoperfil
 
-
+        # Verificar si hay imagen y que no sea una URL o string inválido
         if not file_id or "drive.google.com" in file_id or "data:image" in file_id:
             return Response({"error": "No se encontró imagen válida."}, status=404)
 
@@ -328,7 +371,7 @@ def get_profile_photo(request):
         drive_url = f"https://drive.google.com/uc?export=download&id={file_id}"
         response = requests.get(drive_url)
 
-
+        # Validar respuesta del servidor
         if response.status_code == 200:
             return HttpResponse(response.content, content_type="image/jpeg")
         else:
@@ -365,27 +408,27 @@ def create_course(request):
     nombrecurso = request.POST.get("nombrecurso")
     descripcioncurso = request.POST.get("descripcioncurso")
     imagen = request.FILES.get("imagen")
-
+    # Validación de campos obligatorios
     if not nombrecurso or not descripcioncurso:
         return Response({"error": "Faltan campos obligatorios"}, status=400)
-
+    # Crear instancia del curso
     curso = Curso(
         id_docente=docente,
         nombrecurso=nombrecurso,
         descripcioncurso=descripcioncurso,
     )
-
+    # Procesar imagen si se incluye
     if imagen:
         if not imagen.content_type.startswith("image/"):
             return Response({"error": "Solo se permiten archivos de imagen."}, status=400)
-
+        # Leer contenido de la imagen y subir a Google Drive
         try:
             file_stream = io.BytesIO(imagen.read())
             file_id = upload_file_to_drive(file_stream, imagen.name)
             curso.imagen_url = file_id
         except Exception as e:
             return Response({"error": f"No se pudo subir la imagen: {str(e)}"}, status=500)
-
+    # Guardar el curso en la base de datos
     curso.save()
 
     return Response({"message": "Curso creado exitosamente", "id": curso.id_curso}, status=200)
@@ -397,7 +440,7 @@ def get_enrolled_courses(request):
 
     # Buscar inscripciones del usuario
     inscripciones = Inscripciones.objects.filter(id_usuario=estudiante).select_related('id_curso', 'id_curso__id_docente')
-
+    
     cursos_data = []
     for inscripcion in inscripciones:
         curso = inscripcion.id_curso
@@ -411,7 +454,7 @@ def get_enrolled_courses(request):
                 docente_info = f"{docente.nombre} {docente.apellidopaterno}"
             except Docente.DoesNotExist:
                 pass  # Si no se encuentra el docente, dejamos "Desconocido"
-
+        #Obtener los datos de los cursos
         if curso:
             cursos_data.append({
                 "id": curso.id_curso,
@@ -429,7 +472,7 @@ def get_enrolled_courses(request):
 def get_all_courses(request):
     cursos = Curso.objects.select_related('id_docente').all()
     data = []
-
+    #Verificar los cursos existentes en la base de datos
     for curso in cursos:
         docente_info = "Desconocido"
         try:
@@ -437,7 +480,7 @@ def get_all_courses(request):
             docente_info = f"{docente.nombre} {docente.apellidopaterno}"
         except Docente.DoesNotExist:
             pass
-
+        # Preparar los datos de los cursos
         data.append({
             "id": curso.id_curso,
             "title": curso.nombrecurso,
@@ -451,18 +494,22 @@ def get_all_courses(request):
 @api_view(['GET'])
 def get_course_details(request, course_id):
     try:
+        # Obtener el curso principal
         curso = Curso.objects.get(id_curso=course_id)
+        # Obtener videos asociados al curso
         videos = Video.objects.filter(id_curso=course_id).values('id_video', 'titulovideo', 'video')
+        # Obtener recursos de apoyo asociados
         recursos = RecursoApoyo.objects.filter(id_curso=course_id).values('id_recurso', 'titulorecurso', 'urlrecurso')
 
         docente_info = "Desconocido"
+        # Obtener información del docente (si existe)
         if curso.id_docente:
             try:
                 docente = Docente.objects.get(usuario=curso.id_docente)
                 docente_info = f"{docente.nombre} {docente.apellidopaterno}"
             except Docente.DoesNotExist:
-                pass
-
+                pass # Mantiene el valor por defecto si no se encuentra el docente
+        # Estructura de respuesta
         course_data = {
             "id": curso.id_curso,
             "title": curso.nombrecurso,
@@ -502,14 +549,14 @@ def inscribir_curso(request):
 def calificar_curso(request):
     id_curso = request.data.get("id_curso")
     calificacion = request.data.get("calificacion")
-
+    # Verificar campos obligatorios
     if not id_curso or not calificacion:
         return Response({"error": "Datos incompletos."}, status=400)
-
+    # Validar que el usuario sea estudiante
     try:
         estudiante = Estudiantes.objects.get(usuario=request.user)
         curso = Curso.objects.get(id_curso=id_curso)
-
+        # Validar que la calificación esté en el rango permitido
         calificacion = int(calificacion)
         if calificacion < 1 or calificacion > 5:
             return Response({"error": "La calificación debe estar entre 1 y 5 estrellas."}, status=400)
@@ -537,10 +584,12 @@ def calificar_curso(request):
 
 @api_view(['GET'])
 def get_teachers_with_courses(request):
+    #Obtener los cursos que tengan cursos creados
     docentes_con_cursos = Curso.objects.exclude(id_docente=None).values_list('id_docente', flat=True).distinct()
     docentes = Docente.objects.filter(usuario_id__in=docentes_con_cursos)
 
     data = []
+    #Enviar la información
     for docente in docentes:
         data.append({
             "id": docente.usuario.id,
@@ -615,9 +664,10 @@ def subir_video(request, id_curso):
     titulo = request.data.get("titulo")
     descripcion = request.data.get("descripcion")
     archivo = request.FILES.get("video")
-
+    #Verificar la existencia del archivo
     if not archivo:
         return Response({"error": "No se seleccionó ningún archivo."}, status=400)
+    #Verificar si el archivo es demasiado grande
     if archivo.size > 524288000:  # 500MB
         return Response({"error": "El archivo es demasiado grande."}, status=400)
 
@@ -707,24 +757,25 @@ def delete_video(request, id_video):
 @permission_classes([IsAuthenticated])
 def editar_video(request, id_video):
     try:
+        # Obtener el video por su ID
         video = Video.objects.get(id_video=id_video)
         if video.id_curso.id_docente != request.user:
             return Response({"error": "No tienes permiso para editar este video."}, status=403)
-
+        # Verificar que el usuario autenticado sea el dueño del curso del video
         titulo = request.data.get("titulo")
         descripcion = request.data.get("descripcion")
         nuevo_video = request.FILES.get("video")
-
+        # Obtener datos del request
         if titulo:
             video.titulovideo = titulo
         if descripcion:
             video.descripcion = descripcion
-
+        # Actualizar campos si se proporcionan
         if nuevo_video:
             from .drive_service import upload_file_to_drive
             file_id = upload_file_to_drive(nuevo_video, nuevo_video.name)
 
-            # Opcional: eliminar el anterior de Drive si deseas
+            # Asignar el nuevo ID del archivo (opcional: eliminar el anterior)
             video.video = file_id
 
         video.save()
@@ -737,6 +788,7 @@ def editar_video(request, id_video):
 @api_view(['GET'])
 def get_video_detail(request, id_video):
     try:
+        #Obtener el video desde la base de datos
         video = Video.objects.get(id_video=id_video)
         return Response({
             "id": video.id_video,
@@ -754,7 +806,7 @@ def subir_recurso(request, id_curso):
         titulo = request.data.get('titulo')
         descripcion = request.data.get('descripcion')
         archivo = request.FILES.get('archivo')
-
+        #Verificar si el archivo existe 
         if not archivo:
             return Response({"error": "No se seleccionó ningún archivo."}, status=400)
         if archivo.size > 524288000:  # Límite de 500MB
@@ -809,20 +861,22 @@ def delete_recurso(request, id_recurso):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def editar_recurso(request, id_recurso):
+    # Obtener el recurso por su ID
     try:
         recurso = RecursoApoyo.objects.get(id_recurso=id_recurso)
         if recurso.id_curso.id_docente != request.user:
+            # Verificar que el usuario autenticado sea el dueño del curso del recurso
             return Response({"error": "No tienes permiso para editar este recurso."}, status=403)
-
+        # Obtener datos del request
         titulo = request.data.get("titulo")
         descripcion = request.data.get("descripcion")
         nuevo_archivo = request.FILES.get("archivo")
-
+        # Actualizar campos si se proporcionan
         if titulo:
             recurso.titulorecurso = titulo
         if descripcion:
             recurso.descripcion = descripcion
-
+        # Reemplazar el archivo de video si se proporciona uno nuevo
         if nuevo_archivo:
             from .drive_service import upload_file_to_drive
             file_id = upload_file_to_drive(nuevo_archivo, nuevo_archivo.name)
@@ -841,37 +895,39 @@ def inscritos_por_curso(request, id_curso):
     inscritos = (
         Inscripciones.objects
         .filter(id_curso=id_curso)
-        .select_related('id_usuario')
+        .select_related('id_usuario') # Optimiza acceso a datos del usuario
     )
     data = []
     for insc in inscritos:
         try:
+            # Verifica si el usuario inscrito es un estudiante
             estudiante = Estudiantes.objects.get(usuario=insc.id_usuario)
             data.append({"nickname": estudiante.nickname})
         except Estudiantes.DoesNotExist:
-            continue
+            continue # Omite si no encuentra un perfil de estudiante asociado
     return Response(data)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def notificar_actualizacion(request, id_curso):
     mensaje_docente = request.data.get("mensaje")
-
+    # Validación del mensaje
     if not mensaje_docente:
         return Response({"error": "Debes proporcionar un mensaje."}, status=400)
 
     try:
         curso = Curso.objects.get(id_curso=id_curso)
-
+        # Obtener el curso por su ID
+        # Verificar que el usuario autenticado sea el docente del curso
         if curso.id_docente != request.user:
             return Response({"error": "No tienes permiso para notificar este curso."}, status=403)
-
+        # Obtener los correos de los estudiantes inscritos
         inscripciones = Inscripciones.objects.filter(id_curso=curso).select_related("id_usuario")
         correos = [i.id_usuario.correoelectronico for i in inscripciones if i.id_usuario.correoelectronico]
-
+        # Si no hay correos, devolver mensaje informativo
         if not correos:
             return Response({"message": "No hay estudiantes inscritos en este curso."})
-
+        # Armar asunto y mensaje del correo
         asunto = f"📘 Actualización en el curso: {curso.nombrecurso}"
         mensaje = (
             f"Hola estudiante,\n\n"
@@ -880,7 +936,7 @@ def notificar_actualizacion(request, id_curso):
             f"Por favor, revisa la plataforma para más detalles.\n\n"
             f"Atentamente,\nYUE-Learning C"
         )
-
+        # Enviar correo a todos los inscritos
         send_mail(
             subject=asunto,
             message=mensaje,
