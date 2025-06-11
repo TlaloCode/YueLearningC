@@ -96,7 +96,7 @@ int main() {
                         <FaArrowLeft/> <span>Atrás</span>
                     </div>
 
-                    <h1 className="title">Práctica lo que sabes</h1>
+                    <h1 className="title">Practica lo que sabes</h1>
                     {problemas.length > 0 && (
                         <>
                             <p className="titulo">
